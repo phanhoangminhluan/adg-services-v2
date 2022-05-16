@@ -1,0 +1,56 @@
+{
+  "Ngày giải ngân": "30/04/2022",
+  "ngaykydoncamket": "TP Hồ Chí Minh, ngày 30 tháng 4 năm 2022",
+  "Danh mục hoá đơn diện tử": [
+    {
+      "STT": "01",
+      "Số hoá đơn": "85",
+      "Ngày hoá đơn": "22/04/2022",
+      "Số tiền trên hoá đơn": "3,217,500,000",
+      "Tên, mã số thuế của đơn vị, tổ chức xuất hoá đơn": [
+        "CÔNG TY TNHH THƯƠNG MẠI SẢN XUẤT NHỰA NHẬT PHONG",
+        "MST: 0315198603"
+      ]
+    },
+    {
+      "STT": "02",
+      "Số hoá đơn": "263",
+      "Ngày hoá đơn": "20/04/2022",
+      "Số tiền trên hoá đơn": "1,877,904,000",
+      "Tên, mã số thuế của đơn vị, tổ chức xuất hoá đơn": [
+        "CÔNG TY CỔ PHẦN ĐẦU TƯ HƯNG ĐÔNG",
+        "MST: 0312372187"
+      ]
+    },
+    {
+      "STT": "03",
+      "Số hoá đơn": "82",
+      "Ngày hoá đơn": "19/04/2022",
+      "Số tiền trên hoá đơn": "2,433,795,000",
+      "Tên, mã số thuế của đơn vị, tổ chức xuất hoá đơn": [
+        "CÔNG TY TNHH ĐẦU TƯ SAO MAI PHÚ QUỐC",
+        "MST: 0316072498"
+      ]
+    },
+    {
+      "STT": "04",
+      "Số hoá đơn": "33",
+      "Ngày hoá đơn": "19/04/2022",
+      "Số tiền trên hoá đơn": "1,733,985,000",
+      "Tên, mã số thuế của đơn vị, tổ chức xuất hoá đơn": [
+        "CÔNG TY TNHH THƯƠNG MẠI DỊCH VỤ HANNY VIỆT NAM",
+        "MST: 0315555862"
+      ]
+    },
+    {
+      "STT": "05",
+      "Số hoá đơn": "20",
+      "Ngày hoá đơn": "26/03/2022",
+      "Số tiền trên hoá đơn": "1,196,091,050",
+      "Tên, mã số thuế của đơn vị, tổ chức xuất hoá đơn": [
+        "CÔNG TY TNHH THƯƠNG MẠI DỊCH VỤ HANNY VIỆT NAM",
+        "MST: 0315555862"
+      ]
+    }
+  ]
+}

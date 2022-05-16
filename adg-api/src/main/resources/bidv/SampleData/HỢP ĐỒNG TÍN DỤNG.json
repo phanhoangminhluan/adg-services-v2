@@ -1,0 +1,53 @@
+{
+  "Số hợp đồng": "01.21/2021/8088928/HĐTD",
+  "Tổng tiền vay": "10,181,371,050",
+  "Ngày ký hợp đồng tín dụng": "30/04/2022",
+  "Ngày ký": "TPHCM, ngày 30 tháng 4 năm 2022",
+  "Tổng tiền vay bằng chữ": "Mười tỷ, một trăm tám mươi mốt triệu, ba trăm bảy mươi mốt ngàn, không trăm mươi đồng",
+  "Nội dung thanh toán": [
+    {
+      "STT": "1",
+      "Nội dung": "Thanh toán tiền hàng theo hóa đơn 85 hết",
+      "Số hiệu chứng từ kế toán": "UNC",
+      "Số tiền (VND)": "3,217,500,000",
+      "Tên đơn vị, số tài khoản, Ngân hàng người thụ hưởng": [
+        "ĐV: CÔNG TY TNHH THƯƠNG MẠI SẢN XUẤT NHỰA NHẬT PHONG",
+        "STK: 10511 0077 2008",
+        "NH: MB-CN TÂN CẢNG, TP HCM"
+      ]
+    },
+    {
+      "STT": "2",
+      "Nội dung": "Thanh toán tiền hàng theo hóa đơn 263 lần 1",
+      "Số hiệu chứng từ kế toán": "UNC",
+      "Số tiền (VND)": "1,600,000,000",
+      "Tên đơn vị, số tài khoản, Ngân hàng người thụ hưởng": [
+        "ĐV: CÔNG TY CỔ PHẦN ĐẦU TƯ HƯNG ĐÔNG",
+        "STK: 1913.3901.3560.18",
+        "NH: TCB - CN Bình Thạnh"
+      ]
+    },
+    {
+      "STT": "3",
+      "Nội dung": "Thanh toán tiền hàng theo hóa đơn 82 hết",
+      "Số hiệu chứng từ kế toán": "UNC",
+      "Số tiền (VND)": "2,433,795,000",
+      "Tên đơn vị, số tài khoản, Ngân hàng người thụ hưởng": [
+        "ĐV: CÔNG TY TNHH ĐẦU TƯ SAO MAI PHÚ QUỐC",
+        "STK : 110601370868",
+        "NH: VIETINBANK -CN4 PGD VĂN THÁNH"
+      ]
+    },
+    {
+      "STT": "4",
+      "Nội dung": "Thanh toán tiền hàng theo hóa đơn 33, 20 hết",
+      "Số hiệu chứng từ kế toán": "UNC",
+      "Số tiền (VND)": "2,930,076,050",
+      "Tên đơn vị, số tài khoản, Ngân hàng người thụ hưởng": [
+        "ĐV: CÔNG TY TNHH THƯƠNG MẠI DỊCH VỤ HANNY VIỆT NAM",
+        "STK: 55558628",
+        "NH: ACB CN - Châu Văn Liêm"
+      ]
+    }
+  ]
+}

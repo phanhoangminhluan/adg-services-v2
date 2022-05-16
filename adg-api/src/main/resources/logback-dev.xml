@@ -1,0 +1,62 @@
+<configuration>
+    <property name="LOG_DIR"
+              value="/Users/luan.phm/engineering/Projects/ADongGroup/adg-services/log/adg-server"/>
+    <appender name="FILE-INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS, Asia/Ho_Chi_Minh} - %-6.6level - %class#%method:%line: %message \n
+            </pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                ${LOG_DIR}/${ACTIVE_PROFILE}/%d{yyyy-MM-dd}/info/${ACTIVE_PROFILE}-info-%d{yyyy-MM-dd-HH}.log
+            </FileNamePattern>
+            <maxHistory>168</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="FILE-ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS, Asia/Ho_Chi_Minh} - %-6.6level - %class#%method:%line: %message \n
+            </pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                ${LOG_DIR}/${ACTIVE_PROFILE}/%d{yyyy-MM-dd}/error/${ACTIVE_PROFILE}-error-%d{yyyy-MM-dd-HH}.log
+            </FileNamePattern>
+            <maxHistory>168</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.merlin.asset.configuration.logback.ConsoleLogPattern"/>
+        </encoder>
+    </appender>
+
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/default.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <root level="INFO">
+        <appender-ref ref="FILE-INFO"/>
+        <appender-ref ref="FILE-ERROR"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="com" level="INFO" additivity="false">
+        <appender-ref ref="FILE-INFO"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE-ERROR"/>
+    </logger>
+
+    <logger name="org" level="INFO" additivity="false">
+        <appender-ref ref="FILE-INFO"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE-ERROR"/>
+    </logger>
+</configuration>
