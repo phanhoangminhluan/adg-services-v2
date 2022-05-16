@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.service.viettin;
 
-import com.adg.api.department.InternationalPayment.general.AdgExcelTableHeaderInfo;
+import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderInfo;
 import org.apache.poi.ss.usermodel.CellType;
 
 /**

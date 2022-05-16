@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.service.bidv.writer.BangKeSuDungTienVay;
 
-import com.adg.api.department.InternationalPayment.general.AdgExcelTableHeaderInfo;
+import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderInfo;
 import com.adg.api.department.InternationalPayment.service.bidv.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
 import com.merlin.asset.core.utils.MapUtils;

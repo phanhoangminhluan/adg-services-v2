@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.service.bidv.writer.DonCamKet;
 
-import com.adg.api.department.InternationalPayment.facade.AdgWordTableHeaderMetadata;
+import com.adg.api.department.InternationalPayment.handler.office.AdgWordTableHeaderMetadata;
 import com.adg.api.department.InternationalPayment.handler.office.word.WordWriter;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;

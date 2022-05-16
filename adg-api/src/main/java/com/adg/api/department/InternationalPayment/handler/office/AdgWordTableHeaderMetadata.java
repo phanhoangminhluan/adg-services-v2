@@ -1,6 +1,5 @@
-package com.adg.api.department.InternationalPayment.facade;
+package com.adg.api.department.InternationalPayment.handler.office;
 
-import com.adg.api.department.InternationalPayment.general.AdgWordTableHeaderInfo;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.BienBanKiemTraSuDungVonVay.BienBanKiemTraSuDungVonVayHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.DonCamKet.DonCamKetTableHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.HopDongTinDung.HopDongTinDungTableHeaderInfoMetadata;

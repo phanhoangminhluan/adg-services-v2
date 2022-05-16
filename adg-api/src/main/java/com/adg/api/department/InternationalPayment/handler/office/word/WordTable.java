@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.handler.office.word;
 
-import com.adg.api.department.InternationalPayment.general.AdgWordTableHeaderInfo;
+import com.adg.api.department.InternationalPayment.handler.office.AdgWordTableHeaderInfo;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.Getter;
 import org.apache.poi.xwpf.usermodel.*;

@@ -1,4 +1,4 @@
-package com.adg.api.department.InternationalPayment.general;
+package com.adg.api.department.InternationalPayment.handler.office;
 
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;

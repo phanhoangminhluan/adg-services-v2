@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.service.bidv.writer.DonMuaHang;
 
-import com.adg.api.department.InternationalPayment.general.AdgExcelTableHeaderInfo;
+import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderInfo;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.PhieuNhapKhoHeaderMetadata;
 import com.merlin.asset.core.utils.MapUtils;
 import org.apache.poi.ss.usermodel.CellType;

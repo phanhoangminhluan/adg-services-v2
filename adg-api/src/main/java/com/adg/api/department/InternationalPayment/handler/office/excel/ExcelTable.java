@@ -1,7 +1,7 @@
 package com.adg.api.department.InternationalPayment.handler.office.excel;
 
-import com.adg.api.department.InternationalPayment.facade.AdgExcelTableHeaderMetadata;
-import com.adg.api.department.InternationalPayment.general.AdgExcelTableHeaderInfo;
+import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderInfo;
+import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderMetadata;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;

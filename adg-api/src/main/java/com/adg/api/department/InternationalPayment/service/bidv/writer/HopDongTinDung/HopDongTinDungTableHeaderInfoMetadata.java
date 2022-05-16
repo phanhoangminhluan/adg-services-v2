@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.service.bidv.writer.HopDongTinDung;
 
-import com.adg.api.department.InternationalPayment.general.AdgWordTableHeaderInfo;
+import com.adg.api.department.InternationalPayment.handler.office.AdgWordTableHeaderInfo;
 import com.adg.api.department.InternationalPayment.handler.office.word.WordUtils;
 import com.adg.api.department.InternationalPayment.service.bidv.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
