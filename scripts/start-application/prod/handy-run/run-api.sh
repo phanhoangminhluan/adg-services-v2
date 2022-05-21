@@ -2,7 +2,7 @@
 
 
 PROJECT_PATH="/home/ubuntu/adg-services-v2"
-SCRIPT_PATH="./scripts/start-application/dev/customized-run/run.sh"
+SCRIPT_PATH="./scripts/start-application/prod/customized-run/run.sh"
 
 cd $PROJECT_PATH
 

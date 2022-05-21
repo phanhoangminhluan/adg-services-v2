@@ -39,7 +39,7 @@ echo java \
 echo "RUNNING COMMAND: END ------------------------------------------------------------------------------------------------------------"
 echo ""
 
-java \
+nohup java \
     -Xms256M \
     -Xmx512M \
     -Dspring.profiles.active="$ACTIVE_PROFILE-$MODE" \
