@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-PROJECT_PATH="/Users/luan.phm/engineering/Projects/ADongGroup/adg-services-v2"
+PROJECT_PATH="/home/ubuntu/adg-services-v2"
 SCRIPT_PATH="./scripts/start-application/dev/customized-run/run.sh"
 
 cd $PROJECT_PATH
