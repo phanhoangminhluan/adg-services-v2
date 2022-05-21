@@ -8,4 +8,4 @@ cd $PROJECT_PATH
 
 echo "Run adg-api service"
 
-sh $SCRIPT_PATH api dev
+sh $SCRIPT_PATH api prod
