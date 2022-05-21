@@ -8,6 +8,7 @@ import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
 
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +23,10 @@ public class UyNhiemChiService {
     private final String outputFolder;
     private final Map<String, Object> data;
 
-    private final String template;
-
-    public UyNhiemChiService(String outputFolder, Map<String, Object> data, String template) {
-        this.wordWriter = new WordWriter(template, new HashMap<>());
+    public UyNhiemChiService(String outputFolder, Map<String, Object> data, InputStream inputStream) {
+        this.wordWriter = new WordWriter(inputStream, new HashMap<>());
         this.outputFolder = outputFolder;
         this.data = this.transformHoaDonRecords(data);
-        this.template = template;
     }
 
     public Map<String, Object> transformHoaDonRecords(Map<String, Object> hoaDonRecords) {

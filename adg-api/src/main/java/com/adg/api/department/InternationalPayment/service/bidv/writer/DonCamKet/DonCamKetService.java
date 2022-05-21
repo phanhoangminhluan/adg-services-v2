@@ -5,6 +5,7 @@ import com.adg.api.department.InternationalPayment.handler.office.word.WordWrite
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,13 +22,10 @@ public class DonCamKetService {
     private final String outputFolder;
     private final Map<String, Object> data;
 
-    private final String template;
-
-    public DonCamKetService(String outputFolder, List<Map<String, Object>> hoaDonRecords, String template) {
-        this.wordWriter = new WordWriter(template, AdgWordTableHeaderMetadata.getHeaderMapDonCamKet());
+    public DonCamKetService(String outputFolder, List<Map<String, Object>> hoaDonRecords, InputStream inputStream) {
+        this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderMapDonCamKet());
         this.outputFolder = outputFolder;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
-        this.template = template;
     }
 
 

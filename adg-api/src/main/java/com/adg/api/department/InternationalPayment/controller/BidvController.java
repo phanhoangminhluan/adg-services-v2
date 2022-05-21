@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/internal/internation-payment/disbursement/bidv/")
+@RequestMapping("/international-payment/disbursement/bidv/")
 public class BidvController {
 
     @Autowired
@@ -31,6 +31,13 @@ public class BidvController {
     @Value("${international-payment.bidv.input.zip}")
     private String inputZip;
 
+    @GetMapping
+    public Map<String, Object> get() {
+        return MapUtils.ImmutableMap()
+                .put("data", MapUtils.ImmutableMap().build())
+                .put("status", "ok")
+                .build();
+    }
 
     @PostMapping("import")
     @SneakyThrows

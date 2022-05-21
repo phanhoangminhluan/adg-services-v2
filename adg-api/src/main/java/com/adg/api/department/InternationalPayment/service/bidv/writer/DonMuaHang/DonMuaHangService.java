@@ -11,6 +11,7 @@ import com.merlin.asset.core.utils.MapUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,12 +42,9 @@ public class DonMuaHangService {
         public static final String DIEN_GIAI = "B12";
     }
 
-    private final String template;
-
-    public DonMuaHangService(String outputFolder, List<Map<String, Object>> phieuNhapKhoRecords, String ncc, String template) {
+    public DonMuaHangService(String outputFolder, List<Map<String, Object>> phieuNhapKhoRecords, String ncc, InputStream inputStream) {
         this.outputFolder = outputFolder;
-        this.template = template;
-        this.excelWriter = new ExcelWriter(template);
+        this.excelWriter = new ExcelWriter(inputStream);
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(
                 this.excelWriter,

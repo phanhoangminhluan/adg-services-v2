@@ -15,10 +15,12 @@ import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.ParserUtils;
 import com.merlin.asset.core.utils.StringUtils;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
  * Created on: 2022.05.10 21:47
  */
 @Service
+@Log4j2
 public class HoaDonService {
 
     private static final Logger logger = LoggerFactory.getLogger(HoaDonService.class);
@@ -45,22 +48,22 @@ public class HoaDonService {
     private String outputZipFolder;
 
     @Value("${international-payment.bidv.output.template.bang-ke-su-dung-tien-vay}")
-    private String bangKeSuDungTienVayTemplate;
+    private Resource bangKeSuDungTienVayTemplate;
 
     @Value("${international-payment.bidv.output.template.bien-ban-kiem-tra-su-dung-von-vay}")
-    private String bienBanKiemTraSuDungVonVayTemplate;
+    private Resource bienBanKiemTraSuDungVonVayTemplate;
 
     @Value("${international-payment.bidv.output.template.don-cam-ket}")
-    private String donCamKetTemplate;
+    private Resource donCamKetTemplate;
 
     @Value("${international-payment.bidv.output.template.don-mua-hang}")
-    private String donMuaHangTemplate;
+    private Resource donMuaHangTemplate;
 
     @Value("${international-payment.bidv.output.template.hop-dong-tin-dung}")
-    private String hopDongTinDungTemplate;
+    private Resource hopDongTinDungTemplate;
 
     @Value("${international-payment.bidv.output.template.uy-nhiem-chi}")
-    private String uyNhiemChiTemplate;
+    private Resource uyNhiemChiTemplate;
 
 
 
@@ -156,7 +159,7 @@ public class HoaDonService {
             String ncc = MapUtils.getString(pnk, PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName);
             String soHoaDon = MapUtils.getString(pnk, PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName);
 
-            Map<String, Object> hoaDonCuaNcc = MapUtils.getMapStringObject(pnk, ncc, new HashMap<>());
+            Map<String, Object> hoaDonCuaNcc = MapUtils.getMapStringObject(mapPnk, ncc, new HashMap<>());
 
             List<Map<String, Object>> sanPhamCuaHoaDon = MapUtils.getListMapStringObject(hoaDonCuaNcc, soHoaDon, new ArrayList<>());
             sanPhamCuaHoaDon.add(pnk);
@@ -202,6 +205,7 @@ public class HoaDonService {
         return IOUtils.toByteArray(new FileInputStream(zipPath));
     }
 
+    @SneakyThrows
     public void transformHoaDonTable(List<Map<String, Object>> records, String folder) {
 
         Map<String, Object> transformedHoaDon = this.mapByNhaCungCap(records);
@@ -211,42 +215,40 @@ public class HoaDonService {
 
 
 
-        BangKeSuDungTienVayService bangKeSuDungTienVayService = new BangKeSuDungTienVayService(folder, sortedListBySttKhongGop, bangKeSuDungTienVayTemplate);
+        BangKeSuDungTienVayService bangKeSuDungTienVayService = new BangKeSuDungTienVayService(folder, sortedListBySttKhongGop, bangKeSuDungTienVayTemplate.getInputStream());
         bangKeSuDungTienVayService.exportDocument();
         logger.info("Export BangKeSuDungTienVayService");
 
-        DonCamKetService donCamKetService = new DonCamKetService(folder, sortedListBySttKhongGop, donCamKetTemplate);
+        DonCamKetService donCamKetService = new DonCamKetService(folder, sortedListBySttKhongGop, donCamKetTemplate.getInputStream());
         donCamKetService.exportDocument();
         logger.info("Export DonCamKetService");
 
-        BienBanKiemTraSuDungVonVayService bienBanKiemTraSuDungVonVayService = new BienBanKiemTraSuDungVonVayService(folder, mapByNhaCungCap, bienBanKiemTraSuDungVonVayTemplate);
+        BienBanKiemTraSuDungVonVayService bienBanKiemTraSuDungVonVayService = new BienBanKiemTraSuDungVonVayService(folder, mapByNhaCungCap, bienBanKiemTraSuDungVonVayTemplate.getInputStream());
         bienBanKiemTraSuDungVonVayService.exportDocument();
         logger.info("Export BienBanKiemTraSuDungVonVayService");
 
-        HopDongTinDungService hopDongTinDungService = new HopDongTinDungService(folder, mapByNhaCungCap, hopDongTinDungTemplate);
+        HopDongTinDungService hopDongTinDungService = new HopDongTinDungService(folder, mapByNhaCungCap, hopDongTinDungTemplate.getInputStream());
         hopDongTinDungService.exportDocument();
         logger.info("Export HopDongTinDungService");
 
 
         for (String ncc : mapByNhaCungCap.keySet()) {
-            UyNhiemChiService uyNhiemChiService = new UyNhiemChiService(folder, MapUtils.getMapStringObject(mapByNhaCungCap, ncc), uyNhiemChiTemplate);
+            UyNhiemChiService uyNhiemChiService = new UyNhiemChiService(folder, MapUtils.getMapStringObject(mapByNhaCungCap, ncc), uyNhiemChiTemplate.getInputStream());
             uyNhiemChiService.exportDocument();
             logger.info("Export UyNhiemChiService");
-
         }
     }
 
+    @SneakyThrows
     public void transformPhieuNhapKho(Map<String, Object> phieuNhapKhoMap, String folder) {
 
         for (String ncc : phieuNhapKhoMap.keySet()) {
             Map<String, Object> donHangMap = MapUtils.getMapStringObject(phieuNhapKhoMap, ncc);
-            List<Map<String, Object>> listMaHang = new ArrayList<>();
             for (String soHoaDon : donHangMap.keySet()) {
-                listMaHang.addAll( MapUtils.getListMapStringObject(donHangMap, soHoaDon));
+                DonMuaHangService donMuaHangService = new DonMuaHangService(folder, MapUtils.getListMapStringObject(donHangMap, soHoaDon), ncc, donMuaHangTemplate.getInputStream());
+                donMuaHangService.exportDocument();
+                logger.info("Export DonMuaHangService");
             }
-            DonMuaHangService donMuaHangService = new DonMuaHangService(folder, listMaHang, ncc, donMuaHangTemplate);
-            donMuaHangService.exportDocument();
-            logger.info("Export DonMuaHangService");
         }
     }
 

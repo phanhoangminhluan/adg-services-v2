@@ -38,17 +38,16 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.adg</groupId>
-            <artifactId>adg-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
+<!--        <dependency>-->
+<!--            <groupId>com.adg</groupId>-->
+<!--            <artifactId>adg-core</artifactId>-->
+<!--            <version>1.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>com.merlin</groupId>
             <artifactId>merlin-asset</artifactId>
-            <version>0.0.10-SNAPSHOT</version>
+            <version>0.0.12-SNAPSHOT</version>
         </dependency>
 
         <dependency>

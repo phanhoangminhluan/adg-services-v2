@@ -50,7 +50,7 @@ public enum DonCamKetTableHeaderInfoMetadata implements AdgWordTableHeaderInfo {
                 run.setFontSize(11);
                 run.setFontFamily("Times New Roman");
             }),
-            record -> MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName)
+            record -> "0" + MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName).replace("0", "")
 
     ),
     NgayHoaDon(

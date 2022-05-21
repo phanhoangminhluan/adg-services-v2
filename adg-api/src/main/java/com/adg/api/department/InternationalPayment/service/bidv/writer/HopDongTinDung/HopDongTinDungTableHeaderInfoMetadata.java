@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Minh-Luan H. Phan
@@ -45,7 +46,11 @@ public enum HopDongTinDungTableHeaderInfoMetadata implements AdgWordTableHeaderI
             },
             runs -> runs.forEach(run -> run.setFontSize(11)),
             record -> {
-                List<String> listSoHoaDon = MapUtils.getListString(record, HoaDonHeaderMetadata.ListSoHoaDon.deAccentedName);
+                List<String> listSoHoaDon = MapUtils
+                        .getListString(record, HoaDonHeaderMetadata.ListSoHoaDon.deAccentedName)
+                        .stream()
+                        .map(soHoaDon -> "0" + soHoaDon.replace("0", ""))
+                        .collect(Collectors.toList());
                 return String.format("Thanh toán tiền hàng theo hoá đơn %s hết.", String.join(", ", listSoHoaDon));
             }
     ),

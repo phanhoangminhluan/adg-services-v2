@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 ############ HOW TO USE ############
@@ -16,12 +17,11 @@ SERVER_PROJECT_PATH="$PROJECT_PATH/adg-api"
 
 SOURCE="$SERVER_PROJECT_PATH/target"
 LOG_DIR="$PROJECT_PATH/log"
-LOGBACK_PATH="$SERVER_PROJECT_PATH/src/main/resources/logback-dev.xml"
 
 JAR_PATH="$SOURCE/adg-api-0.0.1-SNAPSHOT.jar"
 
-ACTIVE_PROFILE=$1
-MODE=$2
+ACTIVE_PROFILE="api"
+MODE="prod"
 
 cd $PROJECT_PATH
 

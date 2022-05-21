@@ -13,6 +13,7 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,13 +30,10 @@ public class HopDongTinDungService {
     private final String outputFolder;
     private final Map<String, Object> data;
 
-    private final String template;
-
-    public HopDongTinDungService(String outputFolder, Map<String, Object> hoaDonRecords, String template) {
-        this.wordWriter = new WordWriter(template, AdgWordTableHeaderMetadata.getHeaderMapHopDongTinDung());
+    public HopDongTinDungService(String outputFolder, Map<String, Object> hoaDonRecords, InputStream inputStream) {
+        this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderMapHopDongTinDung());
         this.outputFolder = outputFolder;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
-        this.template = template;
     }
 
     public Map<String, Object> transformHoaDonRecords(Map<String, Object> hoaDonRecords) {

@@ -26,8 +26,8 @@ public class WordWriter {
     private final InputStream inputStream;
 
     @SneakyThrows
-    public WordWriter(String template, Map<Integer, AdgWordTableHeaderInfo> headerMap) {
-        this.inputStream = Files.newInputStream(Paths.get(template));
+    public WordWriter(InputStream inputStream, Map<Integer, AdgWordTableHeaderInfo> headerMap) {
+        this.inputStream = inputStream;
         this.document = new XWPFDocument(this.inputStream);
         this.wordTable = new WordTable(this.document, headerMap);
     }

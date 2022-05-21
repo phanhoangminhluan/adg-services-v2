@@ -9,6 +9,7 @@ import com.merlin.asset.core.utils.MapUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,15 +27,12 @@ public class BangKeSuDungTienVayService {
     private Map<String, Object> data;
     private String outputFolder;
 
-    private final String template;
-
-    public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, String template) {
+    public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, InputStream inputStream) {
         this.outputFolder = outputFolder;
-        this.excelWriter = new ExcelWriter(template);
+        this.excelWriter = new ExcelWriter(inputStream);
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(this.excelWriter, AdgExcelTableHeaderMetadata.getBangKeSuDungTienVay());
         this.data = this.transformHoaDonRecords(hoaDonRecords);
-        this.template = template;
     }
 
     public Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords) {
@@ -94,8 +92,8 @@ public class BangKeSuDungTienVayService {
     private void fillDescription() {
         String description = String.format(
                 "Chi tiết nội dung sử dụng tiền vay theo hợp đồng tín dụng ngắn hạn cụ thể số : 01.219/2021/8088928/HĐTD ngày %s được ký kết giữa Ngân hàng và Bên vay.",
-                DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_03))
-            );
+                DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09))
+        );
         String originalCellAddress = "A7";
         Cell originalCell = this.excelWriter.getCell(originalCellAddress);
         originalCell.setCellValue(description);
@@ -104,7 +102,7 @@ public class BangKeSuDungTienVayService {
     private void fillAdditionalDescription() {
         String description = String.format(
                 "Bảng kê này là một bộ phận trong thể tách rời hợp đồng tín dụng ngắn hạn cụ thể số 01.219/2021/8088928/HĐTD ngày %s được ký kết giữa Ngân hàng và Bên vay.",
-                DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_03))
+                DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09))
         );
 
         String originalCellAddress = "A13";

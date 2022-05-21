@@ -13,6 +13,7 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,13 +30,10 @@ public class BienBanKiemTraSuDungVonVayService {
     private final String outputFolder;
     private final Map<String, Object> data;
 
-    private final String template;
-
-    public BienBanKiemTraSuDungVonVayService(String outputFolder, Map<String, Object> hoaDonRecords, String template) {
-        this.wordWriter = new WordWriter(template, AdgWordTableHeaderMetadata.getHeaderBienBanKiemTraSuDungVonVay());
+    public BienBanKiemTraSuDungVonVayService(String outputFolder, Map<String, Object> hoaDonRecords, InputStream inputStream) {
+        this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderBienBanKiemTraSuDungVonVay());
         this.outputFolder = outputFolder;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
-        this.template = template;
     }
 
     public void exportDocument() {
@@ -91,6 +89,7 @@ public class BienBanKiemTraSuDungVonVayService {
         XWPFTableCell sumCell = WordUtils.Table.mergeCell(row, 0, 3);
         sumCell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
         XWPFRun run = WordUtils.Table.setCell(sumCell, "Tổng");
+        run.setFontFamily("Times New Roman");
         run.setBold(true);
         run.setFontSize(11);
         WordUtils.Table.makeCenter(sumCell);
@@ -98,7 +97,9 @@ public class BienBanKiemTraSuDungVonVayService {
         XWPFTableCell calculatedSell = WordUtils.Table.mergeCell(row, 1, 2);
         calculatedSell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
         String val = String.format("%s VND (Bằng chữ: %s.)", MapUtils.getString(data, "Tổng tiền vay bằng số"), MapUtils.getString(data, "Tổng tiền vay bằng chữ"));
-        WordUtils.Table.setCell(calculatedSell, val).setFontSize(11);
+        XWPFRun calculatedCellRun = WordUtils.Table.setCell(calculatedSell, val);
+        calculatedCellRun.setFontSize(11);
+        calculatedCellRun.setFontFamily("Times New Roman");
         WordUtils.Table.makeCenter(calculatedSell);
 
     }

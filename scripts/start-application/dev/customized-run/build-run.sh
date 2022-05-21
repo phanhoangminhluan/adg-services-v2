@@ -31,14 +31,13 @@ echo ""
 echo "RUNNING COMMAND: START ------------------------------------------------------------------------------------------------------------"
 
 echo java \
-    -Xms256M \
-    -Xmx512M \
-    -Dspring.profiles.active="$ACTIVE_PROFILE-$MODE" \
-    -Dlogging.config="$LOGBACK_PATH" \
-    -DACTIVE_PROFILE="$ACTIVE_PROFILE" \
-    -DLOG_DIR="$LOG_DIR" \
-    -jar "$JAR_PATH" \
-    com.adg.server.AdgServerApplication "$ACTIVE_PROFILE"
+         -Xms256M \
+         -Xmx512M \
+         -Dspring.profiles.active="$ACTIVE_PROFILE-$MODE" \
+         -DACTIVE_PROFILE="$ACTIVE_PROFILE" \
+         -DLOG_DIR="$LOG_DIR" \
+         -jar "$JAR_PATH" \
+         com.adg.server.AdgServerApplication "$ACTIVE_PROFILE"
 
 echo "RUNNING COMMAND: END ------------------------------------------------------------------------------------------------------------"
 echo ""

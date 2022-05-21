@@ -5,8 +5,10 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +18,20 @@ import java.util.List;
  */
 public class ExcelWriter {
 
-    private String filePath;
     private Workbook workbook;
-    private FileInputStream fileInputStream;
+    private InputStream fileInputStream;
     private Sheet sheet;
 
     @SneakyThrows
-    public ExcelWriter(String filePath) {
-        this.filePath = filePath;
-        this.fileInputStream = new FileInputStream(filePath);
+    public ExcelWriter(File file) {
+        this.fileInputStream = new FileInputStream(file);
         this.workbook = new XSSFWorkbook(fileInputStream);
+    }
+
+    @SneakyThrows
+    public ExcelWriter(InputStream inputStream) {
+        this.fileInputStream = inputStream;
+        this.workbook = new XSSFWorkbook(inputStream);
     }
 
     public void openSheet() {

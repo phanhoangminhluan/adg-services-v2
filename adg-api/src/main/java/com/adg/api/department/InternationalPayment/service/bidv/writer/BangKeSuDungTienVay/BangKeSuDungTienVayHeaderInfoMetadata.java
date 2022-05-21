@@ -24,7 +24,7 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
             "Nội dung",
             "B9",
             CellType.STRING,
-            record -> String.format("Thanh toán tiền hàng theo hoá đơn %s hết", MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName))
+            record -> String.format("Thanh toán tiền hàng theo hoá đơn %s hết", "0" + MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName).replace("0", ""))
     ),
     SoHieuChungTuKeToan(
             "Số hiệu chứng từ kế toán",

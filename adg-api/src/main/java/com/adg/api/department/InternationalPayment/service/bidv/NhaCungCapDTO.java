@@ -23,7 +23,7 @@ public class NhaCungCapDTO {
     public static Map<String, NhaCungCapDTO> nhaCungCapMap = new HashMap<>();
 
     static {
-        String raw = FileUtils.readContent("/Users/luan.phm/engineering/Projects/ADongGroup/adg-services-v2/adg-api/src/main/resources/adg-clients.json");
+        String raw = FileUtils.readContent("/home/ubuntu/adg-services-v2/adg-api/src/main/resources/adg-clients.json");
         List<NhaCungCapDTO> dtos = JsonUtils.fromJson(raw, new TypeToken<List<NhaCungCapDTO>>(){}.getType());
         for (NhaCungCapDTO dto : dtos) {
             nhaCungCapMap.put(dto.tenKhachHang, dto);

@@ -9,6 +9,7 @@ import com.merlin.asset.core.utils.MapUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
+import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +29,7 @@ public class KeDienTuService {
     private String filePath = "/Users/luan.phm/engineering/Projects/ADongGroup/adg-services/adg-api/src/main/resources/2. Kê Điện Tử.xlsx";
 
     public KeDienTuService() {
-        this.excelWriter = new ExcelWriter(filePath);
+        this.excelWriter = new ExcelWriter(new File(filePath));
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(this.excelWriter, AdgExcelTableHeaderMetadata.getBangKeChungTuDeNghiGiaiNgan());
     }
