@@ -4,6 +4,7 @@ import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableH
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelTable;
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelUtils;
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelWriter;
+import com.adg.api.department.InternationalPayment.service.bidv.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.PhieuNhapKhoHeaderMetadata;
 import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
@@ -93,7 +94,7 @@ public class DonMuaHangService {
         result.put("Ngày", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
         result.put("Địa chỉ", "");
         result.put("Số", String.format("ĐMH%s",DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("ddMMyy"))));
-        result.put("Mã số thuế", "");
+        result.put("Mã số thuế", NhaCungCapDTO.nhaCungCapMap.get(tenNcc).getMaSoThue());
         result.put("Loại tiền", "VND");
         result.put("Điện thoại", "");
         result.put("Fax", "");
