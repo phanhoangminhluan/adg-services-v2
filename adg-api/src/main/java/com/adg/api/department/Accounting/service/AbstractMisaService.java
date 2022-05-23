@@ -127,7 +127,7 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
                 isFinish = currentPage > totalPages;
             } else {
                 currentPage--;
-                isFinish = currentPage == totalPages;
+                isFinish = currentPage <= 0;
             }
         }
 
