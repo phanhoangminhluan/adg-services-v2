@@ -165,7 +165,7 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
     }
 
     public void sync(MisaSyncDTO misaSyncDTO) {
-        Map<String, Object> statistic = this.fetchV2();
+        Map<String, Object> statistic = this.fetch();
         this.sendSlack(statistic, misaSyncDTO);
     }
 
