@@ -98,7 +98,7 @@ public class HopDongTinDungService {
     }
 
     private void build() {
-        String fileName = String.format("Hợp đồng tín dung - %s.docx",
+        String fileName = String.format("Hợp đồng tín dụng - %s.docx",
                 DateTimeUtils.convertZonedDateTimeToFormat(
                         ZonedDateTime.now(),
                         "Asia/Ho_Chi_Minh",
