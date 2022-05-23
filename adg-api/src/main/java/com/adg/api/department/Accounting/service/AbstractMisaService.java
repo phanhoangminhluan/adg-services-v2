@@ -144,7 +144,7 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
         return MapUtils.ImmutableMap()
                 .put("totalRecords", totalRecords)
                 .put("totalPages", totalPages)
-                .put("fullFlowDuration", System.currentTimeMillis() - t1)
+                .put("fullFlowDuration", DateTimeUtils.getRunningTimeInSecond(t1))
                 .put("stats", misaStoringStatistics)
                 .build();
     }
@@ -216,7 +216,8 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
                 .append("---- GENERAL STATS").append("\n")
                 .append(String.format("Processed/Total records: %s/%s", processedRecords, totalRecords)).append("\n")
                 .append(String.format("Processed/Total pages: %s/%s", stats.size(), totalPages)).append("\n")
-                .append(String.format("Success rate: %s%%", Math.round(processedRecords / (totalRecords * 1.0) * 100))).append("\n").append("\n")
+                .append(String.format("Success rate: %s%%", Math.round(processedRecords / (totalRecords * 1.0) * 100))).append("\n")
+                .append(String.format("Full flow duration: %s%%", MapUtils.getString(statistic,"fullFlowDuration"))).append("\n").append("\n")
                 .append("---- MISA API CALLING STATS").append("\n")
                 .append(String.format("Total duration: %s seconds", df.format(totalApiCallingDuration / 1000.0) )).append("\n")
                 .append(String.format("Average duration: %s seconds / page", df.format(avgApiCallingDuration / 1000.0))).append("\n")
