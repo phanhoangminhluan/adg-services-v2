@@ -65,7 +65,7 @@ public class DonMuaHangService {
     private void build() {
         String fileName = String.format("Đơn mua hàng - %s - %s.xlsx",
                 this.ncc,
-                DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.MA_DATE_TIME_FORMATTER)
+                DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_03)
         );
         this.excelWriter.build(this.outputFolder + "/" + fileName);
     }

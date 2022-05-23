@@ -70,7 +70,7 @@ public class BienBanKiemTraSuDungVonVayService {
         result.put("Số tiền vay", NumberUtils.formatNumber1(tongTienVay));
         result.put("Tổng tiền vay bằng chữ", MoneyUtils.convertMoneyToText(tongTienVay));
         result.put("Danh sách thanh toán tiền hàng", arr);
-        result.put("Ngày đề nghị giải ngân", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
+        result.put("Ngày đề nghị giải ngân", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_03));
 
 
         return result;

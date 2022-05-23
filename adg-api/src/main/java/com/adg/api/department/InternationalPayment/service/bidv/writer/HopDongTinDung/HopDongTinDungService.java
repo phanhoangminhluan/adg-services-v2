@@ -102,7 +102,7 @@ public class HopDongTinDungService {
                 DateTimeUtils.convertZonedDateTimeToFormat(
                         ZonedDateTime.now(),
                         "Asia/Ho_Chi_Minh",
-                        DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_01)
+                        DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_03)
                 )
         );
         this.wordWriter.build(outputFolder + "/" + fileName);
