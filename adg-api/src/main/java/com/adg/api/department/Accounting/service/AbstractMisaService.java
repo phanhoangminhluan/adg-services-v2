@@ -112,9 +112,9 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
                 : totalPages;
         log.info("Starting to fetch/store data. Start page: {}", currentPage);
         long t1 = System.currentTimeMillis();
-        boolean isFinish = true;
+        boolean isFinish = false;
         List<Future> futures = new ArrayList<>();
-        while (isFinish) {
+        while (!isFinish) {
             int finalCurrentPage = currentPage;
             Future future = executorService.submit(() -> {
                 Map<String, Object> misaStoringStatistic = this.handleLoop(finalCurrentPage);
