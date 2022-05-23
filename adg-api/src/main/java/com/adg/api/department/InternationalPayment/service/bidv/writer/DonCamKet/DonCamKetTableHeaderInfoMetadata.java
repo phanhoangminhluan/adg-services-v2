@@ -4,6 +4,7 @@ import com.adg.api.department.InternationalPayment.handler.office.AdgWordTableHe
 import com.adg.api.department.InternationalPayment.handler.office.word.WordUtils;
 import com.adg.api.department.InternationalPayment.service.bidv.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
+import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
 import com.merlin.asset.core.utils.ParserUtils;
@@ -11,6 +12,7 @@ import org.apache.poi.xwpf.usermodel.TableWidthType;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -66,7 +68,11 @@ public enum DonCamKetTableHeaderInfoMetadata implements AdgWordTableHeaderInfo {
                 run.setFontSize(11);
                 run.setFontFamily("Times New Roman");
             }),
-            record -> MapUtils.getString(record, HoaDonHeaderMetadata.NgayChungTu.deAccentedName).split(" ")[0]
+            record -> {
+                String val = MapUtils.getString(record, HoaDonHeaderMetadata.NgayChungTu.deAccentedName).split(" ")[0];
+                ZonedDateTime zdt = DateTimeUtils.convertStringToZonedDateTime(val, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_03), "UTC", "UTC");
+                return DateTimeUtils.convertZonedDateTimeToFormat(zdt, "UTC", DateTimeUtils.FMT_10);
+            }
     ),
     SoTienTrenHoaDon(
             "Số tiền trên hoá đơn",
@@ -100,9 +106,9 @@ public enum DonCamKetTableHeaderInfoMetadata implements AdgWordTableHeaderInfo {
                 String nhaCungCap = MapUtils.getString(record, HoaDonHeaderMetadata.NhaCungCap.deAccentedName);
                 NhaCungCapDTO dto = NhaCungCapDTO.nhaCungCapMap.get(nhaCungCap);
                 if (dto == null) {
-                    return String.format("\nSỐ TK: \nTẠI NH: ");
+                    return String.format("\nMST: ");
                 }
-                return String.format("%s\nSỐ TK: %s\nTẠI NH: %s", dto.getTenKhachHang(), dto.getSoTaiKhoan(), dto.getTenNganHang());
+                return String.format("%s\nMST: %s", dto.getTenKhachHang(), dto.getMaSoThue());
             }
     ),
 
