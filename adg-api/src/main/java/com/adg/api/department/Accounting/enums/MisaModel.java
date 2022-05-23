@@ -14,12 +14,12 @@ import com.adg.api.department.Accounting.service.AbstractDTO;
  */
 public enum MisaModel {
 
-    CUSTOMER("Customers", "modified_date", MisaOrderType.DESC, CustomerDTO.class),
-    EMPLOYEE("Employees", "modified_date",  MisaOrderType.DESC, EmployeeDTO.class),
-    ORDER("SaleOrders", "modified_date",  MisaOrderType.DESC, OrderDTO.class),
-    ORGANIZATION_UNIT("OrganizationUnits", "modified_date",  MisaOrderType.DESC, OrganizationUnitDTO.class),
-    PRODUCT("Products", "modified_date",  MisaOrderType.DESC, ProductDTO.class),
-    STOCK("Stocks", "modified_date",  MisaOrderType.DESC, StockDTO.class);
+    ORDER("SaleOrders", "modified_date",  MisaOrderType.DESC, OrderDTO.class), // 35586
+    CUSTOMER("Customers", "modified_date", MisaOrderType.DESC, CustomerDTO.class), // 2662
+    PRODUCT("Products", "modified_date",  MisaOrderType.DESC, ProductDTO.class), // 1059
+    STOCK("Stocks", "modified_date",  MisaOrderType.DESC, StockDTO.class), // 175
+    EMPLOYEE("Employees", "modified_date",  MisaOrderType.DESC, EmployeeDTO.class), // 137
+    ORGANIZATION_UNIT("OrganizationUnits", "modified_date",  MisaOrderType.DESC, OrganizationUnitDTO.class); // 26
 
     public final String uri;
     public final String orderByField;

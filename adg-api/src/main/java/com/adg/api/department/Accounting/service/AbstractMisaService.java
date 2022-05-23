@@ -11,6 +11,7 @@ import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.ParserUtils;
 import com.merlin.mapper.MerlinMapper;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -94,6 +98,57 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
                 .build();
     }
 
+    @SneakyThrows
+    protected Map<String, Object> fetchV2() {
+
+        final ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        List<Map<String, Object>> misaStoringStatistics = new ArrayList<>();
+        MisaPayload payload = this.callMisaRestApi(1);
+        int totalPages = payload.getTotalPages();
+        int totalRecords = payload.getTotalRecords();
+        int currentPage = this.getMisaModel().orderType == MisaOrderType.ASC
+                ? 1
+                : totalPages;
+        log.info("Starting to fetch/store data. Start page: {}", currentPage);
+        long t1 = System.currentTimeMillis();
+        boolean isFinish = true;
+        List<Future> futures = new ArrayList<>();
+        while (isFinish) {
+            int finalCurrentPage = currentPage;
+            Future future = executorService.submit(() -> {
+                Map<String, Object> misaStoringStatistic = this.handleLoop(finalCurrentPage);
+                misaStoringStatistics.add(misaStoringStatistic);
+            });
+            futures.add(future);
+
+            if (this.getMisaModel().orderType == MisaOrderType.ASC) {
+                currentPage++;
+                isFinish = currentPage > totalPages;
+            } else {
+                currentPage--;
+                isFinish = currentPage == totalPages;
+            }
+        }
+
+        long t2 = System.currentTimeMillis();
+
+        while (!futures.stream().allMatch(Future::isDone)) {
+            Thread.sleep(500);
+            log.info("Wait for {}", DateTimeUtils.getRunningTimeInSecond(t2));
+        }
+
+        executorService.shutdown();
+
+        log.info("Fetch/store data done. Total duration {}", DateTimeUtils.getRunningTimeInSecond(t1));
+        return MapUtils.ImmutableMap()
+                .put("totalRecords", totalRecords)
+                .put("totalPages", totalPages)
+                .put("fullFlowDuration", System.currentTimeMillis() - t1)
+                .put("stats", misaStoringStatistics)
+                .build();
+    }
+
     public Map<String, Object> handleLoop( int currentPage) {
         long t1 = System.currentTimeMillis();
         log.info("Starting to fetch/store page {}", currentPage);
@@ -105,11 +160,12 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
         return MapUtils.ImmutableMap()
                 .putAll(misaStoringStatistic)
                 .put("apiCallingDuration", t2 - t1)
+                .put("page", currentPage)
                 .build();
     }
 
     public void sync(MisaSyncDTO misaSyncDTO) {
-        Map<String, Object> statistic = this.fetch();
+        Map<String, Object> statistic = this.fetchV2();
         this.sendSlack(statistic, misaSyncDTO);
     }
 
@@ -126,20 +182,19 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
         int maxApiCallingDuration = 0;
         int maxStoringDurationPage = 1;
         int maxApiCallingDurationPage = 1;
-        int i = 1;
         for (Map<String, Object> stat : stats) {
             int storingDuration =  MapUtils.getInt(stat, "storingTime");
             int apiCallingDuration = MapUtils.getInt(stat, "apiCallingDuration");
+            int currentPage = MapUtils.getInt(stat, "currentPage");
             processedRecords += MapUtils.getInt(stat, "savedRecordCounts");
             totalStoringDuration += MapUtils.getInt(stat, "storingTime");
             totalApiCallingDuration += MapUtils.getInt(stat, "apiCallingDuration");
 
             maxStoringDuration = Math.max(maxStoringDuration, storingDuration);
             maxApiCallingDuration = Math.max(maxApiCallingDuration, apiCallingDuration);
-            if (maxStoringDuration == storingDuration) maxStoringDurationPage = i;
-            if (maxApiCallingDuration == apiCallingDuration) maxApiCallingDurationPage = i;
+            if (maxStoringDuration == storingDuration) maxStoringDurationPage = currentPage;
+            if (maxApiCallingDuration == apiCallingDuration) maxApiCallingDurationPage = currentPage;
 
-            i++;
         }
 
         DecimalFormat df = new DecimalFormat("0.00");

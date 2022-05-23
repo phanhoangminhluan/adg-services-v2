@@ -11,12 +11,17 @@ import com.adg.api.department.Accounting.service.Stock.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * @author Minh-Luan H. Phan
  * Created on: 2022.05.22 00:07
  */
 @Component
 public class MisaService {
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 
     @Autowired
     private StockService stockService;
@@ -37,28 +42,40 @@ public class MisaService {
     private OrderService orderService;
 
     public void sync(MisaSyncDTO misaSyncDTO) {
-        if (misaSyncDTO.getModels().contains(MisaModel.STOCK)) {
-            this.stockService.sync(misaSyncDTO);
-        }
-
-        if (misaSyncDTO.getModels().contains(MisaModel.EMPLOYEE)) {
-            this.employeeService.sync(misaSyncDTO);
+        if (misaSyncDTO.getModels().contains(MisaModel.ORDER)) {
+            EXECUTOR_SERVICE.execute(() -> {
+                this.orderService.sync(misaSyncDTO);
+            });
         }
 
         if (misaSyncDTO.getModels().contains(MisaModel.CUSTOMER)) {
-            this.customerService.sync(misaSyncDTO);
+            EXECUTOR_SERVICE.execute(() -> {
+                this.customerService.sync(misaSyncDTO);
+            });
         }
 
         if (misaSyncDTO.getModels().contains(MisaModel.PRODUCT)) {
-            this.productService.sync(misaSyncDTO);
+            EXECUTOR_SERVICE.execute(() -> {
+                this.productService.sync(misaSyncDTO);
+            });
+        }
+
+        if (misaSyncDTO.getModels().contains(MisaModel.STOCK)) {
+            EXECUTOR_SERVICE.execute(() -> {
+                this.stockService.sync(misaSyncDTO);
+            });
+        }
+
+        if (misaSyncDTO.getModels().contains(MisaModel.EMPLOYEE)) {
+            EXECUTOR_SERVICE.execute(() -> {
+                this.employeeService.sync(misaSyncDTO);
+            });
         }
 
         if (misaSyncDTO.getModels().contains(MisaModel.ORGANIZATION_UNIT)) {
-            this.organizationUnitService.sync(misaSyncDTO);
-        }
-
-        if (misaSyncDTO.getModels().contains(MisaModel.ORDER)) {
-            this.orderService.sync(misaSyncDTO);
+            EXECUTOR_SERVICE.execute(() -> {
+                this.organizationUnitService.sync(misaSyncDTO);
+            });
         }
 
     }
