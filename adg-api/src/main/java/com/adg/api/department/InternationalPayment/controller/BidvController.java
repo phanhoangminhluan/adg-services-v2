@@ -5,6 +5,7 @@ import com.adg.api.util.ZipUtils;
 import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import java.util.Map;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/international-payment/disbursement/bidv/")
+@Log4j2
 public class BidvController {
 
     @Autowired
@@ -80,11 +82,10 @@ public class BidvController {
     )
     public byte[] exportFile(@RequestBody Map<String, Object> request) {
         try {
+            log.info("Export Request: {}", JsonUtils.toJson(request));
             Map<String, Object> data = MapUtils.getMapStringObject(request, "data");
             List<Map<String, Object>> hd = MapUtils.getListMapStringObject(data, "hd");
-            System.out.println(JsonUtils.toJson(hd));
             List<Map<String, Object>> pnk = MapUtils.getListMapStringObject(data, "pnk");
-            System.out.println(JsonUtils.toJson(pnk));
             return this.hoaDonService.exportDocuments(hd, this.hoaDonService.convertDtoToPnk(pnk));
         } catch (Exception exception) {
             exception.printStackTrace();

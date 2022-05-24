@@ -87,7 +87,7 @@ public class HoaDonService {
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(output, "records");
         List<Map<String, Object>> actualRecords = records.stream().filter(record -> !ParserUtils.isNullOrEmpty(MapUtils.getString(record, HoaDonHeaderMetadata.SoChungTu.name, "").trim())).collect(Collectors.toList());
 
-        this.validate(MapUtils.ImmutableMap()
+        this.validateHoaDon(MapUtils.ImmutableMap()
                 .put("headers", MapUtils.getListMapStringObject(output, "headers"))
                 .put("records", actualRecords)
                 .build());
@@ -100,11 +100,57 @@ public class HoaDonService {
         return deAccentedRecords;
     }
 
+    private List<String> validatePnkHeaders(List<Map<String, Object>> headers) {
+
+        List<String> messages = new ArrayList<>();
+
+        for (PhieuNhapKhoHeaderMetadata phieuNhapKhoHeaderMetadata : PhieuNhapKhoHeaderMetadata.values()) {
+            boolean found = false;
+            if (!phieuNhapKhoHeaderMetadata.isOriginalField) {
+                continue;
+            }
+            for (Map<String, Object> headerMap : headers) {
+                String headerName = MapUtils.getString(headerMap, "name", "");
+                if (headerName.trim().isEmpty()) {
+                    continue;
+                }
+                if (StringUtils
+                        .makeCamelCase(headerName)
+                        .equals(phieuNhapKhoHeaderMetadata.deAccentedName)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                messages.add(String.format("Header named '%s' is not found", phieuNhapKhoHeaderMetadata.name));
+            }
+        }
+
+        return messages;
+    }
+
+    public Map<String, Object> scanPhieuNhapKhoTable(ExcelReader excelReader, int row, String column) {
+        Map<String, Object> output = null;
+        int currentRow = row;
+        do {
+            output = excelReader.readTable(column + currentRow + "");
+            List<Map<String, Object>> headers = MapUtils.getListMapStringObject(output, "headers");
+            List<String> errorHeaderMessages = this.validatePnkHeaders(headers);
+            if (errorHeaderMessages.isEmpty()) {
+                break;
+            } else {
+                currentRow++;
+            }
+        } while (currentRow - row < 10);
+        return output;
+    }
+
     public Map<String, Object> readPhieuNhapKho(List<String> listFilePhieuNhapKho) {
         Map<String, Object> phieuNhapKhoByNCC = new HashMap<>();
         for (String filePhieuNhapKho : listFilePhieuNhapKho) {
             ExcelReader excelReader = new ExcelReader(filePhieuNhapKho);
-            Map<String, Object> output = excelReader.readTable("A16");
+            Map<String, Object> output = this.scanPhieuNhapKhoTable(excelReader, 14, "A");
+
             List<Map<String, Object>> records = MapUtils.getListMapStringObject(output, "records");
             String description = excelReader.getCellValueAsString("A10");
             Map<String, Object> phieuNhapKhoDescription = this.parsePhieuNhapKhoDescription(description);
@@ -311,9 +357,9 @@ public class HoaDonService {
     }
 
 
-    private void validate(Map<String, Object> output) {
-        List<String> headerErrorMessages = this.validateHeaders(MapUtils.getListMapStringObject(output, "headers"));
-        List<String> recordErrorMessages = this.validateRecords(MapUtils.getListMapStringObject(output, "records"));
+    private void validateHoaDon(Map<String, Object> output) {
+        List<String> headerErrorMessages = this.validateHoaDonHeaders(MapUtils.getListMapStringObject(output, "headers"));
+        List<String> recordErrorMessages = this.validateHoaDonRecords(MapUtils.getListMapStringObject(output, "records"));
         boolean hasError = false;
 
         if (!headerErrorMessages.isEmpty()) {
@@ -332,7 +378,7 @@ public class HoaDonService {
 
     }
 
-    private List<String> validateHeaders(List<Map<String, Object>> headers) {
+    private List<String> validateHoaDonHeaders(List<Map<String, Object>> headers) {
 
         List<String> messages = new ArrayList<>();
 
@@ -357,7 +403,7 @@ public class HoaDonService {
         return messages;
     }
 
-    private List<String> validateRecords(List<Map<String, Object>> records) {
+    private List<String> validateHoaDonRecords(List<Map<String, Object>> records) {
         List<String> messages = new ArrayList<>();
 
         for (Map<String, Object> record : records) {
