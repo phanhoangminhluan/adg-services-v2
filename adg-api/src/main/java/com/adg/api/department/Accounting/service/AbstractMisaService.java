@@ -251,7 +251,7 @@ public abstract class AbstractMisaService<T extends AbstractDTO, E, ID, M extend
                 .build();
     }
 
-    private List<T> parsePayload(MisaPayload payload) {
+    protected List<T> parsePayload(MisaPayload payload) {
         List<Map<String, Object>> data = payload.getData();
         return data.stream().map(item -> JsonUtils.fromJson(JsonUtils.toJson(item), this.getDtoClass())).collect(Collectors.toList());
     }
