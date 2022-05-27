@@ -50,7 +50,7 @@ public enum HopDongTinDungTableHeaderInfoMetadata implements AdgWordTableHeaderI
                 List<String> listSoHoaDon = MapUtils
                         .getListString(record, HoaDonHeaderMetadata.ListSoHoaDon.deAccentedName)
                         .stream()
-                        .map(soHoaDon -> HoaDonService.transformSoHoaDon(MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName)))
+                        .map(HoaDonService::transformSoHoaDon)
                         .collect(Collectors.toList());
                 return String.format("Thanh toán tiền hàng theo hoá đơn %s hết.", String.join(", ", listSoHoaDon));
             }
