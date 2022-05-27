@@ -440,4 +440,11 @@ public class HoaDonService {
         return deAccentedRecord;
     }
 
+    public static String transformSoHoaDon(String soHoaDon) {
+        while (soHoaDon.startsWith("0")) {
+            soHoaDon = soHoaDon.substring(1);
+        }
+        return "0" + soHoaDon;
+    }
+
 }

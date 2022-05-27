@@ -4,6 +4,7 @@ import com.adg.api.department.InternationalPayment.handler.office.AdgWordTableHe
 import com.adg.api.department.InternationalPayment.handler.office.word.WordUtils;
 import com.adg.api.department.InternationalPayment.service.bidv.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
+import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
@@ -52,8 +53,7 @@ public enum DonCamKetTableHeaderInfoMetadata implements AdgWordTableHeaderInfo {
                 run.setFontSize(11);
                 run.setFontFamily("Times New Roman");
             }),
-            record -> "0" + MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName).replace("0", "")
-
+            record -> HoaDonService.transformSoHoaDon(MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName))
     ),
     NgayHoaDon(
             "Ngày hoá đơn",

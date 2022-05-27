@@ -4,6 +4,7 @@ import com.adg.api.department.InternationalPayment.handler.office.AdgWordTableHe
 import com.adg.api.department.InternationalPayment.handler.office.word.WordUtils;
 import com.adg.api.department.InternationalPayment.service.bidv.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
+import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
 import com.merlin.asset.core.utils.ParserUtils;
@@ -49,10 +50,11 @@ public enum HopDongTinDungTableHeaderInfoMetadata implements AdgWordTableHeaderI
                 List<String> listSoHoaDon = MapUtils
                         .getListString(record, HoaDonHeaderMetadata.ListSoHoaDon.deAccentedName)
                         .stream()
-                        .map(soHoaDon -> "0" + soHoaDon.replace("0", ""))
+                        .map(soHoaDon -> HoaDonService.transformSoHoaDon(MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName)))
                         .collect(Collectors.toList());
                 return String.format("Thanh toán tiền hàng theo hoá đơn %s hết.", String.join(", ", listSoHoaDon));
             }
+
     ),
     SoHieuChungTuKeToan(
             "Số hiệu chứng từ kế toán",
