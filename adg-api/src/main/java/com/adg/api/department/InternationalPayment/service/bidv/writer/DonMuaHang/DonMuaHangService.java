@@ -30,6 +30,7 @@ public class DonMuaHangService {
     private Map<String, Object> data;
     private String outputFolder;
     private String ncc;
+    private String soHoaDon;
 
     private static class DonMuaHangAddress {
         public static final String TEN_NCC = "B8";
@@ -64,7 +65,8 @@ public class DonMuaHangService {
     }
 
     private void build() {
-        String fileName = String.format("Đơn mua hàng - %s - %s.xlsx",
+        String fileName = String.format("Đơn mua hàng - %s - %s - %s.xlsx",
+                this.soHoaDon,
                 this.ncc,
                 DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_03)
         );
@@ -89,6 +91,7 @@ public class DonMuaHangService {
 
             tenNcc = MapUtils.getString(phieuNhapKhoRecord, PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName);
             table.add(transformedRecord);
+            this.soHoaDon = MapUtils.getString(phieuNhapKhoRecord, PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName);
         }
         result.put("Tên NCC", tenNcc);
         result.put("Ngày", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
