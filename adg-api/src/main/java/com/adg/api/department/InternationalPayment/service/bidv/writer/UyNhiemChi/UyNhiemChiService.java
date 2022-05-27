@@ -22,10 +22,12 @@ public class UyNhiemChiService {
     private final WordWriter wordWriter;
     private final String outputFolder;
     private final Map<String, Object> data;
+    private final ZonedDateTime fileDate;
 
-    public UyNhiemChiService(String outputFolder, Map<String, Object> data, InputStream inputStream) {
+    public UyNhiemChiService(String outputFolder, Map<String, Object> data, ZonedDateTime fileDate, InputStream inputStream) {
         this.wordWriter = new WordWriter(inputStream, new HashMap<>());
         this.outputFolder = outputFolder;
+        this.fileDate = fileDate;
         this.data = this.transformHoaDonRecords(data);
     }
 
@@ -38,7 +40,7 @@ public class UyNhiemChiService {
         result.put("Số tài khoản", nhaCungCapDTO == null ?  "" : nhaCungCapDTO.getSoTaiKhoan());
         result.put("Ngân hàng", nhaCungCapDTO == null ?  "" : nhaCungCapDTO.getTenNganHang());
         result.put("Số tiền bằng chữ", MoneyUtils.convertMoneyToText(MapUtils.getDouble(hoaDonRecords, HoaDonHeaderMetadata.TongTienThanhToanCacHoaDon.deAccentedName)));
-        result.put("Ngày", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd/MM/yyyy")));
+        result.put("Ngày", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd/MM/yyyy")));
 
         return result;
     }

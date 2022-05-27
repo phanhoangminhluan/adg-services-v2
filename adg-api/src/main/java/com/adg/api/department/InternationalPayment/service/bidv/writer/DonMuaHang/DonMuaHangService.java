@@ -31,6 +31,7 @@ public class DonMuaHangService {
     private String outputFolder;
     private String ncc;
     private String soHoaDon;
+    private ZonedDateTime fileDate;
 
     private static class DonMuaHangAddress {
         public static final String TEN_NCC = "B8";
@@ -44,7 +45,7 @@ public class DonMuaHangService {
         public static final String DIEN_GIAI = "B12";
     }
 
-    public DonMuaHangService(String outputFolder, List<Map<String, Object>> phieuNhapKhoRecords, String ncc, InputStream inputStream) {
+    public DonMuaHangService(String outputFolder, List<Map<String, Object>> phieuNhapKhoRecords, String ncc, ZonedDateTime fileDate, InputStream inputStream) {
         this.outputFolder = outputFolder;
         this.excelWriter = new ExcelWriter(inputStream);
         this.excelWriter.openSheet();
@@ -52,6 +53,7 @@ public class DonMuaHangService {
                 this.excelWriter,
                 AdgExcelTableHeaderMetadata.getDonMuaHang()
         );
+        this.fileDate = fileDate;
         this.data = this.transformHoaDonRecords(phieuNhapKhoRecords);
         this.ncc = ncc;
     }
@@ -94,9 +96,9 @@ public class DonMuaHangService {
             this.soHoaDon = MapUtils.getString(phieuNhapKhoRecord, PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName);
         }
         result.put("Tên NCC", tenNcc);
-        result.put("Ngày", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
-        result.put("Địa chỉ", "");
-        result.put("Số", String.format("ĐMH%s",DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("ddMMyy"))));
+        result.put("Ngày", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
+        result.put("Địa chỉ", NhaCungCapDTO.nhaCungCapMap.get(tenNcc) == null ? NhaCungCapDTO.nhaCungCapMap.get(tenNcc).getDiaChi() : "xxx-xxx-xxx");
+        result.put("Số", String.format("ĐMH%s",DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.getFormatterWithDefaultValue("ddMMyy"))));
         result.put("Mã số thuế", NhaCungCapDTO.nhaCungCapMap.get(tenNcc) == null ? NhaCungCapDTO.nhaCungCapMap.get(tenNcc).getMaSoThue() : "xxx-xxx-xxx");
         result.put("Loại tiền", "VND");
         result.put("Điện thoại", "");
@@ -104,7 +106,7 @@ public class DonMuaHangService {
         result.put("Diễn giải", "");
         result.put("Danh sách mã hàng", table);
         result.put("Số tiền viết bằng chữ", MoneyUtils.convertMoneyToText(thanhTien));
-        result.put("Ngày giao hàng", String.format("Kể từ ngày %s", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd/MM/yyyy"))));
+        result.put("Ngày giao hàng", String.format("Kể từ ngày %s", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.getFormatterWithDefaultValue("dd/MM/yyyy"))));
         result.put("Địa điểm giao hàng", "Tại kho Công ty Cổ Phần Á Đông ADG");
         result.put("Điều khoản thanh toán", "");
         result.put("Ghi chú", "");

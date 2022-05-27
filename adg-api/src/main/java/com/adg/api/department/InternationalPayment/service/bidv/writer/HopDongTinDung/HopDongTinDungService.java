@@ -29,10 +29,12 @@ public class HopDongTinDungService {
     private final WordWriter wordWriter;
     private final String outputFolder;
     private final Map<String, Object> data;
+    private final ZonedDateTime fileDate;
 
-    public HopDongTinDungService(String outputFolder, Map<String, Object> hoaDonRecords, InputStream inputStream) {
+    public HopDongTinDungService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
         this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderMapHopDongTinDung());
         this.outputFolder = outputFolder;
+        this.fileDate = fileDate;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
@@ -57,8 +59,8 @@ public class HopDongTinDungService {
 
         result.put("Số hợp đồng", "01.21/2021/8088928/HĐTD");
         result.put("Tổng tiền vay", NumberUtils.formatNumber1(tongTienVay));
-        result.put("Ngày ký hợp đồng tín dụng", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
-        result.put("Ngày ký", String.format("TPHCM, ngày %s tháng %s năm %s", ZonedDateTime.now().getDayOfMonth(), ZonedDateTime.now().getMonthValue(), ZonedDateTime.now().getYear()));
+        result.put("Ngày ký hợp đồng tín dụng", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
+        result.put("Ngày ký", String.format("TPHCM, ngày %s tháng %s năm %s", this.fileDate.getDayOfMonth(), this.fileDate.getMonthValue(), this.fileDate.getYear()));
         result.put("Tổng tiền vay bằng chữ", MoneyUtils.convertMoneyToText(tongTienVay));
 
         result.put("Nội dung thanh toán", arr);

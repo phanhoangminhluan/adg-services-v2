@@ -21,10 +21,12 @@ public class DonCamKetService {
     private final WordWriter wordWriter;
     private final String outputFolder;
     private final Map<String, Object> data;
+    private final ZonedDateTime fileDate;
 
-    public DonCamKetService(String outputFolder, List<Map<String, Object>> hoaDonRecords, InputStream inputStream) {
+    public DonCamKetService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
         this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderMapDonCamKet());
         this.outputFolder = outputFolder;
+        this.fileDate = fileDate;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
@@ -42,8 +44,9 @@ public class DonCamKetService {
         }
         result.put("Danh mục hoá đơn diện tử", table);
 
-        result.put("Ngày giải ngân", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_10));
-        result.put("ngaykydoncamket", String.format("TP Hồ Chí Minh, ngày %s tháng %s năm %s", ZonedDateTime.now().getDayOfMonth(), ZonedDateTime.now().getMonthValue(), ZonedDateTime.now().getYear()));
+        result.put("Ngày giải ngân", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09));
+
+        result.put("ngaykydoncamket", String.format("TP Hồ Chí Minh, ngày %s tháng %s năm %s", fileDate.getDayOfMonth(), fileDate.getMonthValue(), fileDate.getYear()));
         return result;
     }
 

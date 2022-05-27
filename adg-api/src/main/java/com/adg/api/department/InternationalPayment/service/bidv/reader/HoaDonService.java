@@ -240,58 +240,58 @@ public class HoaDonService {
     }
 
     @SneakyThrows
-    public byte[] exportDocuments(List<Map<String, Object>> hoaDonRecords, Map<String, Object> pnkRecords) {
+    public byte[] exportDocuments(List<Map<String, Object>> hoaDonRecords, Map<String, Object> pnkRecords, String fileDate) {
         String folder = this.getOutputFolder();
         String zipPath = this.getOutputZipFolder() + String.format("BIDV - Hồ Sơ Giải Ngân - %s.zip", System.currentTimeMillis());
 
-        this.transformHoaDonTable(hoaDonRecords, folder);
-        this.transformPhieuNhapKho(pnkRecords, folder);
+        ZonedDateTime zdt = DateTimeUtils.convertStringToZonedDateTime(fileDate, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09), "UTC", "UTC");
+
+        this.transformHoaDonTable(hoaDonRecords, zdt, folder);
+        this.transformPhieuNhapKho(pnkRecords, zdt, folder);
         ZipUtils.zipFolder(Paths.get(folder), Paths.get(zipPath));
 
         return IOUtils.toByteArray(new FileInputStream(zipPath));
     }
 
     @SneakyThrows
-    public void transformHoaDonTable(List<Map<String, Object>> records, String folder) {
+    public void transformHoaDonTable(List<Map<String, Object>> records, ZonedDateTime fileDate, String folder) {
 
         Map<String, Object> transformedHoaDon = this.mapByNhaCungCap(records);
         Map<String, Object> mapByNhaCungCap = MapUtils.getMapStringObject(transformedHoaDon, "Map by nhà cung cấp");
 
         List<Map<String, Object>> sortedListBySttKhongGop = MapUtils.getListMapStringObject(transformedHoaDon, "Số thứ tự không gộp");
 
-
-
         BangKeSuDungTienVayService bangKeSuDungTienVayService = new BangKeSuDungTienVayService(folder, sortedListBySttKhongGop, bangKeSuDungTienVayTemplate.getInputStream());
         bangKeSuDungTienVayService.exportDocument();
         logger.info("Export BangKeSuDungTienVayService");
 
-        DonCamKetService donCamKetService = new DonCamKetService(folder, sortedListBySttKhongGop, donCamKetTemplate.getInputStream());
+        DonCamKetService donCamKetService = new DonCamKetService(folder, sortedListBySttKhongGop, fileDate, donCamKetTemplate.getInputStream());
         donCamKetService.exportDocument();
         logger.info("Export DonCamKetService");
 
-        BienBanKiemTraSuDungVonVayService bienBanKiemTraSuDungVonVayService = new BienBanKiemTraSuDungVonVayService(folder, mapByNhaCungCap, bienBanKiemTraSuDungVonVayTemplate.getInputStream());
+        BienBanKiemTraSuDungVonVayService bienBanKiemTraSuDungVonVayService = new BienBanKiemTraSuDungVonVayService(folder, mapByNhaCungCap, fileDate, bienBanKiemTraSuDungVonVayTemplate.getInputStream());
         bienBanKiemTraSuDungVonVayService.exportDocument();
         logger.info("Export BienBanKiemTraSuDungVonVayService");
 
-        HopDongTinDungService hopDongTinDungService = new HopDongTinDungService(folder, mapByNhaCungCap, hopDongTinDungTemplate.getInputStream());
+        HopDongTinDungService hopDongTinDungService = new HopDongTinDungService(folder, mapByNhaCungCap, fileDate, hopDongTinDungTemplate.getInputStream());
         hopDongTinDungService.exportDocument();
         logger.info("Export HopDongTinDungService");
 
 
         for (String ncc : mapByNhaCungCap.keySet()) {
-            UyNhiemChiService uyNhiemChiService = new UyNhiemChiService(folder, MapUtils.getMapStringObject(mapByNhaCungCap, ncc), uyNhiemChiTemplate.getInputStream());
+            UyNhiemChiService uyNhiemChiService = new UyNhiemChiService(folder, MapUtils.getMapStringObject(mapByNhaCungCap, ncc), fileDate, uyNhiemChiTemplate.getInputStream());
             uyNhiemChiService.exportDocument();
             logger.info("Export UyNhiemChiService");
         }
     }
 
     @SneakyThrows
-    public void transformPhieuNhapKho(Map<String, Object> phieuNhapKhoMap, String folder) {
+    public void transformPhieuNhapKho(Map<String, Object> phieuNhapKhoMap, ZonedDateTime zdt, String folder) {
 
         for (String ncc : phieuNhapKhoMap.keySet()) {
             Map<String, Object> donHangMap = MapUtils.getMapStringObject(phieuNhapKhoMap, ncc);
             for (String soHoaDon : donHangMap.keySet()) {
-                DonMuaHangService donMuaHangService = new DonMuaHangService(folder, MapUtils.getListMapStringObject(donHangMap, soHoaDon), ncc, donMuaHangTemplate.getInputStream());
+                DonMuaHangService donMuaHangService = new DonMuaHangService(folder, MapUtils.getListMapStringObject(donHangMap, soHoaDon), ncc, zdt, donMuaHangTemplate.getInputStream());
                 donMuaHangService.exportDocument();
                 logger.info("Export DonMuaHangService");
             }

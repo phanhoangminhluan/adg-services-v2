@@ -38,6 +38,7 @@ public class NhaCungCapDTO {
     private String soTaiKhoan;
     private String tenNganHang;
     private String maSoThue;
+    private String diaChi;
 
     public static void main(String[] args) {
         String raw = FileUtils.readContent("./adg-api/src/main/resources/adg-clients.json");

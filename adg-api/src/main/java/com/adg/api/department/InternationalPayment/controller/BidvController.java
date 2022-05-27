@@ -2,6 +2,7 @@ package com.adg.api.department.InternationalPayment.controller;
 
 import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
 import com.adg.api.util.ZipUtils;
+import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +88,8 @@ public class BidvController {
             Map<String, Object> data = MapUtils.getMapStringObject(request, "data");
             List<Map<String, Object>> hd = MapUtils.getListMapStringObject(data, "hd");
             List<Map<String, Object>> pnk = MapUtils.getListMapStringObject(data, "pnk");
-            return this.hoaDonService.exportDocuments(hd, this.hoaDonService.convertDtoToPnk(pnk));
+            String fileDate = MapUtils.getString(data, "fileDate", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "UTC", DateTimeUtils.FMT_09));
+            return this.hoaDonService.exportDocuments(hd, this.hoaDonService.convertDtoToPnk(pnk), fileDate);
         } catch (Exception exception) {
             exception.printStackTrace();
         }

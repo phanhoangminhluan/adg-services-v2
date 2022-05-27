@@ -29,10 +29,12 @@ public class BienBanKiemTraSuDungVonVayService {
     private final WordWriter wordWriter;
     private final String outputFolder;
     private final Map<String, Object> data;
+    private final ZonedDateTime fileDate;
 
-    public BienBanKiemTraSuDungVonVayService(String outputFolder, Map<String, Object> hoaDonRecords, InputStream inputStream) {
+    public BienBanKiemTraSuDungVonVayService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
         this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderBienBanKiemTraSuDungVonVay());
         this.outputFolder = outputFolder;
+        this.fileDate = fileDate;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
@@ -62,15 +64,13 @@ public class BienBanKiemTraSuDungVonVayService {
         }
 
 
-        result.put("Ngày hôm nay", String.format("ngày %s tháng %s năm %s", ZonedDateTime.now().getDayOfMonth(), ZonedDateTime.now().getMonthValue(), ZonedDateTime.now().getYear()));
+        result.put("Ngày hôm nay", String.format("ngày %s tháng %s năm %s", this.fileDate.getDayOfMonth(), this.fileDate.getMonthValue(), this.fileDate.getYear()));
         result.put("Đại diện khách hàng", "");
         result.put("Đại diện ngân hàng", "");
-        result.put("Mã số giấy đề nghị giải ngân", "01.219/2021/8088928/HĐTD");
         result.put("Tổng tiền vay bằng số", NumberUtils.formatNumber1(tongTienVay));
         result.put("Số tiền vay", NumberUtils.formatNumber1(tongTienVay));
         result.put("Tổng tiền vay bằng chữ", MoneyUtils.convertMoneyToText(tongTienVay));
         result.put("Danh sách thanh toán tiền hàng", arr);
-        result.put("Ngày đề nghị giải ngân", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_10));
 
 
         return result;
