@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Minh-Luan H. Phan
  * Created on: 2022.04.24 15:18
  */
-public class BangKeChungTuDienTuDeNghiGiaiNgan {
+public class BangKeChungTuDienTuDeNghiGiaiNganService {
 
     private final ExcelWriter excelWriter;
     private final ExcelTable excelTable;
@@ -31,7 +31,7 @@ public class BangKeChungTuDienTuDeNghiGiaiNgan {
     private final String outputFolder;
     private final ZonedDateTime fileDate;
 
-    public BangKeChungTuDienTuDeNghiGiaiNgan(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, InputStream inputStream) {
+    public BangKeChungTuDienTuDeNghiGiaiNganService(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, InputStream inputStream) {
 
         this.outputFolder = outputFolder;
         this.excelWriter = new ExcelWriter(inputStream);
@@ -70,11 +70,12 @@ public class BangKeChungTuDienTuDeNghiGiaiNgan {
             String ncc = MapUtils.getString(hoaDonRecord, HoaDonHeaderMetadata.NhaCungCap.deAccentedName);
             String soChungTu = MapUtils.getString(hoaDonRecord, HoaDonHeaderMetadata.SoHoaDon.deAccentedName);
             String ngayChungTu = MapUtils.getString(hoaDonRecord, HoaDonHeaderMetadata.NgayChungTu.deAccentedName);
+            ngayChungTu = DateTimeUtils.reformatDate(ngayChungTu, DateTimeUtils.FMT_01, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09), "UTC", "UTC");
             String soTien = MapUtils.getString(hoaDonRecord, HoaDonHeaderMetadata.TongTienThanhToan.deAccentedName);
             danhSachChungTu.add(
                     MapUtils.ImmutableMap()
                             .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.TT.getHeaderName(), stt)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.SoChungTu.getHeaderName(), soChungTu)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.SoChungTu.getHeaderName(), "0" + soChungTu)
                             .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.NgayChungTu.getHeaderName(), ngayChungTu)
                             .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.SoTien.getHeaderName(), soTien)
                             .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.DonViPhatHanh.getHeaderName(), ncc)
@@ -96,7 +97,7 @@ public class BangKeChungTuDienTuDeNghiGiaiNgan {
 
     private void insertRecordToTable() {
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(this.data, "danhSachChungTu");
-        records.forEach(record -> this.excelTable.insert(record));
+        records.forEach(this.excelTable::insert);
         this.excelTable.removeSampleRow();
     }
 

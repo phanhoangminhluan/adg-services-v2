@@ -48,6 +48,7 @@ public class ToKhaiHaiQuanService {
                             .put(ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedHeader, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.transformCallback.apply(output))
                             .put(ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedHeader, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.transformCallback.apply(output))
                             .put(ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedHeader, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.transformCallback.apply(output))
+                            .put(ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedHeader, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.transformCallback.apply(output))
                     .build());
         }
         return result;

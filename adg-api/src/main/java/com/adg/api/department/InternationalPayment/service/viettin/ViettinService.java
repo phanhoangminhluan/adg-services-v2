@@ -2,15 +2,23 @@ package com.adg.api.department.InternationalPayment.service.viettin;
 
 import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanService;
+import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDienTuDeNghiGiaiNganService;
 import com.adg.api.util.ZipUtils;
+import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +32,15 @@ public class ViettinService {
 
     @Value("${international-payment.bidv.input.zip}")
     private String inputZip;
+
+    @Value("${international-payment.bidv.output.files}")
+    private String output;
+
+    @Value("${international-payment.bidv.output.zip}")
+    private String outputZipFolder;
+
+    @Value("${international-payment.bidv.output.template.bang-ke-chung-tu-dien-tu-de-nghi-giai-ngan}")
+    private Resource bangKeChungTuDienTuDeNghiGiaiNganTemplate;
 
     @Autowired
     private ToKhaiHaiQuanService toKhaiHaiQuanService;
@@ -61,5 +78,43 @@ public class ViettinService {
             files.forEach(File::delete);
         }
         return MapUtils.ImmutableMap().build();
+    }
+
+    public byte[] exportDocuments(Map<String, Object> request) {
+        Map<String, Object> data = MapUtils.getMapStringObject(request, "data");
+        List<Map<String, Object>> hoaDon = MapUtils.getListMapStringObject(data, "hoaDon");
+        List<Map<String, Object>> toKhaiHaiQuan = MapUtils.getListMapStringObject(data, "toKhaiHaiQuan");
+        String fileDate = MapUtils.getString(data, "fileDate", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "UTC", DateTimeUtils.FMT_09));
+        return writeFiles(hoaDon, toKhaiHaiQuan, fileDate);
+    }
+
+    @SneakyThrows
+    public byte[] writeFiles(List<Map<String, Object>> hoaDon, List<Map<String, Object>> toKhaiHaiQuan, String fileDate) {
+        String folder = this.getOutputFolder();
+        String zipPath = this.getOutputZipFolder() + String.format("VIETTIN - Hồ Sơ Giải Ngân - %s.zip", System.currentTimeMillis());
+        ZonedDateTime zdt = DateTimeUtils.convertStringToZonedDateTime(fileDate, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09), "UTC", "UTC");
+
+        BangKeChungTuDienTuDeNghiGiaiNganService bangKeChungTuDienTuDeNghiGiaiNganService =
+                new BangKeChungTuDienTuDeNghiGiaiNganService(folder, hoaDon, toKhaiHaiQuan, zdt, bangKeChungTuDienTuDeNghiGiaiNganTemplate.getInputStream());
+        bangKeChungTuDienTuDeNghiGiaiNganService.exportDocuments();
+
+        ZipUtils.zipFolder(Paths.get(folder), Paths.get(zipPath));
+
+        return IOUtils.toByteArray(new FileInputStream(zipPath));
+
+    }
+
+    private String getOutputFolder() {
+        String path = String.format(output, DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("yyyy/MM/dd/HHmmss")));
+        File file = new File(path);
+        file.mkdirs();
+        return path;
+    }
+
+    private String getOutputZipFolder() {
+        String path = String.format(outputZipFolder, DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("yyyy/MM/dd/HHmmss")));
+        File file = new File(path);
+        file.mkdirs();
+        return path;
     }
 }

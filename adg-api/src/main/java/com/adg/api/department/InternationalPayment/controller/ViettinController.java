@@ -6,6 +6,7 @@ import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,19 @@ public class ViettinController {
                         .put("data", data)
                         .put("status", "ok")
                 .build());
+    }
+
+    @PostMapping(value = "export",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public byte[] exportFile(@RequestBody Map<String, Object> request) {
+        try {
+            log.info("Export Request: {}", JsonUtils.toJson(request));
+            return this.viettinService.exportDocuments(request);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        return null;
     }
 
 }
