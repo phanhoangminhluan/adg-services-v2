@@ -1,0 +1,296 @@
+{
+  "Số tờ khai": "E4",
+  "Mã phân loại kiểm tra": "I6",
+  "Mã loại hình": "P6",
+  "Mã số hàng hóa đại diện của tờ khai": "AE6",
+  "Tên cơ quan Hải quan tiếp nhận tờ khai": "L7",
+  "Mã bộ phận xử lý tờ khai": "AE7",
+  "Ngày đăng ký": "G8",
+  "Ngày thay đổi đăng ký": "R8",
+  "Thời hạn tái nhập/ tái xuất": "AE8",
+  "Người nhập khẩu": {
+    "Mã": "H10",
+    "Tên": "H11",
+    "Mã bưu chính": "H13",
+    "Địa chỉ": "H14",
+    "Số điện thoại": "H16"
+  },
+  "Người ủy thác nhập khẩu": {
+    "Mã": "H18",
+    "Tên": "H19"
+  },
+  "Người xuất khẩu": {
+    "Mã": "H22",
+    "Tên": "H23",
+    "Mã bưu chính": "H24",
+    "Địa chỉ": [
+      "H25",
+      "U25",
+      "U26"
+    ],
+    "Mã nước": "H27"
+  },
+  "Số vận đơn": [
+    "D31",
+    "D32",
+    "D33",
+    "D34",
+    "D35"
+  ],
+  "Số lượng": [
+    "K36",
+    "P36"
+  ],
+  "Tổng trọng lượng hàng (Gross)": [
+    "K37",
+    "P37"
+  ],
+  "Số lượng container": "K38",
+  "Địa điểm lưu kho": [
+    "U30",
+    "Z30"
+  ],
+  "Địa điểm dỡ hàng": [
+    "U31",
+    "Z31"
+  ],
+  "Địa điểm xếp hàng": [
+    "U32",
+    "Z32"
+  ],
+  "Phương tiện vận chuyển": [
+    "T34",
+    "Z34"
+  ],
+  "Ký hiệu và số hiệu": "U36",
+  "Ngày được phép nhập kho đầu tiên": "Y39",
+  "Mã văn bản pháp quy khác": "Y40",
+  "Số hóa đơn": "J41",
+  "Số tiếp nhận hóa đơn điện tử": "J42",
+  "Ngày phát hành": "J43",
+  "Phương thức thanh toán": "J44",
+  "Tổng trị giá hóa đơn": "J45",
+  "Tổng trị giá tính thuế": "J46",
+  "Tổng hệ số phân bổ trị giá": "J47",
+  "Mã kết quả kiểm tra nội dung": "J48",
+  "Giấy phép nhập khẩu": [
+    "F50",
+    "R50",
+    "AC50",
+    "F51",
+    "R51"
+  ],
+  "Mã phân loại khai trị giá": "I52",
+  "Khai trị giá tổng hợp": "I53",
+  "Các khoản điều chỉnh": "H54",
+  "Phí vận chuyển": "L55",
+  "Phí bảo hiểm": "L56",
+  "Mã tên": [
+    "D58",
+    "D59",
+    "D60",
+    "D61",
+    "D62"
+  ],
+  "Mã phân loại": [
+    "G58",
+    "G59",
+    "G60",
+    "G61",
+    "G62"
+  ],
+  "Trị giá khoản điều chỉnh": [
+    "N58",
+    "N59",
+    "N60",
+    "N61",
+    "N62"
+  ],
+  "Tổng hệ số phân bổ": [
+    "U58",
+    "U59",
+    "U60",
+    "U61",
+    "U62"
+  ],
+  "Chi tiết khai trị giá": "D64",
+  "Tên sắc thuế": [
+    "D68",
+    "D69",
+    "D70",
+    "D71",
+    "D72"
+  ],
+  "Tổng tiền thuế": [
+    "H68",
+    "H69",
+    "H70",
+    "H71",
+    "H72"
+  ],
+  "Số dòng tổng": [
+    "N68",
+    "N69",
+    "N70",
+    "N71",
+    "N72"
+  ],
+  "Tổng tiền thuế phải nộp": [
+    "X68",
+    "AE68"
+  ],
+  "Số tiền bảo lãnh": [
+    "X69",
+    "AE69"
+  ],
+  "Tỷ giá tính thuế": [
+    "X70",
+    "AB70",
+    "X71",
+    "AB71",
+    "X72",
+    "AB72"
+  ],
+  "Mã xác định thời hạn nộp thuế": "X73",
+  "Người nộp thuế": "AF73",
+  "Mã lý do đề nghị BP": "X74",
+  "Phân loại nộp thuế": "AF74",
+  "Tổng số trang của tờ khai": "U75",
+  "Tổng số dòng hàng của tờ khai": "AF75",
+  "Số đính kèm khai báo điện tử": [
+    "K84", "S84", "Z84"
+
+  ],
+  "Phần ghi chú": "G85",
+  "Số quản lý của nội bộ doanh nghiệp": "K87",
+  "Số quản lý người sử dụng": "AC87",
+  "Phân loại chỉ thị của Hải quan": {
+    "Ngày": [
+      "D90",
+      "D93",
+      "D96",
+      "D99",
+      "D102",
+      "D105",
+      "D108",
+      "D111",
+      "D113",
+      "D115",
+      "D117"
+    ],
+    "Tên": [
+      "I90",
+      "I93",
+      "I96",
+      "I99",
+      "I102",
+      "I105",
+      "I108",
+      "I111",
+      "I113",
+      "I115",
+      "I117"
+    ],
+    "Nội dung": [
+      "R90",
+      "R93",
+      "R96",
+      "R99",
+      "R102",
+      "R105",
+      "R108",
+      "R111",
+      "R113",
+      "R115",
+      "R117"
+    ]
+  },
+  "Mục thông báo của Hải quan": {
+    "Ngày khai báo nộp thuế": "K121",
+    "Tổng số tiền thuế chậm nộp": "D123"
+  },
+  "Thời hạn cho phép vận chuyển bảo thuế (khởi hành)": "R127",
+  "Thông tin trung chuyển": {
+    "Địa điểm": [
+      "L129",
+      "L130",
+      "L131"
+    ],
+    "Ngày đến": [
+      "P129",
+      "P130",
+      "P131"
+    ],
+    "Ngày khởi hành": [
+      "U129",
+      "U130",
+      "U131"
+    ]
+  },
+  "Địa điểm đích cho vận chuyển bảo thuế": "P132",
+  "Mã số hàng hóa": "G160",
+  "Mã quản lý riêng": "R160",
+  "Mã phân loại tái xác nhận giá": "AC160",
+  "Mô tả hàng hóa": "G161",
+  "Số lượng (1)": [
+    "V164", "AE164"
+  ],
+  "Số lượng (2)": [
+    "V165", "AE165"
+  ],
+  "Trị giá hóa đơn": [
+    "I166"
+  ],
+  "Đơn giá hóa đơn": [
+    "V166",
+    "AC166",
+    "AE166"
+  ],
+  "Thuế nhập khẩu": {
+    "Trị giá tính thuế (S)": [
+      "I68",
+      "P168"
+    ],
+    "Số lượng tính thuế": "I169",
+    "Thuế suất": [
+      "H170",
+      "I170"
+    ],
+    "Số tiền thuế": [
+      "I171",
+      "P171"
+    ],
+    "Số tiền miễn giảm": [
+      "I172",
+      "P172"
+    ],
+    "Số thứ tự của dòng hàng trên tờ khai tạm nhập tái xuất tương ứng": "S173",
+    "Danh mục miễn thuế nhập khẩu": "K174"
+  },
+  "Thuế và thu khác": {
+    "Tên": [
+      "H178"
+    ],
+    "Trị giá tính thuế": [
+      "I179", "P179"
+    ],
+    "Thuế suất": [
+      "I180"
+    ],
+    "Số tiền thuế": [
+      "I181", "P181"
+    ],
+    "Số tiền miễn giảm": [
+      "I182", "P182"
+    ],
+    "Mã áp dụng thuế suất": [
+      "W178"
+    ],
+    "Số lượng tính thuế": [
+      "W179"
+    ],
+    "Miễn / Giảm / Không chịu thuế và thu khác": [
+      "AC185"
+    ]
+  }
+}

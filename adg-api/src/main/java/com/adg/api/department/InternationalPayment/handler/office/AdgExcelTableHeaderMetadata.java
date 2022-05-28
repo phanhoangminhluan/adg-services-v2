@@ -21,7 +21,7 @@ public class AdgExcelTableHeaderMetadata {
     private String startCellAddress;
     private int columnSize;
 
-    public static AdgExcelTableHeaderMetadata getBangKeChungTuDeNghiGiaiNgan() {
+    public static AdgExcelTableHeaderMetadata getBangKeChungTuDienTuDeNghiGiaiNgan() {
         List<AdgExcelTableHeaderInfo> headers = Arrays.asList(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.values());
 
         return AdgExcelTableHeaderMetadata.builder()

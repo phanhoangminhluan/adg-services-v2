@@ -32,7 +32,7 @@ public class ExcelReader {
     private FileInputStream fileInputStream;
     private Sheet sheet;
 
-    public final static String TO_KHAI_HAI_QUAN = "/Users/luan.phm/engineering/Projects/ADongGroup/adg-services/adg-api/src/main/resources/ToKhaiHaiQuan.json";
+    public final static String TO_KHAI_HAI_QUAN = "/Users/luan.phm/engineering/Projects/ADongGroup/adg-services-v2/adg-api/src/main/resources/viettin/template-to-khai-hai-quan.json";
 
     @SneakyThrows
     public ExcelReader(String filePath) {
