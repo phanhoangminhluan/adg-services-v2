@@ -57,9 +57,8 @@ public class HopDongTinDungService {
         }
 
 
-        result.put("Số hợp đồng", "01.21/2021/8088928/HĐTD");
         result.put("Tổng tiền vay", NumberUtils.formatNumber1(tongTienVay));
-        result.put("Ngày ký hợp đồng tín dụng", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
+        result.put("Ngày ký hợp đồng tín dụng", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
         result.put("Ngày ký", String.format("TPHCM, ngày %s tháng %s năm %s", this.fileDate.getDayOfMonth(), this.fileDate.getMonthValue(), this.fileDate.getYear()));
         result.put("Tổng tiền vay bằng chữ", MoneyUtils.convertMoneyToText(tongTienVay));
 
