@@ -51,9 +51,19 @@ public class GiayNhanNoService {
 
         soTienBangChu = MoneyUtils.convertMoneyToText(soTienBangSo);
 
+        String mucDichSuDungKhoanNo = "";
+        if (!hoaDonRecords.isEmpty()) {
+            mucDichSuDungKhoanNo = "Thanh toán tiền hàng trong nước.";
+        }
+        if (!toKhaiHaiQuanRecords.isEmpty()) {
+            mucDichSuDungKhoanNo += " Thanh toán tiền thuế GTGT, thuế NK hàng NK.";
+        }
+
+
         return MapUtils.ImmutableMap()
                 .put("tongTienThanhToanBangSo", NumberUtils.formatNumber1(soTienBangSo))
                 .put("tongTienThanhToanBangChu", soTienBangChu)
+                .put("mucDichSuDungKhoanNo", mucDichSuDungKhoanNo.trim())
                 .put("ngayFileDate", String.format("Ngày %s tháng %s năm %s", fileDate.getDayOfMonth(), fileDate.getMonthValue(), fileDate.getYear()))
                 .build();
     }
