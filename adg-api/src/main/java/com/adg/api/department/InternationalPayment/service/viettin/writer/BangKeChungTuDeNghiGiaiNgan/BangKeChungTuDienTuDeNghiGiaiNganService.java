@@ -1,11 +1,10 @@
-package com.adg.api.department.InternationalPayment.service.viettin.writer;
+package com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan;
 
 import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderMetadata;
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelTable;
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelUtils;
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelWriter;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
-import com.adg.api.department.InternationalPayment.service.viettin.BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo;
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanHeaderInfoMetadata;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;

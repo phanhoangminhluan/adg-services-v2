@@ -2,7 +2,7 @@ package com.adg.api.department.InternationalPayment.service.viettin;
 
 import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanService;
-import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDienTuDeNghiGiaiNganService;
+import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganService;
 import com.adg.api.util.ZipUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.JsonUtils;

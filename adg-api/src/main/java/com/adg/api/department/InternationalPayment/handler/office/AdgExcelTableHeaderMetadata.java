@@ -2,7 +2,7 @@ package com.adg.api.department.InternationalPayment.handler.office;
 
 import com.adg.api.department.InternationalPayment.service.bidv.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.DonMuaHang.DonMuaHangHeaderInfoMetadata;
-import com.adg.api.department.InternationalPayment.service.viettin.BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo;
+import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo;
 import lombok.Builder;
 import lombok.Data;
 
