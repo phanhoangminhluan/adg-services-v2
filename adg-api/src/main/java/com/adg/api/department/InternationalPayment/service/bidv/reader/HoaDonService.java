@@ -261,7 +261,7 @@ public class HoaDonService {
 
         List<Map<String, Object>> sortedListBySttKhongGop = MapUtils.getListMapStringObject(transformedHoaDon, "Số thứ tự không gộp");
 
-        BangKeSuDungTienVayService bangKeSuDungTienVayService = new BangKeSuDungTienVayService(folder, sortedListBySttKhongGop, bangKeSuDungTienVayTemplate.getInputStream());
+        BangKeSuDungTienVayService bangKeSuDungTienVayService = new BangKeSuDungTienVayService(folder, sortedListBySttKhongGop, fileDate, bangKeSuDungTienVayTemplate.getInputStream());
         bangKeSuDungTienVayService.exportDocument();
         logger.info("Export BangKeSuDungTienVayService");
 
