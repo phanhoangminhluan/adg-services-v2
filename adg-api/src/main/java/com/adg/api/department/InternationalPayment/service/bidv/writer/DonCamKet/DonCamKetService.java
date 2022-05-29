@@ -67,8 +67,8 @@ public class DonCamKetService {
     private void build() {
         String fileName = String.format("Đơn cam kết - %s.docx",
                 DateTimeUtils.convertZonedDateTimeToFormat(
-                        ZonedDateTime.now(),
-                        "Asia/Ho_Chi_Minh",
+                        this.fileDate,
+                        "UTC",
                         DateTimeUtils.FMT_03
                 )
         );

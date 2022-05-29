@@ -54,8 +54,8 @@ public class UyNhiemChiService {
         String fileName = String.format("Uỷ nhiệm chi - %s - %s.docx",
                 MapUtils.getString(this.data, "Người cung cấp"),
                 DateTimeUtils.convertZonedDateTimeToFormat(
-                        ZonedDateTime.now(),
-                        "Asia/Ho_Chi_Minh",
+                        this.fileDate,
+                        "UTC",
                         DateTimeUtils.FMT_03
                 )
         );

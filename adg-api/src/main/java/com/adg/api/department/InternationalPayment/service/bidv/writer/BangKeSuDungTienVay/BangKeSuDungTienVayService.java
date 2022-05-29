@@ -26,12 +26,14 @@ public class BangKeSuDungTienVayService {
     private ExcelTable excelTable;
     private Map<String, Object> data;
     private String outputFolder;
+    private ZonedDateTime fileDate;
 
-    public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, InputStream inputStream) {
+    public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
         this.outputFolder = outputFolder;
         this.excelWriter = new ExcelWriter(inputStream);
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(this.excelWriter, AdgExcelTableHeaderMetadata.getBidvBangKeSuDungTienVay());
+        this.fileDate = fileDate;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
@@ -63,7 +65,7 @@ public class BangKeSuDungTienVayService {
     }
 
     private void build() {
-        String fileName = String.format("Bảng kê sử dụng tiền vay - %s.xlsx", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_03));
+        String fileName = String.format("Bảng kê sử dụng tiền vay - %s.xlsx", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_03));
         this.excelWriter.build(outputFolder + "/" + fileName);
     }
 

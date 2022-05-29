@@ -107,8 +107,8 @@ public class BienBanKiemTraSuDungVonVayService {
     private void build() {
         String fileName = String.format("Biên bản kiểm tra sử dụng vốn vay - %s.docx",
                 DateTimeUtils.convertZonedDateTimeToFormat(
-                        ZonedDateTime.now(),
-                        "Asia/Ho_Chi_Minh",
+                        this.fileDate,
+                        "UTC",
                         DateTimeUtils.FMT_03
                 )
         );
