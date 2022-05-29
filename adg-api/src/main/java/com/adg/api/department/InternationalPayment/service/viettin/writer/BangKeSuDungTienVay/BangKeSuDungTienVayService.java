@@ -51,11 +51,19 @@ public class BangKeSuDungTienVayService {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> bangKe = new ArrayList<>();
 
+        int stt = 1;
+
+
         for (Map<String, Object> hoaDonRecord : hoaDonRecords) {
             Map<String, Object> transformedRecord = new HashMap<>();
             for (BangKeSuDungTienVayHeaderInfoMetadata headerInfoMetadata : BangKeSuDungTienVayHeaderInfoMetadata.values()) {
-                transformedRecord.put(headerInfoMetadata.getHeaderName(), headerInfoMetadata.transformHoaDonCallback.apply(hoaDonRecord));
+                if (headerInfoMetadata == BangKeSuDungTienVayHeaderInfoMetadata.TT) {
+                    transformedRecord.put(headerInfoMetadata.getHeaderName(), stt);
+                } else {
+                    transformedRecord.put(headerInfoMetadata.getHeaderName(), headerInfoMetadata.transformHoaDonCallback.apply(hoaDonRecord));
+                }
             }
+            stt++;
             totalCost += MapUtils.getDouble(hoaDonRecord, HoaDonHeaderMetadata.TongTienThanhToan.deAccentedName);
             bangKe.add(transformedRecord);
         }
@@ -63,8 +71,13 @@ public class BangKeSuDungTienVayService {
         for (Map<String, Object> toKhaiHaiQuanRecord : toKhaiHaiQuanRecords) {
             Map<String, Object> transformedRecord = new HashMap<>();
             for (BangKeSuDungTienVayHeaderInfoMetadata headerInfoMetadata : BangKeSuDungTienVayHeaderInfoMetadata.values()) {
-                transformedRecord.put(headerInfoMetadata.getHeaderName(), headerInfoMetadata.transformToKhaiHaiQuanCallback.apply(toKhaiHaiQuanRecord));
+                if (headerInfoMetadata == BangKeSuDungTienVayHeaderInfoMetadata.TT) {
+                    transformedRecord.put(headerInfoMetadata.getHeaderName(), stt);
+                } else {
+                    transformedRecord.put(headerInfoMetadata.getHeaderName(), headerInfoMetadata.transformToKhaiHaiQuanCallback.apply(toKhaiHaiQuanRecord));
+                }
             }
+            stt++;
             totalCost += MapUtils.getDouble(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName);
 
             bangKe.add(transformedRecord);
@@ -75,6 +88,7 @@ public class BangKeSuDungTienVayService {
     private void insertRecordToTable() {
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(this.data, "Bảng kê");
         records.forEach(item -> this.excelTable.insert(item));
+        this.excelTable.merge();
     }
     private void build() {
         String fileName = String.format("Bảng kê sử dụng tiền vay - %s.xlsx", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_03));

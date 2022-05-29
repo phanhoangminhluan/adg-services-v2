@@ -89,4 +89,9 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
     public CellType getCellType() {
         return this.cellType;
     }
+
+    @Override
+    public boolean isGroupedColumn() {
+        return false;
+    }
 }

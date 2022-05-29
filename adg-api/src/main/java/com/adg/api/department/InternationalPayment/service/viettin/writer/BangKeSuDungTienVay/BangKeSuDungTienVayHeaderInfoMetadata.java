@@ -22,14 +22,16 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
             "A6",
             CellType.NUMERIC,
             record -> MapUtils.getString(record, HoaDonHeaderMetadata.SoThuTuKhongGop.deAccentedName),
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoThuTuKhongGop.deAccentedName)
+            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoThuTuKhongGop.deAccentedName),
+            false
     ),
     TenKhachHang(
             "TÊN KHÁCH HÀNG",
             "B6",
             CellType.STRING,
             record -> MapUtils.getString(record, HoaDonHeaderMetadata.NhaCungCap.deAccentedName),
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName)
+            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName),
+            true
     ),
     TaiKhoan(
             "TÀI KHOẢN",
@@ -44,7 +46,8 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
                 String nhaCungCap = MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName);
                 NhaCungCapDTO dto = NhaCungCapDTO.nhaCungCapMap.get(nhaCungCap);
                 return dto == null ? "xxxx-xxxx-xxxx" : dto.getSoTaiKhoan();
-            }
+            },
+            true
     ),
     NganHang(
             "NGÂN HÀNG",
@@ -59,22 +62,25 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
                 String nhaCungCap = MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName);
                 NhaCungCapDTO dto = NhaCungCapDTO.nhaCungCapMap.get(nhaCungCap);
                 return dto == null ? "xxxx-xxxx-xxxx" : dto.getTenNganHang();
-            }
+            },
+            true
     ),
     MucDich(
             "MỤC ĐÍCH",
             "E6",
             CellType.STRING,
             record -> "Thanh toán tiền hạt nhựa",
-            record -> "Thanh toán tiền thuế GTGT, thuế NK hàng NK"
+            record -> "Thanh toán tiền thuế GTGT, thuế NK hàng NK",
+            true
     ),
     SoChungTu(
             "SỐ CHỨNG TỪ",
             "F6",
             CellType.STRING,
             record -> "0" + MapUtils.getString(record, HoaDonHeaderMetadata.SoHoaDon.deAccentedName).replace("0", ""),
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName)
-            ),
+            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName),
+            true
+    ),
     NgayChungTu(
             "NGÀY CHỨNG TỪ",
             "G6",
@@ -87,35 +93,40 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
                             "UTC",
                             "UTC"
                     ),
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedName)
+            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedName),
+            false
     ),
     SoTien(
             "SỐ TIỀN (VND)",
             "H6",
             CellType.NUMERIC,
             record -> MapUtils.getString(record, HoaDonHeaderMetadata.TongTienThanhToan.deAccentedName),
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName)
+            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName),
+            false
     ),
     SoTienDaThanhToan(
             "SỐ TIỀN ĐÃ THANH TOÁN (VND)",
             "I6",
             CellType.STRING,
             record -> "-",
-            record -> "-"
+            record -> "-",
+            false
     ),
     SoTienNhanNo(
             "SỐ TIỀN NHẬN NỢ (VND)",
             "J6",
             CellType.NUMERIC,
             record -> MapUtils.getString(record, HoaDonHeaderMetadata.TongTienThanhToan.deAccentedName),
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName)
+            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName),
+            false
     ),
     PhuongThucGiaiNgan(
             "PHƯƠNG THỨC GIẢI NGÂN",
             "K6",
             CellType.STRING,
             record -> "CK",
-            record -> "CK"
+            record -> "CK",
+            false
     )
     ;
     private final String header;
@@ -123,13 +134,15 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
     private final CellType cellType;
     public final Function<Map<String, Object>, String> transformHoaDonCallback;
     public final Function<Map<String, Object>, String> transformToKhaiHaiQuanCallback;
+    private final boolean isGroupedColumn;
 
-    BangKeSuDungTienVayHeaderInfoMetadata(String header, String cellAddress, CellType cellType, Function<Map<String, Object>, String> transformHoaDonCallback, Function<Map<String, Object>, String> transformToKhaiHaiQuanCallback) {
+    BangKeSuDungTienVayHeaderInfoMetadata(String header, String cellAddress, CellType cellType, Function<Map<String, Object>, String> transformHoaDonCallback, Function<Map<String, Object>, String> transformToKhaiHaiQuanCallback, boolean isGroupedColumn) {
         this.header = header;
         this.cellAddress = cellAddress;
         this.cellType = cellType;
         this.transformHoaDonCallback = transformHoaDonCallback;
         this.transformToKhaiHaiQuanCallback = transformToKhaiHaiQuanCallback;
+        this.isGroupedColumn = isGroupedColumn;
     }
 
     @Override
@@ -150,5 +163,10 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
     @Override
     public CellType getCellType() {
         return this.cellType;
+    }
+
+    @Override
+    public boolean isGroupedColumn() {
+        return this.isGroupedColumn;
     }
 }

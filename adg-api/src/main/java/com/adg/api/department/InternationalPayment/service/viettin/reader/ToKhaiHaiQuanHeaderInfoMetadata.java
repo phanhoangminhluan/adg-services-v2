@@ -94,4 +94,9 @@ public enum ToKhaiHaiQuanHeaderInfoMetadata implements AdgExcelTableHeaderInfo {
     public CellType getCellType() {
         return this.cellType;
     }
+
+    @Override
+    public boolean isGroupedColumn() {
+        return false;
+    }
 }

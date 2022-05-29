@@ -12,4 +12,5 @@ public interface AdgExcelTableHeaderInfo {
     String getCellAddress();
     int getOrdinal();
     CellType getCellType();
+    boolean isGroupedColumn();
 }

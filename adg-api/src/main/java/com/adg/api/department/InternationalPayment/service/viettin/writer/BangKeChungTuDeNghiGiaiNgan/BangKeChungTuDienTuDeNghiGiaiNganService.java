@@ -97,7 +97,9 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
     private void insertRecordToTable() {
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(this.data, "danhSachChungTu");
         records.forEach(this.excelTable::insert);
+        this.excelTable.merge();
         this.excelTable.removeSampleRow();
+
     }
 
     private void fillSignDate() {

@@ -60,6 +60,36 @@ public class ExcelTable {
        return currentRow;
     }
 
+    public void merge() {
+        Row currentRow = this.excelWriter.getSheet().getRow(sampleRow.getRowNum() + 1);
+        int startRow = currentRow.getRowNum() + 1;
+        for (int columnIndex = this.startColumnIndex; columnIndex <= this.endColumnIndex; columnIndex++) {
+            AdgExcelTableHeaderInfo header = this.headerNameIndexMap.get(columnIndex);
+            if (header.isGroupedColumn()) {
+                Cell startMergeRegion = this.excelWriter.getCell(currentRow, columnIndex);
+                String startMergeValue = ExcelUtils.parseString(startMergeRegion);
+                Cell currentCell = null;
+                String currentValue = null;
+                for (int rowIndex = startRow; rowIndex <= sampleRow.getRowNum() + size; rowIndex++) {
+                    currentCell = this.excelWriter.getCell(this.excelWriter.getRow(rowIndex), columnIndex);
+                    currentValue = ExcelUtils.parseString(currentCell);
+                    if (currentValue == null || !currentValue.equals(startMergeValue)) {
+                        startMergeValue = currentValue;
+                        if (!startMergeRegion.getAddress().formatAsString().equals(this.excelWriter.getAboveCell(currentCell).getAddress().formatAsString())) {
+                            this.excelWriter.mergeCell(startMergeRegion, this.excelWriter.getAboveCell(currentCell));
+                        }
+                        startMergeRegion = currentCell;
+                    }
+                }
+                if (currentCell != null) {
+                    if (!startMergeRegion.getAddress().formatAsString().equals(currentCell.getAddress().formatAsString())) {
+                        this.excelWriter.mergeCell(startMergeRegion, currentCell);
+                    }
+                }
+            }
+        }
+    }
+
     public void removeSampleRow() {
         this.excelWriter.removeRow(this.sampleRow, startColumnIndex, endColumnIndex);
     }

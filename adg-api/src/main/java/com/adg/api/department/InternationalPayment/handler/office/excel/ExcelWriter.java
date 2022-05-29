@@ -2,6 +2,7 @@ package com.adg.api.department.InternationalPayment.handler.office.excel;
 
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -69,6 +70,12 @@ public class ExcelWriter {
         return row.createCell(columnIndex);
     }
 
+    public Cell getAboveCell(Cell currentCell) {
+        int rowIndex = currentCell.getRowIndex();
+        int columnIndex = currentCell.getColumnIndex();
+        return this.getCell(this.getRow(rowIndex - 1), columnIndex);
+    }
+
     public Row getRow(int rowIndex) {
         Row row = this.sheet.getRow(rowIndex);
         if (row != null) {
@@ -77,6 +84,16 @@ public class ExcelWriter {
 
         return this.sheet.createRow(rowIndex);
     }
+
+    public void mergeCell(String startCell, String endCell) {
+        this.sheet.addMergedRegion(CellRangeAddress.valueOf(startCell + ":" + endCell));
+    }
+
+    public void mergeCell(Cell startCell, Cell endCell) {
+        this.sheet.addMergedRegion(CellRangeAddress.valueOf(startCell.getAddress().formatAsString() + ":" + endCell.getAddress().formatAsString()));
+
+    }
+
 
 
     public List<Cell> getCellsByRange(String startCellAddress, int columnSize) {
