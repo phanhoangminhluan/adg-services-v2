@@ -5,6 +5,7 @@ import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonSer
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeSuDungTienVay.BangKeSuDungTienVayService;
+import com.adg.api.department.InternationalPayment.service.viettin.writer.GiayNhanNo.GiayNhanNoService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.UyNhiemChi.UyNhiemChiService;
 import com.adg.api.util.ZipUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
@@ -51,6 +52,9 @@ public class ViettinService {
 
     @Value("${international-payment.viettin.output.template.uy-nhiem-chi}")
     private Resource uyNhiemChiTemplate;
+
+    @Value("${international-payment.viettin.output.template.giay-nhan-no}")
+    private Resource giayNhanNoTemplate;
 
     @Autowired
     private ToKhaiHaiQuanService toKhaiHaiQuanService;
@@ -116,9 +120,14 @@ public class ViettinService {
         bangKeSuDungTienVayService.exportDocument();
 
         for (String nhaCungCap : groupedHoaDonRecords.keySet()) {
-            UyNhiemChiService uyNhiemChiService = new UyNhiemChiService(folder, hoaDonRecords, nhaCungCap, zdt, uyNhiemChiTemplate.getInputStream());
+            UyNhiemChiService uyNhiemChiService =
+                    new UyNhiemChiService(folder, hoaDonRecords, nhaCungCap, zdt, uyNhiemChiTemplate.getInputStream());
             uyNhiemChiService.exportDocument();
         }
+
+        GiayNhanNoService giayNhanNoService =
+                new GiayNhanNoService(folder, hoaDonRecords, toKhaiHaiQuanRecords, zdt, giayNhanNoTemplate.getInputStream());
+        giayNhanNoService.exportDocument();
 
         ZipUtils.zipFolder(Paths.get(folder), Paths.get(zipPath));
 
