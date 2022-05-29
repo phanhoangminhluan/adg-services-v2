@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.CellType;
  * @author Minh-Luan H. Phan
  * Created on: 2022.04.24 11:22
  */
-public enum BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo implements AdgExcelTableHeaderInfo {
+public enum BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo implements AdgExcelTableHeaderInfo {
 
     TT("TT", "A9", CellType.NUMERIC),
     SoChungTu("Số chứng từ", "B9", CellType.NUMERIC),
@@ -20,7 +20,7 @@ public enum BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo implements 
     private final String cellAddress;
     private final CellType cellType;
 
-    BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo(String header, String cellAddress, CellType cellType) {
+    BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo(String header, String cellAddress, CellType cellType) {
         this.header = header;
         this.cellAddress = cellAddress;
         this.cellType = cellType;

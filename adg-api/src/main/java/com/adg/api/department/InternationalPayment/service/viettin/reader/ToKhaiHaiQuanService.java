@@ -40,16 +40,19 @@ public class ToKhaiHaiQuanService {
 
         List<Map<String, Object>> result = new ArrayList<>();
 
+        int i = 1;
         for (String filePath : filePaths) {
             ExcelReader excelReader = new ExcelReader(filePath);
             Map<String, Object> output = MapUtils.getMapStringObject(excelReader.getCellValues(this.toKhaiHaiQuanAddressMap), "data");
 
             result.add(MapUtils.ImmutableMap()
-                            .put(ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedHeader, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.transformCallback.apply(output))
-                            .put(ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedHeader, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.transformCallback.apply(output))
-                            .put(ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedHeader, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.transformCallback.apply(output))
-                            .put(ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedHeader, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.transformCallback.apply(output))
+                            .put(ToKhaiHaiQuanHeaderInfoMetadata.SoThuTuKhongGop.deAccentedName, i)
+                            .put(ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.transformCallback.apply(output))
+                            .put(ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.transformCallback.apply(output))
+                            .put(ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.transformCallback.apply(output))
+                            .put(ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedName, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.transformCallback.apply(output))
                     .build());
+            i++;
         }
         return result;
     }

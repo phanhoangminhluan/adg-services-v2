@@ -48,18 +48,18 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
         List<Map<String, Object>> danhSachChungTu = new ArrayList<>();
         int stt = 1;
         for (Map<String, Object> toKhaiHaiQuanRecord : toKhaiHaiQuanRecords) {
-            String ncc = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedHeader);
-            String soChungTu = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedHeader);
-            String ngayChungTu = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedHeader);
-            String soTien = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedHeader);
+            String ncc = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName);
+            String soChungTu = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName);
+            String ngayChungTu = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedName);
+            String soTien = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName);
             danhSachChungTu.add(
                     MapUtils.ImmutableMap()
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.TT.getHeaderName(), stt)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.SoChungTu.getHeaderName(), soChungTu)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.NgayChungTu.getHeaderName(), ngayChungTu)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.SoTien.getHeaderName(), soTien)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.DonViPhatHanh.getHeaderName(), ncc)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.GhiChu.getHeaderName(), "TKHQ")
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.TT.getHeaderName(), stt)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.SoChungTu.getHeaderName(), soChungTu)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.NgayChungTu.getHeaderName(), ngayChungTu)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.SoTien.getHeaderName(), soTien)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.DonViPhatHanh.getHeaderName(), ncc)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.GhiChu.getHeaderName(), "TKHQ")
                             .build()
             );
             stt++;
@@ -73,12 +73,12 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
             String soTien = MapUtils.getString(hoaDonRecord, HoaDonHeaderMetadata.TongTienThanhToan.deAccentedName);
             danhSachChungTu.add(
                     MapUtils.ImmutableMap()
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.TT.getHeaderName(), stt)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.SoChungTu.getHeaderName(), "0" + soChungTu)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.NgayChungTu.getHeaderName(), ngayChungTu)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.SoTien.getHeaderName(), soTien)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.DonViPhatHanh.getHeaderName(), ncc)
-                            .put(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.GhiChu.getHeaderName(), "Hoá đơn")
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.TT.getHeaderName(), stt)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.SoChungTu.getHeaderName(), "0" + soChungTu)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.NgayChungTu.getHeaderName(), ngayChungTu)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.SoTien.getHeaderName(), soTien)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.DonViPhatHanh.getHeaderName(), ncc)
+                            .put(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.GhiChu.getHeaderName(), "Hoá đơn")
                             .build()
             );
             stt++;
@@ -113,7 +113,7 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
     }
 
     private void fillSum() {
-        Cell soTienHeaderCell = this.excelWriter.getCell(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.SoTien.getCellAddress());
+        Cell soTienHeaderCell = this.excelWriter.getCell(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.SoTien.getCellAddress());
         String startCell = this.excelWriter.getCell(
                 this.excelWriter.getRow(soTienHeaderCell.getRowIndex() + 1),
                 soTienHeaderCell.getColumnIndex()
@@ -134,48 +134,8 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
 
     private void build() {
         String fileName = String.format("Bảng kê chứng từ điện tử đề nghị giải ngân - %s.xlsx",
-                DateTimeUtils.convertZonedDateTimeToFormat(fileDate, "UTC", DateTimeUtils.FMT_10)
+                DateTimeUtils.convertZonedDateTimeToFormat(fileDate, "UTC", DateTimeUtils.FMT_03)
         );
         this.excelWriter.build(this.outputFolder + "/" + fileName);
     }
-
-
-
-//    public static void main(String[] args) {
-//        Map<String, Object> item = MapUtils.ImmutableMap()
-//                .put("TT", "1")
-//                .put("Số chứng từ", "12345")
-//                .put("Ngày chứng từ", "23/12/1998")
-//                .put("Số tiền (VND)", "100000000")
-//                .put("Đơn vị phát hành", "Chi cục HQ CK Cảng Sài Gòn KV I")
-//                .put("Ghi chú", "TKHQ")
-//                .build();
-//
-//        Map<String, Object> item1 = MapUtils.ImmutableMap()
-//                .put("TT", "2")
-//                .put("Số chứng từ", "6789")
-//                .put("Ngày chứng từ", "23/12/1998")
-//                .put("Số tiền (VND)", "100000000")
-//                .put("Đơn vị phát hành", "Chi cục HQ CK Cảng Sài Gòn KV I")
-//                .put("Ghi chú", "TKHQ")
-//                .build();
-//
-//        Map<String, Object> item2 = MapUtils.ImmutableMap()
-//                .put("TT", "3")
-//                .put("Số chứng từ", "1011112")
-//                .put("Ngày chứng từ", "23/12/1998")
-//                .put("Số tiền (VND)", "100000000")
-//                .put("Đơn vị phát hành", "Chi cục HQ CK Cảng Sài Gòn KV I")
-//                .put("Ghi chú", "TKHQ")
-//                .build();
-//
-//        BangKeChungTuDienTuDeNghiGiaiNgan bangKeSuDungTienVay = new BangKeChungTuDienTuDeNghiGiaiNgan();
-//        bangKeSuDungTienVay.insertRecordToTable(Arrays.asList(item, item1, item2));
-//        bangKeSuDungTienVay.excelTable.removeSampleRow();
-//        bangKeSuDungTienVay.fillSum();
-//        bangKeSuDungTienVay.fillSignDate();
-//        bangKeSuDungTienVay.build();
-//
-//    }
-
 }

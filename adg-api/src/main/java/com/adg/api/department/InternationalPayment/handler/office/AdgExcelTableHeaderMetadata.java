@@ -2,7 +2,7 @@ package com.adg.api.department.InternationalPayment.handler.office;
 
 import com.adg.api.department.InternationalPayment.service.bidv.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.DonMuaHang.DonMuaHangHeaderInfoMetadata;
-import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo;
+import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,7 +22,7 @@ public class AdgExcelTableHeaderMetadata {
     private int columnSize;
 
     public static AdgExcelTableHeaderMetadata getBangKeChungTuDienTuDeNghiGiaiNgan() {
-        List<AdgExcelTableHeaderInfo> headers = Arrays.asList(BangKeChungTuDienTuDeNghiGiaiNganTableMetadataHeaderInfo.values());
+        List<AdgExcelTableHeaderInfo> headers = Arrays.asList(BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo.values());
 
         return AdgExcelTableHeaderMetadata.builder()
                 .headers(headers)
@@ -31,12 +31,22 @@ public class AdgExcelTableHeaderMetadata {
                 .build();
     }
 
-    public static AdgExcelTableHeaderMetadata getBangKeSuDungTienVay() {
+    public static AdgExcelTableHeaderMetadata getBidvBangKeSuDungTienVay() {
         List<AdgExcelTableHeaderInfo> headers = Arrays.asList(BangKeSuDungTienVayHeaderInfoMetadata.values());
 
         return AdgExcelTableHeaderMetadata.builder()
                 .headers(headers)
                 .startCellAddress("A10")
+                .columnSize(headers.size())
+                .build();
+    }
+
+    public static AdgExcelTableHeaderMetadata getViettinBangKeSuDungTienVay() {
+        List<AdgExcelTableHeaderInfo> headers = Arrays.asList(com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata.values());
+
+        return AdgExcelTableHeaderMetadata.builder()
+                .headers(headers)
+                .startCellAddress("A7")
                 .columnSize(headers.size())
                 .build();
     }
