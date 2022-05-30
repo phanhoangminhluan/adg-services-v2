@@ -56,6 +56,9 @@ public class ViettinService {
     @Value("${international-payment.viettin.output.template.giay-nhan-no}")
     private Resource giayNhanNoTemplate;
 
+    @Value("${international-payment.viettin.output.template.bang-ke-nop-thue}")
+    private Resource bangKeNopThueTemplate;
+
     @Autowired
     private ToKhaiHaiQuanService toKhaiHaiQuanService;
 

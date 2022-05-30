@@ -87,6 +87,23 @@ public class BangKeSuDungTienVayService {
         );
 
         ExcelUtils.setCell(tongCell, String.format("SUM(%s:%s)", startCell, endCell), CellType.FORMULA);
+
+        ExcelUtils.setCell(
+                this.excelWriter.getCell("A7"),
+                String.format("Chi tiết nội dung sử dụng tiền vay theo hợp đồng tín dụng ngắn hạn cụ thể số : 01.219/2021/8088928/HĐTD ngày %s được ký kết giữa Ngân hàng và Bên vay.", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09)),
+                CellType.STRING);
+
+        Cell sttHeaderCell = this.excelWriter.getCell(BangKeSuDungTienVayHeaderInfoMetadata.TT.getCellAddress());
+
+        Cell finalCell = this.excelWriter.getCell(
+                this.excelWriter.getRow(sttHeaderCell.getRowIndex() + this.excelTable.getSize() + 3),
+                sttHeaderCell.getColumnIndex()
+        );
+
+        ExcelUtils.setCell(
+                finalCell,
+                String.format("Bảng kê này là một bộ phận trong thể tách rời hợp đồng tín dụng ngắn hạn cụ thể số 01.219/2021/8088928/HĐTD ngày %s được ký kết giữa Ngân hàng và Bên vay.", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09)),
+                CellType.STRING);
     }
 
 }

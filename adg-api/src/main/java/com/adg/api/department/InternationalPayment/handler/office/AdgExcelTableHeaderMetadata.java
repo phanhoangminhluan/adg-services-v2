@@ -3,6 +3,7 @@ package com.adg.api.department.InternationalPayment.handler.office;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.DonMuaHang.DonMuaHangHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo;
+import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeNopThue.BangKeNopThueHeaderInfoMetadata;
 import lombok.Builder;
 import lombok.Data;
 
@@ -47,6 +48,16 @@ public class AdgExcelTableHeaderMetadata {
         return AdgExcelTableHeaderMetadata.builder()
                 .headers(headers)
                 .startCellAddress("A7")
+                .columnSize(headers.size())
+                .build();
+    }
+
+    public static AdgExcelTableHeaderMetadata getBangKeNopThue() {
+        List<AdgExcelTableHeaderInfo> headers = Arrays.asList(BangKeNopThueHeaderInfoMetadata.values());
+
+        return AdgExcelTableHeaderMetadata.builder()
+                .headers(headers)
+                .startCellAddress("D26")
                 .columnSize(headers.size())
                 .build();
     }

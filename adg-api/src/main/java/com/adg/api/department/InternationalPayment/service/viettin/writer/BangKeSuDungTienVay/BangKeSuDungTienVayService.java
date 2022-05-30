@@ -37,7 +37,7 @@ public class BangKeSuDungTienVayService {
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(this.excelWriter, AdgExcelTableHeaderMetadata.getViettinBangKeSuDungTienVay());
         this.fileDate = fileDate;
-        this.data = this.transformHoaDonRecords(hoaDonRecords, toKhaiHaiQuanRecords);
+        this.data = this.transformRecords(hoaDonRecords, toKhaiHaiQuanRecords);
     }
 
     public void exportDocument() {
@@ -47,7 +47,7 @@ public class BangKeSuDungTienVayService {
         this.build();
     }
 
-    private Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords) {
+    private Map<String, Object> transformRecords(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> bangKe = new ArrayList<>();
 

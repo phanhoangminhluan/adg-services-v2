@@ -52,6 +52,20 @@ public enum ToKhaiHaiQuanHeaderInfoMetadata implements AdgExcelTableHeaderInfo {
             CellType.NUMERIC,
             record -> "",
             false, false, AdgHeaderType.INTEGER
+    ),
+    NoiDungKhoanNop(
+            "Noi Dung Khoan Nop",
+            "",
+            CellType.STRING,
+            record -> "",
+            false, false, AdgHeaderType.STRING
+    ),
+    MaNDKTTM(
+            "MaNDKTTM",
+            "",
+            CellType.STRING,
+            record -> "",
+            false, false, AdgHeaderType.INTEGER
     )
     ;
 

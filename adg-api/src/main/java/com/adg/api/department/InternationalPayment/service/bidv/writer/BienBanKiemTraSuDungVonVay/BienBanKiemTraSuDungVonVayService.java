@@ -65,6 +65,7 @@ public class BienBanKiemTraSuDungVonVayService {
 
 
         result.put("Ngày hôm nay", String.format("ngày %s tháng %s năm %s", this.fileDate.getDayOfMonth(), this.fileDate.getMonthValue(), this.fileDate.getYear()));
+        result.put("ngayGiaiNgan", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09));
         result.put("Đại diện khách hàng", "");
         result.put("Đại diện ngân hàng", "");
         result.put("Tổng tiền vay bằng số", NumberUtils.formatNumber1(tongTienVay));
