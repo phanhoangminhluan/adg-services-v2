@@ -22,18 +22,20 @@ import java.util.Map;
  */
 public class BangKeSuDungTienVayService {
 
-    private ExcelWriter excelWriter;
-    private ExcelTable excelTable;
-    private Map<String, Object> data;
-    private String outputFolder;
-    private ZonedDateTime fileDate;
+    private final ExcelWriter excelWriter;
+    private final ExcelTable excelTable;
+    private final Map<String, Object> data;
+    private final String outputFolder;
+    private final ZonedDateTime fileDate;
+    private final String contractNumber;
 
-    public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
+    public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, String contractNumber, InputStream inputStream) {
         this.outputFolder = outputFolder;
         this.excelWriter = new ExcelWriter(inputStream);
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(this.excelWriter, AdgExcelTableHeaderMetadata.getBidvBangKeSuDungTienVay());
         this.fileDate = fileDate;
+        this.contractNumber = contractNumber;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
@@ -90,7 +92,7 @@ public class BangKeSuDungTienVayService {
 
         ExcelUtils.setCell(
                 this.excelWriter.getCell("A7"),
-                String.format("Chi tiết nội dung sử dụng tiền vay theo hợp đồng tín dụng ngắn hạn cụ thể số : 01.219/2021/8088928/HĐTD ngày %s được ký kết giữa Ngân hàng và Bên vay.", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09)),
+                String.format("Chi tiết nội dung sử dụng tiền vay theo hợp đồng tín dụng ngắn hạn cụ thể số : 01.%s/2021/8088928/HĐTD ngày %s được ký kết giữa Ngân hàng và Bên vay.", contractNumber, DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09)),
                 CellType.STRING);
 
         Cell sttHeaderCell = this.excelWriter.getCell(BangKeSuDungTienVayHeaderInfoMetadata.TT.getCellAddress());
@@ -102,7 +104,7 @@ public class BangKeSuDungTienVayService {
 
         ExcelUtils.setCell(
                 finalCell,
-                String.format("Bảng kê này là một bộ phận trong thể tách rời hợp đồng tín dụng ngắn hạn cụ thể số 01.219/2021/8088928/HĐTD ngày %s được ký kết giữa Ngân hàng và Bên vay.", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09)),
+                String.format("Bảng kê này là một bộ phận trong thể tách rời hợp đồng tín dụng ngắn hạn cụ thể số 01.%s/2021/8088928/HĐTD ngày %s được ký kết giữa Ngân hàng và Bên vay.", contractNumber, DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09)),
                 CellType.STRING);
     }
 

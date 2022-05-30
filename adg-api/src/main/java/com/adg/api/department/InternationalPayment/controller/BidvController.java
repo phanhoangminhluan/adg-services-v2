@@ -89,7 +89,8 @@ public class BidvController {
             List<Map<String, Object>> hd = MapUtils.getListMapStringObject(data, "hd");
             List<Map<String, Object>> pnk = MapUtils.getListMapStringObject(data, "pnk");
             String fileDate = MapUtils.getString(data, "fileDate", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "UTC", DateTimeUtils.FMT_09));
-            return this.hoaDonService.exportDocuments(hd, this.hoaDonService.convertDtoToPnk(pnk), fileDate);
+            String contractNumber = MapUtils.getString(data, "contractNumber");
+            return this.hoaDonService.exportDocuments(hd, this.hoaDonService.convertDtoToPnk(pnk), fileDate, contractNumber);
         } catch (Exception exception) {
             exception.printStackTrace();
         }

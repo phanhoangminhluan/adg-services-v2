@@ -30,11 +30,13 @@ public class BienBanKiemTraSuDungVonVayService {
     private final String outputFolder;
     private final Map<String, Object> data;
     private final ZonedDateTime fileDate;
+    private final String soHopDong;
 
-    public BienBanKiemTraSuDungVonVayService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
+    public BienBanKiemTraSuDungVonVayService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, String soHopDong, InputStream inputStream) {
         this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderBienBanKiemTraSuDungVonVay());
         this.outputFolder = outputFolder;
         this.fileDate = fileDate;
+        this.soHopDong = soHopDong;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
@@ -66,6 +68,7 @@ public class BienBanKiemTraSuDungVonVayService {
 
         result.put("Ngày hôm nay", String.format("ngày %s tháng %s năm %s", this.fileDate.getDayOfMonth(), this.fileDate.getMonthValue(), this.fileDate.getYear()));
         result.put("ngayGiaiNgan", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09));
+        result.put("soHopDong", soHopDong);
         result.put("Đại diện khách hàng", "");
         result.put("Đại diện ngân hàng", "");
         result.put("Tổng tiền vay bằng số", NumberUtils.formatNumber1(tongTienVay));

@@ -30,11 +30,13 @@ public class HopDongTinDungService {
     private final String outputFolder;
     private final Map<String, Object> data;
     private final ZonedDateTime fileDate;
+    private final String contractNumber;
 
-    public HopDongTinDungService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
+    public HopDongTinDungService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, String contractNumber, InputStream inputStream) {
         this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderMapHopDongTinDung());
         this.outputFolder = outputFolder;
         this.fileDate = fileDate;
+        this.contractNumber = contractNumber;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
@@ -56,7 +58,7 @@ public class HopDongTinDungService {
             arr.add(transformedRecord);
         }
 
-
+        result.put("Số hợp đồng", String.format("01.%s/2021/8088928/HĐTD", contractNumber));
         result.put("Tổng tiền vay", NumberUtils.formatNumber1(tongTienVay));
         result.put("Ngày ký hợp đồng tín dụng", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
         result.put("Ngày ký", String.format("TPHCM, ngày %s tháng %s năm %s", this.fileDate.getDayOfMonth(), this.fileDate.getMonthValue(), this.fileDate.getYear()));

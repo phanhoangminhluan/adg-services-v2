@@ -240,13 +240,13 @@ public class HoaDonService {
     }
 
     @SneakyThrows
-    public byte[] exportDocuments(List<Map<String, Object>> hoaDonRecords, Map<String, Object> pnkRecords, String fileDate) {
+    public byte[] exportDocuments(List<Map<String, Object>> hoaDonRecords, Map<String, Object> pnkRecords, String fileDate, String contactNumber) {
         String folder = this.getOutputFolder();
         String zipPath = this.getOutputZipFolder() + String.format("BIDV - Hồ Sơ Giải Ngân - %s.zip", System.currentTimeMillis());
 
         ZonedDateTime zdt = DateTimeUtils.convertStringToZonedDateTime(fileDate, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09), "UTC", "UTC");
 
-        Map<String, Object> hoaDonMapByNcc = this.transformHoaDonTable(hoaDonRecords, zdt, folder);
+        Map<String, Object> hoaDonMapByNcc = this.transformHoaDonTable(hoaDonRecords, zdt, contactNumber, folder);
         this.transformPhieuNhapKho(pnkRecords, hoaDonMapByNcc, zdt, folder);
         ZipUtils.zipFolder(Paths.get(folder), Paths.get(zipPath));
 
@@ -254,14 +254,14 @@ public class HoaDonService {
     }
 
     @SneakyThrows
-    public Map<String, Object> transformHoaDonTable(List<Map<String, Object>> records, ZonedDateTime fileDate, String folder) {
+    public Map<String, Object> transformHoaDonTable(List<Map<String, Object>> records, ZonedDateTime fileDate, String contractNumber, String folder) {
 
         Map<String, Object> transformedHoaDon = this.mapByNhaCungCap(records);
         Map<String, Object> mapByNhaCungCap = MapUtils.getMapStringObject(transformedHoaDon, "Map by nhà cung cấp");
 
         List<Map<String, Object>> sortedListBySttKhongGop = MapUtils.getListMapStringObject(transformedHoaDon, "Số thứ tự không gộp");
 
-        BangKeSuDungTienVayService bangKeSuDungTienVayService = new BangKeSuDungTienVayService(folder, sortedListBySttKhongGop, fileDate, bangKeSuDungTienVayTemplate.getInputStream());
+        BangKeSuDungTienVayService bangKeSuDungTienVayService = new BangKeSuDungTienVayService(folder, sortedListBySttKhongGop, fileDate, contractNumber, bangKeSuDungTienVayTemplate.getInputStream());
         bangKeSuDungTienVayService.exportDocument();
         logger.info("Export BangKeSuDungTienVayService");
 
@@ -269,11 +269,11 @@ public class HoaDonService {
         donCamKetService.exportDocument();
         logger.info("Export DonCamKetService");
 
-        BienBanKiemTraSuDungVonVayService bienBanKiemTraSuDungVonVayService = new BienBanKiemTraSuDungVonVayService(folder, mapByNhaCungCap, fileDate, bienBanKiemTraSuDungVonVayTemplate.getInputStream());
+        BienBanKiemTraSuDungVonVayService bienBanKiemTraSuDungVonVayService = new BienBanKiemTraSuDungVonVayService(folder, mapByNhaCungCap, fileDate, contractNumber, bienBanKiemTraSuDungVonVayTemplate.getInputStream());
         bienBanKiemTraSuDungVonVayService.exportDocument();
         logger.info("Export BienBanKiemTraSuDungVonVayService");
 
-        HopDongTinDungService hopDongTinDungService = new HopDongTinDungService(folder, mapByNhaCungCap, fileDate, hopDongTinDungTemplate.getInputStream());
+        HopDongTinDungService hopDongTinDungService = new HopDongTinDungService(folder, mapByNhaCungCap, fileDate, contractNumber, hopDongTinDungTemplate.getInputStream());
         hopDongTinDungService.exportDocument();
         logger.info("Export HopDongTinDungService");
 
