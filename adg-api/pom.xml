@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.merlin</groupId>
             <artifactId>merlin-asset</artifactId>
-            <version>0.0.15-SNAPSHOT</version>
+            <version>0.0.17-SNAPSHOT</version>
         </dependency>
 
         <dependency>

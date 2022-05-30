@@ -33,6 +33,7 @@ public class DonMuaHangService {
     private String ncc;
     private String soHoaDon;
     private ZonedDateTime fileDate;
+    private String ngayChungTu;
 
     private static class DonMuaHangAddress {
         public static final String TEN_NCC = "B8";
@@ -46,7 +47,7 @@ public class DonMuaHangService {
         public static final String DIEN_GIAI = "B12";
     }
 
-    public DonMuaHangService(String outputFolder, List<Map<String, Object>> phieuNhapKhoRecords, String ncc, ZonedDateTime fileDate, InputStream inputStream) {
+    public DonMuaHangService(String outputFolder, List<Map<String, Object>> phieuNhapKhoRecords, String ncc, String ngayChungTu, ZonedDateTime fileDate, InputStream inputStream) {
         this.outputFolder = outputFolder;
         this.excelWriter = new ExcelWriter(inputStream);
         this.excelWriter.openSheet();
@@ -55,7 +56,8 @@ public class DonMuaHangService {
                 AdgExcelTableHeaderMetadata.getDonMuaHang()
         );
         this.fileDate = fileDate;
-        this.data = this.transformHoaDonRecords(phieuNhapKhoRecords);
+        this.ngayChungTu = ngayChungTu;
+        this.data = this.transformPhieuNhapKhoRecords(phieuNhapKhoRecords);
         this.ncc = ncc;
     }
 
@@ -76,7 +78,7 @@ public class DonMuaHangService {
         this.excelWriter.build(this.outputFolder + "/" + fileName);
     }
 
-    private Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> phieuNhapKhoRecords) {
+    private Map<String, Object> transformPhieuNhapKhoRecords(List<Map<String, Object>> phieuNhapKhoRecords) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> table = new ArrayList<>();
         String tenNcc = "";
@@ -91,7 +93,6 @@ public class DonMuaHangService {
                     }
                 }
             }
-
             tenNcc = MapUtils.getString(phieuNhapKhoRecord, PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName).trim();
             table.add(transformedRecord);
             this.soHoaDon = HoaDonService.transformSoHoaDon(MapUtils.getString(phieuNhapKhoRecord, PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName));
@@ -107,7 +108,7 @@ public class DonMuaHangService {
         result.put("Diễn giải", "");
         result.put("Danh sách mã hàng", table);
         result.put("Số tiền viết bằng chữ", MoneyUtils.convertMoneyToText(thanhTien));
-        result.put("Ngày giao hàng", String.format("Kể từ ngày %s", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.getFormatterWithDefaultValue("dd/MM/yyyy"))));
+        result.put("Ngày giao hàng", String.format("Kể từ ngày %s", DateTimeUtils.reformatDate(this.ngayChungTu, DateTimeUtils.FMT_01, DateTimeUtils.FMT_09)));
         result.put("Địa điểm giao hàng", "Tại kho Công ty Cổ Phần Á Đông ADG");
         result.put("Điều khoản thanh toán", "");
         result.put("Ghi chú", "");

@@ -246,15 +246,15 @@ public class HoaDonService {
 
         ZonedDateTime zdt = DateTimeUtils.convertStringToZonedDateTime(fileDate, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09), "UTC", "UTC");
 
-        this.transformHoaDonTable(hoaDonRecords, zdt, folder);
-        this.transformPhieuNhapKho(pnkRecords, zdt, folder);
+        Map<String, Object> hoaDonMapByNcc = this.transformHoaDonTable(hoaDonRecords, zdt, folder);
+        this.transformPhieuNhapKho(pnkRecords, hoaDonMapByNcc, zdt, folder);
         ZipUtils.zipFolder(Paths.get(folder), Paths.get(zipPath));
 
         return IOUtils.toByteArray(new FileInputStream(zipPath));
     }
 
     @SneakyThrows
-    public void transformHoaDonTable(List<Map<String, Object>> records, ZonedDateTime fileDate, String folder) {
+    public Map<String, Object> transformHoaDonTable(List<Map<String, Object>> records, ZonedDateTime fileDate, String folder) {
 
         Map<String, Object> transformedHoaDon = this.mapByNhaCungCap(records);
         Map<String, Object> mapByNhaCungCap = MapUtils.getMapStringObject(transformedHoaDon, "Map by nhà cung cấp");
@@ -283,15 +283,17 @@ public class HoaDonService {
             uyNhiemChiService.exportDocument();
             logger.info("Export UyNhiemChiService");
         }
+        return mapByNhaCungCap;
     }
 
     @SneakyThrows
-    public void transformPhieuNhapKho(Map<String, Object> phieuNhapKhoMap, ZonedDateTime zdt, String folder) {
+    public void transformPhieuNhapKho(Map<String, Object> phieuNhapKhoMap, Map<String, Object> mapByNcc, ZonedDateTime zdt, String folder) {
 
-        for (String ncc : phieuNhapKhoMap.keySet()) {
-            Map<String, Object> donHangMap = MapUtils.getMapStringObject(phieuNhapKhoMap, ncc);
+        for (String nhaCungCap : phieuNhapKhoMap.keySet()) {
+            Map<String, Object> donHangMap = MapUtils.getMapStringObject(phieuNhapKhoMap, nhaCungCap);
             for (String soHoaDon : donHangMap.keySet()) {
-                DonMuaHangService donMuaHangService = new DonMuaHangService(folder, MapUtils.getListMapStringObject(donHangMap, soHoaDon), ncc, zdt, donMuaHangTemplate.getInputStream());
+                String ngayHoaDon = MapUtils.getString(mapByNcc, String.format("%s.%s.%s", nhaCungCap, soHoaDon, HoaDonHeaderMetadata.NgayChungTu.deAccentedName));
+                DonMuaHangService donMuaHangService = new DonMuaHangService(folder, MapUtils.getListMapStringObject(donHangMap, soHoaDon), nhaCungCap, ngayHoaDon, zdt, donMuaHangTemplate.getInputStream());
                 donMuaHangService.exportDocument();
                 logger.info("Export DonMuaHangService");
             }
