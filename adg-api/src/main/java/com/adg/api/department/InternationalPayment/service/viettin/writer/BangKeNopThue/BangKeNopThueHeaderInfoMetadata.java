@@ -35,19 +35,19 @@ public enum BangKeNopThueHeaderInfoMetadata implements AdgExcelTableHeaderInfo {
          "Nội dung khoản nộp NSNN",
          "J25",
             CellType.STRING,
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.NoiDungKhoanNop.deAccentedName)
+            record -> "Thuế GTGT hàng NK"
     ),
     MaNDKTTM(
             "Mã NDKTTM",
             "K25",
             CellType.NUMERIC,
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.MaNDKTTM.deAccentedName)
+            record -> "1702"
     ),
     SoTien(
             "Số tiền",
             "L25",
             CellType.NUMERIC,
-            record -> ""
+            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName)
     )
 
     ;
@@ -65,22 +65,22 @@ public enum BangKeNopThueHeaderInfoMetadata implements AdgExcelTableHeaderInfo {
 
     @Override
     public String getHeaderName() {
-        return null;
+        return this.header;
     }
 
     @Override
     public String getCellAddress() {
-        return null;
+        return this.cellAddress;
     }
 
     @Override
     public int getOrdinal() {
-        return 0;
+        return this.ordinal();
     }
 
     @Override
     public CellType getCellType() {
-        return null;
+        return this.cellType;
     }
 
     @Override

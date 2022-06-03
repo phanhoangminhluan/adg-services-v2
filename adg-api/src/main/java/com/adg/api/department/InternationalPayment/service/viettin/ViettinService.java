@@ -2,14 +2,15 @@ package com.adg.api.department.InternationalPayment.service.viettin;
 
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
+import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganService;
+import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeNopThue.BangKeNopThueService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeSuDungTienVay.BangKeSuDungTienVayService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.GiayNhanNo.GiayNhanNoService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.UyNhiemChi.UyNhiemChiService;
 import com.adg.api.util.ZipUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
-import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
@@ -82,11 +83,9 @@ public class ViettinService {
             List<Map<String, Object>> toKhaiHaiQuan = this.toKhaiHaiQuanService.readToKhaiHaiQuan(fileTKHQ);
             List<Map<String, Object>> hoaDon = this.hoaDonService.readHoaDonTable(fileHoaDon);
 
-            System.out.println(JsonUtils.toJson(toKhaiHaiQuan));
-
             return MapUtils.ImmutableMap()
-                    .put("toKhaiHaiQuan", toKhaiHaiQuan)
-                    .put("hoaDon", hoaDon)
+                    .put("tkhq", toKhaiHaiQuan)
+                    .put("hd", hoaDon)
                     .build();
 
         } catch (Exception exception) {
@@ -99,8 +98,8 @@ public class ViettinService {
 
     public byte[] exportDocuments(Map<String, Object> request) {
         Map<String, Object> data = MapUtils.getMapStringObject(request, "data");
-        List<Map<String, Object>> hoaDon = MapUtils.getListMapStringObject(data, "hoaDon");
-        List<Map<String, Object>> toKhaiHaiQuan = MapUtils.getListMapStringObject(data, "toKhaiHaiQuan");
+        List<Map<String, Object>> hoaDon = MapUtils.getListMapStringObject(data, "hd");
+        List<Map<String, Object>> toKhaiHaiQuan = MapUtils.getListMapStringObject(data, "tkhq");
         String fileDate = MapUtils.getString(data, "fileDate", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "UTC", DateTimeUtils.FMT_09));
         return writeFiles(hoaDon, toKhaiHaiQuan, fileDate);
     }
@@ -110,7 +109,8 @@ public class ViettinService {
         String folder = this.getOutputFolder();
         String zipPath = this.getOutputZipFolder() + String.format("VIETTIN - Hồ Sơ Giải Ngân - %s.zip", System.currentTimeMillis());
 
-        Map<String, Object> groupedHoaDonRecords = this.groupHoaDonByNCC(hoaDonRecords);
+        Map<String, Object> hoaDonRecordsGroupByNhaCungCap = this.groupHoaDonByNCC(hoaDonRecords);
+        Map<String, Object> toKhaiHaiQuanRecordsGroupBySoToKhai = this.groupToKhaiHaiQuanRecordsBySoToKhai(toKhaiHaiQuanRecords);
 
         ZonedDateTime zdt = DateTimeUtils.convertStringToZonedDateTime(fileDate, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09), "UTC", "UTC");
 
@@ -122,15 +122,24 @@ public class ViettinService {
                 new BangKeSuDungTienVayService(folder, hoaDonRecords, toKhaiHaiQuanRecords, zdt, bangKeSuDungTienVayTemplate.getInputStream());
         bangKeSuDungTienVayService.exportDocument();
 
-        for (String nhaCungCap : groupedHoaDonRecords.keySet()) {
+        for (String nhaCungCap : hoaDonRecordsGroupByNhaCungCap.keySet()) {
             UyNhiemChiService uyNhiemChiService =
                     new UyNhiemChiService(folder, hoaDonRecords, nhaCungCap, zdt, uyNhiemChiTemplate.getInputStream());
             uyNhiemChiService.exportDocument();
         }
 
+
+
         GiayNhanNoService giayNhanNoService =
                 new GiayNhanNoService(folder, hoaDonRecords, toKhaiHaiQuanRecords, zdt, giayNhanNoTemplate.getInputStream());
         giayNhanNoService.exportDocument();
+
+        for (String soToKhai : toKhaiHaiQuanRecordsGroupBySoToKhai.keySet()) {
+            BangKeNopThueService bangKeNopThueService =
+                    new BangKeNopThueService(folder, MapUtils.getListMapStringObject(toKhaiHaiQuanRecordsGroupBySoToKhai, soToKhai), soToKhai, zdt, bangKeNopThueTemplate.getInputStream());
+            bangKeNopThueService.exportDocument();
+        }
+
 
         ZipUtils.zipFolder(Paths.get(folder), Paths.get(zipPath));
 
@@ -146,6 +155,16 @@ public class ViettinService {
             result.put(nhaCungCap, danhSachHoaDon);
         }
         return result;
+    }
+
+    private Map<String, Object> groupToKhaiHaiQuanRecordsBySoToKhai(List<Map<String, Object>> toKhaiHaiQuanRecords) {
+        return toKhaiHaiQuanRecords.stream().reduce(new HashMap<>(), (result, record) -> {
+            String soToKhai = MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
+            List<Map<String, Object>> records = MapUtils.getListMapStringObject(result, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
+            records.add(record);
+            result.put(soToKhai, records);
+            return result;
+        });
     }
 
     private String getOutputFolder() {

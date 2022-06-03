@@ -6,7 +6,6 @@ import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelUti
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelWriter;
 import com.adg.api.department.InternationalPayment.service.bidv.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanHeaderInfoMetadata;
-import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata;
 import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
@@ -33,40 +32,51 @@ public class BangKeNopThueService {
     private ZonedDateTime fileDate;
     private double totalCost = 0;
     private final String nhaCungCap;
+    private final String soToKhai;
 
 
-    public BangKeNopThueService(String outputFolder, List<Map<String, Object>> toKhaiHaiQuanRecords, String nhaCungCap, ZonedDateTime fileDate, InputStream inputStream) {
+    public BangKeNopThueService(String outputFolder, List<Map<String, Object>> toKhaiHaiQuanRecords, String soToKhai, ZonedDateTime fileDate, InputStream inputStream) {
         this.outputFolder = outputFolder;
         this.excelWriter = new ExcelWriter(inputStream);
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(this.excelWriter, AdgExcelTableHeaderMetadata.getBangKeNopThue());
         this.fileDate = fileDate;
-        this.nhaCungCap = nhaCungCap;
+        this.nhaCungCap = MapUtils.getString(toKhaiHaiQuanRecords.get(0), ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName);
+        this.soToKhai = soToKhai;
         this.data = this.transformRecords(toKhaiHaiQuanRecords);
     }
 
     private Map<String, Object> transformRecords(List<Map<String, Object>> toKhaiHaiQuanRecords) {
-        Map<String, Object> result = new HashMap<>();
-        List<Map<String, Object>> bangKe = new ArrayList<>();
-
+        List<Map<String, Object>> table = new ArrayList<>();
         int stt = 1;
-
         for (Map<String, Object> toKhaiHaiQuanRecord : toKhaiHaiQuanRecords) {
-            Map<String, Object> transformedRecord = new HashMap<>();
-            for (BangKeSuDungTienVayHeaderInfoMetadata headerInfoMetadata : BangKeSuDungTienVayHeaderInfoMetadata.values()) {
-                if (headerInfoMetadata == BangKeSuDungTienVayHeaderInfoMetadata.TT) {
-                    transformedRecord.put(headerInfoMetadata.getHeaderName(), stt);
-                } else {
-                    transformedRecord.put(headerInfoMetadata.getHeaderName(), headerInfoMetadata.transformToKhaiHaiQuanCallback.apply(toKhaiHaiQuanRecord));
-                }
+            Map<String, Object> record = new HashMap<>();
+            for (BangKeNopThueHeaderInfoMetadata headerInfo : BangKeNopThueHeaderInfoMetadata.values()) {
+                record.put(headerInfo.getHeaderName(), headerInfo.transformToKhaiHaiQuanCallback.apply(toKhaiHaiQuanRecord));
             }
-            stt++;
+
             totalCost += MapUtils.getDouble(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName);
 
-            bangKe.add(transformedRecord);
+            List<Map<String, Object>> chiTietThue = MapUtils.getListMapStringObject(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.ChiTietThue.deAccentedName);
+            for (Map<String, Object> map : chiTietThue) {
+                Map<String, Object> clonedRecord = new HashMap<>(record);
+                String tenSacThue =  MapUtils.getString(map, ToKhaiHaiQuanHeaderInfoMetadata.TenSacThue.deAccentedName);
+
+                clonedRecord.put(BangKeNopThueHeaderInfoMetadata.STT.getHeaderName(), stt);
+                clonedRecord.put(BangKeNopThueHeaderInfoMetadata.SoTien.getHeaderName(), MapUtils.getString(map, ToKhaiHaiQuanHeaderInfoMetadata.TienThue.deAccentedName));
+                if (tenSacThue.equals("Thuế NK")) {
+                    clonedRecord.put(BangKeNopThueHeaderInfoMetadata.MaNDKTTM.getHeaderName(), "1901");
+                    clonedRecord.put(BangKeNopThueHeaderInfoMetadata.NoiDungKhoanNop.getHeaderName(), "Thuế nhập khẩu");
+                }
+
+                table.add(clonedRecord);
+
+                stt++;
+            }
         }
-        result.put("Bảng kê", bangKe);
-        return result;
+        return MapUtils.ImmutableMap()
+                .put("Bảng kê", table)
+                .build();
     }
     public void exportDocument() {
         this.insertRecordToTable();
@@ -76,12 +86,15 @@ public class BangKeNopThueService {
 
     private void insertRecordToTable() {
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(this.data, "Bảng kê");
-        records.forEach(item -> this.excelTable.insert(item));
+        records.forEach(item -> this.excelTable.insert2(item));
         this.excelTable.removeSampleRow();
     }
 
     private void build() {
-        String fileName = String.format("Bảng kê nộp thuế - %s.xlsx", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_03));
+        String fileName = String.format("Bảng kê nộp thuế - %s - %s.xlsx",
+                this.soToKhai,
+                DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_03)
+        );
         this.excelWriter.build(outputFolder + "/" + fileName);
     }
 
@@ -119,8 +132,8 @@ public class BangKeNopThueService {
             nganHang = nhaCungCapDTO.getTenNganHang();
         }
 
-        ExcelUtils.setCell(this.excelWriter.getCell("H19"), nganHang, CellType.FORMULA);
-        ExcelUtils.setCell(this.excelWriter.getCell("H24"), this.nhaCungCap, CellType.FORMULA);
+        ExcelUtils.setCell(this.excelWriter.getCell("H19"), nganHang, CellType.STRING);
+        ExcelUtils.setCell(this.excelWriter.getCell("H24"), this.nhaCungCap, CellType.STRING);
     }
 
 }

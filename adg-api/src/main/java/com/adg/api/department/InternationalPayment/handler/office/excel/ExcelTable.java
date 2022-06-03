@@ -2,7 +2,9 @@ package com.adg.api.department.InternationalPayment.handler.office.excel;
 
 import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderInfo;
 import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderMetadata;
+import com.google.common.collect.Comparators;
 import lombok.Getter;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -47,7 +49,6 @@ public class ExcelTable {
         size++;
         Row currentRow = this.excelWriter.insertBelow(lastRow);
         currentRow = this.excelWriter.cloneRowSetting(lastRow, currentRow , this.startColumnIndex, this.endColumnIndex);
-
        for (int i = this.startColumnIndex; i <= this.endColumnIndex; i++) {
            AdgExcelTableHeaderInfo header = this.headerNameIndexMap.get(i);
            Cell cell = currentRow.getCell(i);
@@ -58,6 +59,53 @@ public class ExcelTable {
 
        }
        return currentRow;
+    }
+
+    /**
+     * SmellCode.
+     * @TODO: Check this later
+     * @param item
+     * @return
+     */
+    public Row insert2(Map<String, Object> item) {
+
+        Row lastRow = this.excelWriter.getSheet().getRow(sampleRow.getRowNum() + size);
+        size++;
+        Row currentRow = this.excelWriter.insertBelow(lastRow);
+        int max = this.headerNameIndexMap.keySet().stream().max(Comparators::max).get();
+        int min = this.headerNameIndexMap.keySet().stream().min(Comparators::min).get();
+        currentRow = this.excelWriter.cloneRowSetting(lastRow, currentRow , 0, 20);
+        Cell preCell = null;
+        for (Integer i : this.headerNameIndexMap.keySet()) {
+            AdgExcelTableHeaderInfo header = this.headerNameIndexMap.get(i);
+            Cell cell = this.excelWriter.getCell(currentRow, i);
+
+            if (preCell != null) {
+                if (preCell.getColumnIndex() != i - 1) {
+                    this.excelWriter.mergeCell(preCell, this.excelWriter.getCell(preCell.getRow(), i - 1));
+
+                    int startI = preCell.getColumnIndex();
+                    int endI = i - 1;
+                    for (int j = startI; j <= endI; j++) {
+                        this.excelWriter.getCell(preCell.getRow(), j).getCellStyle().setBorderBottom(BorderStyle.THIN);
+                    }
+
+                    preCell.getCellStyle().setBorderBottom(BorderStyle.THIN);
+                    preCell.getCellStyle().setBorderLeft(BorderStyle.THIN);
+                    preCell.getCellStyle().setBorderRight(BorderStyle.THIN);
+                    preCell.getCellStyle().setBorderTop(BorderStyle.THIN);
+                }
+            }
+            Object value = item.get(
+                    header.getHeaderName()
+            );
+            if (value != null) {
+                ExcelUtils.setCell(cell, value, header.getCellType());
+            }
+            preCell = cell;
+
+        }
+        return currentRow;
     }
 
     public void merge() {

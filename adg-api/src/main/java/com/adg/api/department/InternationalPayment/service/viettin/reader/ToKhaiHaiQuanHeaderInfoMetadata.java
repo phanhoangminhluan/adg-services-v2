@@ -66,7 +66,28 @@ public enum ToKhaiHaiQuanHeaderInfoMetadata implements AdgExcelTableHeaderInfo {
             CellType.STRING,
             record -> "",
             false, false, AdgHeaderType.INTEGER
-    )
+    ),
+    ChiTietThue(
+            "chiTietThue",
+            "",
+            CellType.STRING,
+            record -> "",
+            false, false, AdgHeaderType.STRING
+    ),
+    TenSacThue(
+            "tenSacThue",
+            "",
+            CellType.STRING,
+            record -> "",
+            false, false, AdgHeaderType.STRING
+    ),
+    TienThue(
+            "tienThue",
+            "",
+            CellType.STRING,
+            record -> "",
+            false, false, AdgHeaderType.STRING
+    ),
     ;
 
     private final String header;
