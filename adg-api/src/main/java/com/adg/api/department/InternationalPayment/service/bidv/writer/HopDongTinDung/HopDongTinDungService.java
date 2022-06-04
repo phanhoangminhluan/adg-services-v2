@@ -9,9 +9,11 @@ import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
 import com.merlin.asset.core.utils.ParserUtils;
+import lombok.SneakyThrows;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -40,7 +42,18 @@ public class HopDongTinDungService {
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
-    public Map<String, Object> transformHoaDonRecords(Map<String, Object> hoaDonRecords) {
+    @SneakyThrows
+    public static void writeOut(
+            String outputFolder,
+            Map<String, Object> hoaDonRecords,
+            ZonedDateTime fileDate,
+            String contractNumber,
+            Resource resource
+    ) {
+        new HopDongTinDungService(outputFolder, hoaDonRecords, fileDate, contractNumber, resource.getInputStream()).exportDocument();
+    }
+
+    private Map<String, Object> transformHoaDonRecords(Map<String, Object> hoaDonRecords) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> arr = new ArrayList<>();
         double tongTienVay = 0;

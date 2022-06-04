@@ -6,8 +6,10 @@ import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelUti
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelWriter;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -29,9 +31,9 @@ public class BangKeSuDungTienVayService {
     private final ZonedDateTime fileDate;
     private final String contractNumber;
 
-    public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, String contractNumber, InputStream inputStream) {
+    public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, String contractNumber, InputStream templateInputStream) {
         this.outputFolder = outputFolder;
-        this.excelWriter = new ExcelWriter(inputStream);
+        this.excelWriter = new ExcelWriter(templateInputStream);
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(this.excelWriter, AdgExcelTableHeaderMetadata.getBidvBangKeSuDungTienVay());
         this.fileDate = fileDate;
@@ -39,7 +41,18 @@ public class BangKeSuDungTienVayService {
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
-    public Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords) {
+    @SneakyThrows
+    public static void writeOut(
+            String outputFolder,
+            List<Map<String, Object>> hoaDonRecords,
+            ZonedDateTime fileDate,
+            String contractNumber,
+            Resource template
+    ) {
+        new BangKeSuDungTienVayService(outputFolder, hoaDonRecords, fileDate, contractNumber, template.getInputStream()).exportDocument();
+    }
+
+    private Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> bangKe = new ArrayList<>();
 
@@ -54,12 +67,12 @@ public class BangKeSuDungTienVayService {
         return result;
     }
 
-    public void insertRecordToTable() {
+    private void insertRecordToTable() {
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(this.data, "Bảng kê");
         records.forEach(item -> this.excelTable.insert(item));
     }
 
-    public void exportDocument() {
+    private void exportDocument() {
         this.insertRecordToTable();
         this.excelTable.removeSampleRow();
         this.fillSum();

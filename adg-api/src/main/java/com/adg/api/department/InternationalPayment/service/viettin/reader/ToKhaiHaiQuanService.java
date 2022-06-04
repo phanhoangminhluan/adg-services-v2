@@ -36,8 +36,6 @@ public class ToKhaiHaiQuanService {
 
     }
 
-
-
     public List<Map<String, Object>> readToKhaiHaiQuan(List<String> filePaths) {
 
         List<Map<String, Object>> result = new ArrayList<>();
@@ -54,7 +52,7 @@ public class ToKhaiHaiQuanService {
                             .replace("N  ", "")
                             .replace("V  ",""))
                     .collect(Collectors.toList());
-//
+
             List<String> tienThueList = MapUtils
                     .getListString(output, "Tổng tiền thuế")
                     .stream()

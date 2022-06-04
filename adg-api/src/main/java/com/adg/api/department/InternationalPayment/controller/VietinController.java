@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.controller;
 
-import com.adg.api.department.InternationalPayment.service.viettin.ViettinService;
+import com.adg.api.department.InternationalPayment.service.viettin.VietinService;
 import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
@@ -17,35 +17,30 @@ import java.util.Map;
  * Created on: 2022.05.28 23:01
  */
 @RestController
-@RequestMapping("/international-payment/disbursement/viettin/")
+@RequestMapping("/international-payment/disbursement/vietin/")
 @Log4j2
 @CrossOrigin(origins = "*")
-public class ViettinController {
+public class VietinController {
 
     @Autowired
-    private ViettinService viettinService;
+    private VietinService vietinService;
 
     @PostMapping("import")
     @SneakyThrows
-    public String importFile(@RequestParam("file") MultipartFile file) {
-        Map<String, Object> data = viettinService.readInputFile(file.getInputStream());
-        return JsonUtils.toJson(MapUtils.ImmutableMap()
-                        .put("data", data)
-                        .put("status", "ok")
-                .build());
+    public Map<String, Object> importFile(@RequestParam("file") MultipartFile file) {
+        log.info("Import request. Original File Name: {}. Size: {}. Content Type: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
+        Map<String, Object> data = vietinService.parseFile(file.getInputStream());
+        return MapUtils.ImmutableMap()
+                .put("data", data)
+                .put("status", "ok")
+                .build();
     }
 
     @PostMapping(value = "export",
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
     public byte[] exportFile(@RequestBody Map<String, Object> request) {
-        try {
-            log.info("Export Request: {}", JsonUtils.toJson(request));
-            return this.viettinService.exportDocuments(request);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        return null;
+        log.info("Export Request: {}", JsonUtils.toJson(request));
+        return this.vietinService.generateDisbursementFiles(request);
     }
-
 }

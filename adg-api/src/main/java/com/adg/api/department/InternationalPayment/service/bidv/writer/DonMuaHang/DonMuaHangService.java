@@ -5,13 +5,16 @@ import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelTab
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelUtils;
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelWriter;
 import com.adg.api.department.InternationalPayment.service.bidv.NhaCungCapDTO;
+import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.PhieuNhapKhoHeaderMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
 import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -47,9 +50,9 @@ public class DonMuaHangService {
         public static final String DIEN_GIAI = "B12";
     }
 
-    public DonMuaHangService(String outputFolder, List<Map<String, Object>> phieuNhapKhoRecords, String ncc, String ngayChungTu, ZonedDateTime fileDate, InputStream inputStream) {
+    public DonMuaHangService(String outputFolder, List<Map<String, Object>> phieuNhapKhoRecords, String nhaCungCap, String ngayChungTu, ZonedDateTime fileDate, InputStream templateInputStream) {
         this.outputFolder = outputFolder;
-        this.excelWriter = new ExcelWriter(inputStream);
+        this.excelWriter = new ExcelWriter(templateInputStream);
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(
                 this.excelWriter,
@@ -58,10 +61,29 @@ public class DonMuaHangService {
         this.fileDate = fileDate;
         this.ngayChungTu = ngayChungTu;
         this.data = this.transformPhieuNhapKhoRecords(phieuNhapKhoRecords);
-        this.ncc = ncc;
+        this.ncc = nhaCungCap;
     }
 
-    public void exportDocument() {
+    @SneakyThrows
+    public static void writeOut(
+            String outputFolder,
+            Map<String, Object> hoaDonRecordsGroupByNhaCungCap,
+            Map<String, Object> phieuNhapKhoRecordsGroupByNhaCungCapAndSoHoaDon,
+            ZonedDateTime fileDate,
+            Resource resource
+    ) {
+        for (String nhaCungCap : phieuNhapKhoRecordsGroupByNhaCungCapAndSoHoaDon.keySet()) {
+            Map<String, Object> phieuNhapKhoRecordsGroupBySoHoaDon = MapUtils.getMapStringObject(phieuNhapKhoRecordsGroupByNhaCungCapAndSoHoaDon, nhaCungCap);
+            for (String soHoaDon : phieuNhapKhoRecordsGroupBySoHoaDon.keySet()) {
+                String ngayHoaDon = MapUtils.getString(hoaDonRecordsGroupByNhaCungCap, String.format("%s.%s.%s", nhaCungCap, soHoaDon, HoaDonHeaderMetadata.NgayChungTu.deAccentedName));
+                List<Map<String, Object>> phieuNhapKhoRecords = MapUtils.getListMapStringObject(phieuNhapKhoRecordsGroupBySoHoaDon, soHoaDon);
+                new DonMuaHangService(outputFolder, phieuNhapKhoRecords, nhaCungCap, ngayHoaDon, fileDate, resource.getInputStream()).exportDocument();
+            }
+
+        }
+    }
+
+    private void exportDocument() {
         this.fillUpperData();
         this.insertRecordToTable();
         this.fillTongTien();

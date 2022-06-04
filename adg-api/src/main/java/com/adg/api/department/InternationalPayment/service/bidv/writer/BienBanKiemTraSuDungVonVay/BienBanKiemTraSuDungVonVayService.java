@@ -9,9 +9,11 @@ import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
 import com.merlin.asset.core.utils.ParserUtils;
+import lombok.SneakyThrows;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -30,24 +32,36 @@ public class BienBanKiemTraSuDungVonVayService {
     private final String outputFolder;
     private final Map<String, Object> data;
     private final ZonedDateTime fileDate;
-    private final String soHopDong;
+    private final String contractNumber;
 
-    public BienBanKiemTraSuDungVonVayService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, String soHopDong, InputStream inputStream) {
+    public BienBanKiemTraSuDungVonVayService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, String contractNumber, InputStream inputStream) {
         this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderBienBanKiemTraSuDungVonVay());
         this.outputFolder = outputFolder;
         this.fileDate = fileDate;
-        this.soHopDong = soHopDong;
+        this.contractNumber = contractNumber;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
-    public void exportDocument() {
+    private void exportDocument() {
         this.fillTextData();
         this.fillTableData();
         this.fillTableSumData();
         this.build();
     }
 
-    public Map<String, Object> transformHoaDonRecords(Map<String, Object> hoaDonRecords) {
+    @SneakyThrows
+    public static void writeOut(
+            String outputFolder,
+            Map<String, Object> hoaDonRecords,
+            ZonedDateTime fileDate,
+            String contractNumber,
+            Resource resource
+    ) {
+        new BienBanKiemTraSuDungVonVayService(outputFolder, hoaDonRecords, fileDate, contractNumber, resource.getInputStream())
+                .exportDocument();
+    }
+
+    private Map<String, Object> transformHoaDonRecords(Map<String, Object> hoaDonRecords) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> arr = new ArrayList<>();
         double tongTienVay = 0;
@@ -68,7 +82,7 @@ public class BienBanKiemTraSuDungVonVayService {
 
         result.put("Ngày hôm nay", String.format("ngày %s tháng %s năm %s", this.fileDate.getDayOfMonth(), this.fileDate.getMonthValue(), this.fileDate.getYear()));
         result.put("ngayGiaiNgan", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_09));
-        result.put("soHopDong", soHopDong);
+        result.put("soHopDong", contractNumber);
         result.put("Đại diện khách hàng", "");
         result.put("Đại diện ngân hàng", "");
         result.put("Tổng tiền vay bằng số", NumberUtils.formatNumber1(tongTienVay));

@@ -4,6 +4,8 @@ import com.adg.api.department.InternationalPayment.handler.office.AdgWordTableHe
 import com.adg.api.department.InternationalPayment.handler.office.word.WordWriter;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import lombok.SneakyThrows;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -23,15 +25,23 @@ public class DonCamKetService {
     private final Map<String, Object> data;
     private final ZonedDateTime fileDate;
 
-    public DonCamKetService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
-        this.wordWriter = new WordWriter(inputStream, AdgWordTableHeaderMetadata.getHeaderMapDonCamKet());
+    public DonCamKetService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, InputStream templateInputStream) {
+        this.wordWriter = new WordWriter(templateInputStream, AdgWordTableHeaderMetadata.getHeaderMapDonCamKet());
         this.outputFolder = outputFolder;
         this.fileDate = fileDate;
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
+    @SneakyThrows
+    public static void writeOut(String outputFolder,
+                                List<Map<String, Object>> hoaDonRecords,
+                                ZonedDateTime fileDate,
+                                Resource resource
+    ) {
+        new DonCamKetService(outputFolder, hoaDonRecords, fileDate, resource.getInputStream()).exportDocument();
+    }
 
-    public Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords) {
+    private Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> table = new ArrayList<>();
 
@@ -50,7 +60,7 @@ public class DonCamKetService {
         return result;
     }
 
-    public void exportDocument() {
+    private void exportDocument() {
         this.fillTextData();
         this.fillTableData();
         this.build();

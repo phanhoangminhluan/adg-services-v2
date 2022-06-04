@@ -34,7 +34,7 @@ import java.util.Map;
  * Created on: 2022.05.28 22:55
  */
 @Service
-public class ViettinService {
+public class VietinService {
 
     @Value("${international-payment.bidv.input.zip}")
     private String inputZip;
@@ -66,7 +66,7 @@ public class ViettinService {
     @Autowired
     private HoaDonService hoaDonService;
 
-    public Map<String, Object> readInputFile(InputStream inputStream) {
+    public Map<String, Object> parseFile(InputStream inputStream) {
         List<File> files = new ArrayList<>();
         try {
             files = ZipUtils.uncompressZipFile(inputStream, inputZip);
@@ -81,7 +81,7 @@ public class ViettinService {
             }
 
             List<Map<String, Object>> toKhaiHaiQuan = this.toKhaiHaiQuanService.readToKhaiHaiQuan(fileTKHQ);
-            List<Map<String, Object>> hoaDon = this.hoaDonService.readHoaDonTable(fileHoaDon);
+            List<Map<String, Object>> hoaDon = this.hoaDonService.parseHoaDonFile(fileHoaDon);
 
             return MapUtils.ImmutableMap()
                     .put("tkhq", toKhaiHaiQuan)
@@ -96,7 +96,7 @@ public class ViettinService {
         return MapUtils.ImmutableMap().build();
     }
 
-    public byte[] exportDocuments(Map<String, Object> request) {
+    public byte[] generateDisbursementFiles(Map<String, Object> request) {
         Map<String, Object> data = MapUtils.getMapStringObject(request, "data");
         List<Map<String, Object>> hoaDon = MapUtils.getListMapStringObject(data, "hd");
         List<Map<String, Object>> toKhaiHaiQuan = MapUtils.getListMapStringObject(data, "tkhq");

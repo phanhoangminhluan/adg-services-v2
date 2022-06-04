@@ -7,6 +7,8 @@ import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
+import lombok.SneakyThrows;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -24,11 +26,20 @@ public class UyNhiemChiService {
     private final Map<String, Object> data;
     private final ZonedDateTime fileDate;
 
-    public UyNhiemChiService(String outputFolder, Map<String, Object> data, ZonedDateTime fileDate, InputStream inputStream) {
+    public UyNhiemChiService(String outputFolder, Map<String, Object> hoaDonRecords, ZonedDateTime fileDate, InputStream inputStream) {
         this.wordWriter = new WordWriter(inputStream, new HashMap<>());
         this.outputFolder = outputFolder;
         this.fileDate = fileDate;
-        this.data = this.transformHoaDonRecords(data);
+        this.data = this.transformHoaDonRecords(hoaDonRecords);
+    }
+
+    @SneakyThrows
+    public static void writeOut(String outputFolder, Map<String, Object> hoaDonRecordsGroupByNhaCungCap, ZonedDateTime fileDate, Resource resource) {
+        for (String ncc : hoaDonRecordsGroupByNhaCungCap.keySet()) {
+            Map<String, Object> summarizedHoaDonByNhaCungCap = MapUtils.getMapStringObject(hoaDonRecordsGroupByNhaCungCap, ncc);
+            new UyNhiemChiService(outputFolder, summarizedHoaDonByNhaCungCap, fileDate, resource.getInputStream())
+                    .exportDocument();
+        }
     }
 
     public Map<String, Object> transformHoaDonRecords(Map<String, Object> hoaDonRecords) {
@@ -45,7 +56,7 @@ public class UyNhiemChiService {
         return result;
     }
 
-    public void exportDocument() {
+    private void exportDocument() {
         this.wordWriter.fillTextData(data);
         this.build();
     }
