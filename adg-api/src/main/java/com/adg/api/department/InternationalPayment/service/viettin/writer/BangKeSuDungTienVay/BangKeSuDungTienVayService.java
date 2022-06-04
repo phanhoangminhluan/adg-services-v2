@@ -8,8 +8,10 @@ import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHead
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanHeaderInfoMetadata;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -38,6 +40,12 @@ public class BangKeSuDungTienVayService {
         this.excelTable = new ExcelTable(this.excelWriter, AdgExcelTableHeaderMetadata.getViettinBangKeSuDungTienVay());
         this.fileDate = fileDate;
         this.data = this.transformRecords(hoaDonRecords, toKhaiHaiQuanRecords);
+    }
+
+    @SneakyThrows
+    public static void writeOut(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, Resource resource) {
+        new BangKeSuDungTienVayService(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, resource.getInputStream())
+                .exportDocument();
     }
 
     public void exportDocument() {

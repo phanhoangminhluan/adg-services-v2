@@ -9,8 +9,10 @@ import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhai
 import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -25,11 +27,11 @@ import java.util.Map;
  */
 public class BangKeNopThueService {
 
-    private ExcelWriter excelWriter;
-    private ExcelTable excelTable;
-    private Map<String, Object> data;
-    private String outputFolder;
-    private ZonedDateTime fileDate;
+    private final ExcelWriter excelWriter;
+    private final ExcelTable excelTable;
+    private final Map<String, Object> data;
+    private final String outputFolder;
+    private final ZonedDateTime fileDate;
     private double totalCost = 0;
     private final String nhaCungCap;
     private final String soToKhai;
@@ -44,6 +46,14 @@ public class BangKeNopThueService {
         this.nhaCungCap = MapUtils.getString(toKhaiHaiQuanRecords.get(0), ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName);
         this.soToKhai = soToKhai;
         this.data = this.transformRecords(toKhaiHaiQuanRecords);
+    }
+
+    @SneakyThrows
+    public static void writeOut(String outputFolder, Map<String, Object> toKhaiHaiQuanRecordsGroupBySoToKhai, ZonedDateTime fileDate, Resource resource) {
+        for (String soToKhai : toKhaiHaiQuanRecordsGroupBySoToKhai.keySet()) {
+            new BangKeNopThueService(outputFolder, MapUtils.getListMapStringObject(toKhaiHaiQuanRecordsGroupBySoToKhai, soToKhai), soToKhai, fileDate, resource.getInputStream())
+                    .exportDocument();
+        }
     }
 
     private Map<String, Object> transformRecords(List<Map<String, Object>> toKhaiHaiQuanRecords) {

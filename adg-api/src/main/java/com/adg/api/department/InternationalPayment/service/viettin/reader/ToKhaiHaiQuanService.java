@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -80,6 +81,16 @@ public class ToKhaiHaiQuanService {
             i++;
         }
         return result;
+    }
+
+    public Map<String, Object> groupToKhaiHaiQuanRecordsBySoToKhai(List<Map<String, Object>> toKhaiHaiQuanRecords) {
+        return toKhaiHaiQuanRecords.stream().reduce(new HashMap<>(), (result, record) -> {
+            String soToKhai = MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
+            List<Map<String, Object>> records = MapUtils.getListMapStringObject(result, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
+            records.add(record);
+            result.put(soToKhai, records);
+            return result;
+        });
     }
 
 

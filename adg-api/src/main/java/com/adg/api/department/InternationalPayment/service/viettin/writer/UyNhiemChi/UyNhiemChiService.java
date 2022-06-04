@@ -8,7 +8,9 @@ import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonSer
 import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.CellType;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -38,7 +40,7 @@ public class UyNhiemChiService {
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
-    public static class UyNhiemChiAddress {
+    private static class UyNhiemChiAddress {
         public static final String SO_TAI_KHOAN = "C12";
         public static final String NGAN_HANG = "E12";
         public static final String SO_TIEN_BANG_SO = "C15";
@@ -46,7 +48,15 @@ public class UyNhiemChiService {
         public static final String NOI_DUNG = "D18";
     }
 
-    public void exportDocument() {
+    @SneakyThrows
+    public static void writeOut(String outputFolder, Map<String, Object> hoaDonRecordsGroupByNhaCungCap, ZonedDateTime fileDate, Resource resource) {
+        for (String nhaCungCap : hoaDonRecordsGroupByNhaCungCap.keySet()) {
+            new UyNhiemChiService(outputFolder, MapUtils.getListMapStringObject(hoaDonRecordsGroupByNhaCungCap, nhaCungCap), nhaCungCap, fileDate, resource.getInputStream())
+                    .exportDocument();
+        }
+    }
+
+    private void exportDocument() {
         this.fillTextData();
         this.build();
     }

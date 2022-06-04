@@ -7,6 +7,8 @@ import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
+import lombok.SneakyThrows;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -31,6 +33,12 @@ public class GiayNhanNoService {
         this.outputFolder = outputFolder;
         this.fileDate = fileDate;
         this.data = this.transformRecords(hoaDonRecords, toKhaiHaiQuanRecords);
+    }
+
+    @SneakyThrows
+    public static void writeOut(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, Resource resource) {
+        new GiayNhanNoService(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, resource.getInputStream())
+                .exportDocument();
     }
 
     private Map<String, Object> transformRecords(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords) {
@@ -68,7 +76,7 @@ public class GiayNhanNoService {
                 .build();
     }
 
-    public void exportDocument() {
+    private void exportDocument() {
         this.wordWriter.fillTextData(data);
         this.build();
     }

@@ -8,8 +8,10 @@ import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHead
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanHeaderInfoMetadata;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -30,10 +32,10 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
     private final String outputFolder;
     private final ZonedDateTime fileDate;
 
-    public BangKeChungTuDienTuDeNghiGiaiNganService(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, InputStream inputStream) {
+    public BangKeChungTuDienTuDeNghiGiaiNganService(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, InputStream templateInputStream) {
 
         this.outputFolder = outputFolder;
-        this.excelWriter = new ExcelWriter(inputStream);
+        this.excelWriter = new ExcelWriter(templateInputStream);
         this.excelWriter.openSheet();
         this.excelTable = new ExcelTable(
                 this.excelWriter,
@@ -43,13 +45,19 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
         this.data = this.transformRecords(hoaDonRecords, toKhaiHaiQuanRecords);
     }
 
+    @SneakyThrows
+    public static void writeOut(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, Resource resource) {
+        new BangKeChungTuDienTuDeNghiGiaiNganService(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, resource.getInputStream())
+                .exportDocuments();
+    }
+
     private Map<String, Object> transformRecords(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> danhSachChungTu = new ArrayList<>();
         int stt = 1;
         for (Map<String, Object> toKhaiHaiQuanRecord : toKhaiHaiQuanRecords) {
             String ncc = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName);
-            String soChungTu = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName);
+            String soChungTu = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
             String ngayChungTu = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedName);
             String soTien = MapUtils.getString(toKhaiHaiQuanRecord, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName);
             danhSachChungTu.add(
@@ -87,7 +95,7 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
         return result;
     }
 
-    public void exportDocuments() {
+    private void exportDocuments() {
         this.insertRecordToTable();
         this.fillSum();
         this.fillSignDate();

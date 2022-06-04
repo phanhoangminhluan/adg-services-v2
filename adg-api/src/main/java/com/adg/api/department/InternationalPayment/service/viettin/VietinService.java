@@ -2,7 +2,6 @@ package com.adg.api.department.InternationalPayment.service.viettin;
 
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
-import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeNopThue.BangKeNopThueService;
@@ -101,47 +100,36 @@ public class VietinService {
         List<Map<String, Object>> hoaDon = MapUtils.getListMapStringObject(data, "hd");
         List<Map<String, Object>> toKhaiHaiQuan = MapUtils.getListMapStringObject(data, "tkhq");
         String fileDate = MapUtils.getString(data, "fileDate", DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "UTC", DateTimeUtils.FMT_09));
-        return writeFiles(hoaDon, toKhaiHaiQuan, fileDate);
+        ZonedDateTime zdt = DateTimeUtils.convertStringToZonedDateTime(fileDate, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09), "UTC", "UTC");
+
+        return writeFiles(hoaDon, toKhaiHaiQuan, zdt);
     }
 
     @SneakyThrows
-    public byte[] writeFiles(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, String fileDate) {
-        String folder = this.getOutputFolder();
-        String zipPath = this.getOutputZipFolder() + String.format("VIETTIN - Hồ Sơ Giải Ngân - %s.zip", System.currentTimeMillis());
+    private byte[] writeFiles(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate) {
+        String outputFolder = this.getOutputFolder();
+        String zipPath = this.getOutputZipFolder() + String.format("VIETIN - Hồ Sơ Giải Ngân - %s.zip", System.currentTimeMillis());
 
         Map<String, Object> hoaDonRecordsGroupByNhaCungCap = this.groupHoaDonByNCC(hoaDonRecords);
-        Map<String, Object> toKhaiHaiQuanRecordsGroupBySoToKhai = this.groupToKhaiHaiQuanRecordsBySoToKhai(toKhaiHaiQuanRecords);
-
-        ZonedDateTime zdt = DateTimeUtils.convertStringToZonedDateTime(fileDate, DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_09), "UTC", "UTC");
-
-        BangKeChungTuDienTuDeNghiGiaiNganService bangKeChungTuDienTuDeNghiGiaiNganService =
-                new BangKeChungTuDienTuDeNghiGiaiNganService(folder, hoaDonRecords, toKhaiHaiQuanRecords, zdt, bangKeChungTuDienTuDeNghiGiaiNganTemplate.getInputStream());
-        bangKeChungTuDienTuDeNghiGiaiNganService.exportDocuments();
-
-        BangKeSuDungTienVayService bangKeSuDungTienVayService =
-                new BangKeSuDungTienVayService(folder, hoaDonRecords, toKhaiHaiQuanRecords, zdt, bangKeSuDungTienVayTemplate.getInputStream());
-        bangKeSuDungTienVayService.exportDocument();
-
-        for (String nhaCungCap : hoaDonRecordsGroupByNhaCungCap.keySet()) {
-            UyNhiemChiService uyNhiemChiService =
-                    new UyNhiemChiService(folder, hoaDonRecords, nhaCungCap, zdt, uyNhiemChiTemplate.getInputStream());
-            uyNhiemChiService.exportDocument();
-        }
+        Map<String, Object> toKhaiHaiQuanRecordsGroupBySoToKhai = this.toKhaiHaiQuanService.groupToKhaiHaiQuanRecordsBySoToKhai(toKhaiHaiQuanRecords);
 
 
+        BangKeChungTuDienTuDeNghiGiaiNganService
+                .writeOut(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, bangKeChungTuDienTuDeNghiGiaiNganTemplate);
 
-        GiayNhanNoService giayNhanNoService =
-                new GiayNhanNoService(folder, hoaDonRecords, toKhaiHaiQuanRecords, zdt, giayNhanNoTemplate.getInputStream());
-        giayNhanNoService.exportDocument();
+        BangKeSuDungTienVayService
+                .writeOut(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, bangKeSuDungTienVayTemplate);
 
-        for (String soToKhai : toKhaiHaiQuanRecordsGroupBySoToKhai.keySet()) {
-            BangKeNopThueService bangKeNopThueService =
-                    new BangKeNopThueService(folder, MapUtils.getListMapStringObject(toKhaiHaiQuanRecordsGroupBySoToKhai, soToKhai), soToKhai, zdt, bangKeNopThueTemplate.getInputStream());
-            bangKeNopThueService.exportDocument();
-        }
+        GiayNhanNoService
+                .writeOut(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, giayNhanNoTemplate);
 
+        UyNhiemChiService
+                .writeOut(outputFolder, hoaDonRecordsGroupByNhaCungCap, fileDate, uyNhiemChiTemplate);
 
-        ZipUtils.zipFolder(Paths.get(folder), Paths.get(zipPath));
+        BangKeNopThueService
+                .writeOut(outputFolder, toKhaiHaiQuanRecordsGroupBySoToKhai, fileDate, bangKeNopThueTemplate);
+
+        ZipUtils.zipFolder(Paths.get(outputFolder), Paths.get(zipPath));
 
         return IOUtils.toByteArray(new FileInputStream(zipPath));
     }
@@ -157,15 +145,6 @@ public class VietinService {
         return result;
     }
 
-    private Map<String, Object> groupToKhaiHaiQuanRecordsBySoToKhai(List<Map<String, Object>> toKhaiHaiQuanRecords) {
-        return toKhaiHaiQuanRecords.stream().reduce(new HashMap<>(), (result, record) -> {
-            String soToKhai = MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
-            List<Map<String, Object>> records = MapUtils.getListMapStringObject(result, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
-            records.add(record);
-            result.put(soToKhai, records);
-            return result;
-        });
-    }
 
     private String getOutputFolder() {
         String path = String.format(output, DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("yyyy/MM/dd/HHmmss")));
