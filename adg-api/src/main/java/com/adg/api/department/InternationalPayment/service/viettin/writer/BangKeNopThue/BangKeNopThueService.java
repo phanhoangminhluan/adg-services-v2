@@ -128,7 +128,7 @@ public class BangKeNopThueService {
 
     private void insertRecordToTable() {
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(this.data, "Bảng kê");
-        records.forEach(item -> this.excelTable.insert2(item));
+        records.forEach(item -> this.excelTable.insert(item));
         this.excelTable.removeSampleRow();
     }
 
@@ -163,9 +163,9 @@ public class BangKeNopThueService {
         Cell kyThueHeaderCell =  this.excelWriter.getCell(BangKeNopThueHeaderInfoMetadata.KyThue.getCellAddress());
         Cell soTienBangChuCell = this.excelWriter.getCell(
                 this.excelWriter.getRow(kyThueHeaderCell.getRowIndex() + this.excelTable.getSize() + 2),
-                soTienHeaderCell.getColumnIndex()
+                kyThueHeaderCell.getColumnIndex()
         );
-        ExcelUtils.setCell(soTienBangChuCell, MoneyUtils.convertMoneyToText(this.totalCost),CellType.STRING);
+        ExcelUtils.setCell(soTienBangChuCell, MoneyUtils.convertMoneyToText(this.totalCost).toLowerCase(),CellType.STRING);
 
         ExcelUtils.setCell(tongCell, String.format("SUM(%s:%s)", startCell, endCell), CellType.FORMULA);
 
@@ -175,8 +175,11 @@ public class BangKeNopThueService {
             nganHang = nhaCungCapDTO.getTenNganHang();
         }
 
-        ExcelUtils.setCell(this.excelWriter.getCell("H19"), nganHang, CellType.STRING);
-        ExcelUtils.setCell(this.excelWriter.getCell("H24"), this.nhaCungCap, CellType.STRING);
+//        ExcelUtils.setCell(this.excelWriter.getCell("H19"), nganHang, CellType.STRING);
+//        ExcelUtils.setCell(this.excelWriter.getCell("H24"), this.nhaCungCap, CellType.STRING);
+
+        ExcelUtils.setCell(this.excelWriter.getCell("D19"), nganHang, CellType.STRING);
+        ExcelUtils.setCell(this.excelWriter.getCell("D24"), this.nhaCungCap, CellType.STRING);
     }
 
 }

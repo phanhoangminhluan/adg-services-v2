@@ -15,13 +15,15 @@ import java.util.function.Function;
 public enum BangKeNopThueHeaderInfoMetadata implements AdgExcelTableHeaderInfo {
     STT(
             "STT",
-            "D25",
+//            "D25",
+            "B25",
             CellType.NUMERIC,
             record -> ""
     ),
     ID(
             "Số tờ TK/số QĐ/số TB/ Mã định danh hồ sơ (ID)",
-            "E25",
+//            "E25",
+            "C25",
             CellType.STRING,
             record -> {
                 String soToKhai = MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
@@ -30,25 +32,29 @@ public enum BangKeNopThueHeaderInfoMetadata implements AdgExcelTableHeaderInfo {
     ),
     KyThue(
             "Kỳ thuế/ngày QĐ/ngày TB",
-            "I25",
+//            "I25",
+            "D25",
             CellType.STRING,
             record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedName)
     ),
     NoiDungKhoanNop(
          "Nội dung khoản nộp NSNN",
-         "J25",
+//         "J25",
+         "E25",
             CellType.STRING,
             record -> "Thuế GTGT hàng NK"
     ),
     MaNDKTTM(
             "Mã NDKTTM",
-            "K25",
+//            "K25",
+            "F25",
             CellType.NUMERIC,
             record -> "1702"
     ),
     SoTien(
             "Số tiền",
-            "L25",
+//            "L25",
+            "G25",
             CellType.NUMERIC,
             record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.TongTienThue.deAccentedName)
     )

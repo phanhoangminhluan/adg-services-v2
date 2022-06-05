@@ -57,7 +57,7 @@ public class AdgExcelTableHeaderMetadata {
 
         return AdgExcelTableHeaderMetadata.builder()
                 .headers(headers)
-                .startCellAddress("D26")
+                .startCellAddress("B26")
                 .columnSize(headers.size())
                 .build();
     }
