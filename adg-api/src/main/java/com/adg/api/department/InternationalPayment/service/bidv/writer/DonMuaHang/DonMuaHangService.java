@@ -12,6 +12,7 @@ import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.core.io.Resource;
@@ -27,6 +28,7 @@ import java.util.Map;
  * @author Minh-Luan H. Phan
  * Created on: 2022.05.03 12:24
  */
+@Log4j2
 public class DonMuaHangService {
 
     private ExcelWriter excelWriter;
@@ -60,44 +62,77 @@ public class DonMuaHangService {
         );
         this.fileDate = fileDate;
         this.ngayChungTu = ngayChungTu;
-        this.data = this.transformPhieuNhapKhoRecords(phieuNhapKhoRecords);
         this.ncc = nhaCungCap;
+        this.data = this.transformPhieuNhapKhoRecords(phieuNhapKhoRecords);
     }
 
     @SneakyThrows
-    public static void writeOut(
+    public static Map<String, Object> writeOut(
             String outputFolder,
             Map<String, Object> hoaDonRecordsGroupByNhaCungCap,
             Map<String, Object> phieuNhapKhoRecordsGroupByNhaCungCapAndSoHoaDon,
             ZonedDateTime fileDate,
             Resource resource
     ) {
+
+        List<Map<String, Object>> statsList = new ArrayList<>();
+        long t1 = System.currentTimeMillis();
         for (String nhaCungCap : phieuNhapKhoRecordsGroupByNhaCungCapAndSoHoaDon.keySet()) {
             Map<String, Object> phieuNhapKhoRecordsGroupBySoHoaDon = MapUtils.getMapStringObject(phieuNhapKhoRecordsGroupByNhaCungCapAndSoHoaDon, nhaCungCap);
             for (String soHoaDon : phieuNhapKhoRecordsGroupBySoHoaDon.keySet()) {
                 String ngayHoaDon = MapUtils.getString(hoaDonRecordsGroupByNhaCungCap, String.format("%s.%s.%s", nhaCungCap, soHoaDon, HoaDonHeaderMetadata.NgayChungTu.deAccentedName));
                 List<Map<String, Object>> phieuNhapKhoRecords = MapUtils.getListMapStringObject(phieuNhapKhoRecordsGroupBySoHoaDon, soHoaDon);
-                new DonMuaHangService(outputFolder, phieuNhapKhoRecords, nhaCungCap, ngayHoaDon, fileDate, resource.getInputStream()).exportDocument();
+                Map<String, Object> stats = new DonMuaHangService(outputFolder, phieuNhapKhoRecords, nhaCungCap, ngayHoaDon, fileDate, resource.getInputStream()).exportDocument();
+                statsList.add(stats);
             }
-
         }
+        return MapUtils.ImmutableMap()
+                .put("step", "Generate 'Đơn Mua Hàng'")
+                .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
+                .put("detail", statsList)
+                .build();
+
     }
 
-    private void exportDocument() {
-        this.fillUpperData();
-        this.insertRecordToTable();
-        this.fillTongTien();
-        this.fillLowerData();
-        this.build();
+    private Map<String, Object> exportDocument() {
+        Map<String, Object> stats = new HashMap<>();
+        try {
+            long t1 = System.currentTimeMillis();
+            this.insertRecordToTable();
+            stats.put("fillTableDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            this.fillUpperData();
+            this.fillTongTien();
+            this.fillLowerData();
+            stats.put("fillOtherDataDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            String fileName = this.build();
+            stats.put("fileName", fileName);
+            stats.put("writeFileDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+        } finally {
+            log.info("Step: {}. File name: {}. Fill table duration: {}. Fill other data duration: {}. Write file duration: {}",
+                    "Generate 'Đơn Mua Hàng'",
+                    MapUtils.getString(stats, "fileName"),
+                    MapUtils.getString(stats, "fillTableDuration"),
+                    MapUtils.getString(stats, "fillOtherDataDuration"),
+                    MapUtils.getString(stats, "writeFileDuration")
+            );
+        }
+
+        return stats;
+
     }
 
-    private void build() {
+    private String build() {
         String fileName = String.format("Đơn mua hàng - %s - %s - %s.xlsx",
                 this.soHoaDon,
-                this.ncc,
+                MapUtils.getString(this.data, "shortNameNcc"),
                 DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_03)
         );
         this.excelWriter.build(this.outputFolder + "/" + fileName);
+        return fileName;
     }
 
     private Map<String, Object> transformPhieuNhapKhoRecords(List<Map<String, Object>> phieuNhapKhoRecords) {
@@ -119,7 +154,11 @@ public class DonMuaHangService {
             table.add(transformedRecord);
             this.soHoaDon = HoaDonService.transformSoHoaDon(MapUtils.getString(phieuNhapKhoRecord, PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName));
         }
+
+        String shortNameNcc = NhaCungCapDTO.nhaCungCapMap.get(ncc) == null ? "xxx-" + System.currentTimeMillis() : NhaCungCapDTO.nhaCungCapMap.get(ncc).getShortName();
+
         result.put("Tên NCC", tenNcc);
+        result.put("shortNameNcc", shortNameNcc);
         result.put("Ngày", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.getFormatterWithDefaultValue("dd-MM-yyyy")));
         result.put("Địa chỉ", NhaCungCapDTO.nhaCungCapMap.get(tenNcc) != null ? NhaCungCapDTO.nhaCungCapMap.get(tenNcc).getDiaChi() : "xxx-xxx-xxx");
         result.put("Số", String.format("ĐMH%s",DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.getFormatterWithDefaultValue("ddMMyy"))));

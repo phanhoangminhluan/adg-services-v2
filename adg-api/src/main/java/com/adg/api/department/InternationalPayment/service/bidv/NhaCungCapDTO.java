@@ -41,5 +41,6 @@ public class NhaCungCapDTO {
     private String tenNganHang;
     private String maSoThue;
     private String diaChi;
+    private String shortName;
 
 }

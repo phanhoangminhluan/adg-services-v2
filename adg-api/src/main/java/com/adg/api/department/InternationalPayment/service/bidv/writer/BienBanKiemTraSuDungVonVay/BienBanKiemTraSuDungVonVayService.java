@@ -10,6 +10,7 @@ import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
 import com.merlin.asset.core.utils.ParserUtils;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
@@ -26,6 +27,7 @@ import java.util.Map;
  * @author Minh-Luan H. Phan
  * Created on: 2022.05.09 22:25
  */
+@Log4j2
 public class BienBanKiemTraSuDungVonVayService {
 
     private final WordWriter wordWriter;
@@ -42,23 +44,51 @@ public class BienBanKiemTraSuDungVonVayService {
         this.data = this.transformHoaDonRecords(hoaDonRecords);
     }
 
-    private void exportDocument() {
-        this.fillTextData();
-        this.fillTableData();
-        this.fillTableSumData();
-        this.build();
+    private Map<String, Object> exportDocument() {
+        Map<String, Object> stats = new HashMap<>();
+        try {
+            long t1 = System.currentTimeMillis();
+            this.fillTextData();
+            stats.put("fillOtherDataDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            this.fillTableData();
+            this.fillTableSumData();
+            stats.put("fillTableDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            String fileName = this.build();
+            stats.put("fileName", fileName);
+            stats.put("writeFileDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+        } finally {
+            log.info("Step: {}. File name: {}. Fill table duration: {}. Fill other data duration: {}. Write file duration: {}",
+                    "Generate 'Biên Bản Kiểm Tra Sử Dụng Vốn Vay'",
+                    MapUtils.getString(stats, "fileName"),
+                    MapUtils.getString(stats, "fillTableDuration"),
+                    MapUtils.getString(stats, "fillOtherDataDuration"),
+                    MapUtils.getString(stats, "writeFileDuration")
+            );
+        }
+        return stats;
+
     }
 
     @SneakyThrows
-    public static void writeOut(
+    public static Map<String, Object> writeOut(
             String outputFolder,
             Map<String, Object> hoaDonRecords,
             ZonedDateTime fileDate,
             String contractNumber,
             Resource resource
     ) {
-        new BienBanKiemTraSuDungVonVayService(outputFolder, hoaDonRecords, fileDate, contractNumber, resource.getInputStream())
+        long t1 = System.currentTimeMillis();
+        Map<String, Object> stats = new BienBanKiemTraSuDungVonVayService(outputFolder, hoaDonRecords, fileDate, contractNumber, resource.getInputStream())
                 .exportDocument();
+        return MapUtils.ImmutableMap()
+                .put("step", "Generate 'Biên Bản Kiểm Tra Sử Dụng Vốn Vay'")
+                .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
+                .put("detail", List.of(stats))
+                .build();
     }
 
     private Map<String, Object> transformHoaDonRecords(Map<String, Object> hoaDonRecords) {
@@ -122,7 +152,7 @@ public class BienBanKiemTraSuDungVonVayService {
 
     }
 
-    private void build() {
+    private String build() {
         String fileName = String.format("Biên bản kiểm tra sử dụng vốn vay - %s.docx",
                 DateTimeUtils.convertZonedDateTimeToFormat(
                         this.fileDate,
@@ -131,5 +161,6 @@ public class BienBanKiemTraSuDungVonVayService {
                 )
         );
         this.wordWriter.build(outputFolder + "/" + fileName);
+        return fileName;
     }
 }

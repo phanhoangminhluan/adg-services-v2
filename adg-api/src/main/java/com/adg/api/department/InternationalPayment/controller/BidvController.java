@@ -65,7 +65,11 @@ public class BidvController {
     )
     public byte[] exportFile(@RequestBody Map<String, Object> request) {
         log.info("Export Request: {}", JsonUtils.toJson(request));
-        return this.bidvService.generateDisbursementFiles(request);
+        long t1 = System.currentTimeMillis();
+
+        Pair<byte[], Map<String, Object>> pair =  this.bidvService.generateDisbursementFiles(request);
+        this.bidvService.sendGenerateDisbursementFilesNotification(request, t1, pair.getSecond());
+        return pair.getFirst();
     }
 
 }

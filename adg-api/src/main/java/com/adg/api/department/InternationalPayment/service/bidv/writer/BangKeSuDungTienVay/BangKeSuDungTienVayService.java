@@ -7,6 +7,7 @@ import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelWri
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.core.io.Resource;
@@ -22,6 +23,7 @@ import java.util.Map;
  * @author Minh-Luan H. Phan
  * Created on: 2022.04.30 13:28
  */
+@Log4j2
 public class BangKeSuDungTienVayService {
 
     private final ExcelWriter excelWriter;
@@ -30,6 +32,7 @@ public class BangKeSuDungTienVayService {
     private final String outputFolder;
     private final ZonedDateTime fileDate;
     private final String contractNumber;
+
 
     public BangKeSuDungTienVayService(String outputFolder, List<Map<String, Object>> hoaDonRecords, ZonedDateTime fileDate, String contractNumber, InputStream templateInputStream) {
         this.outputFolder = outputFolder;
@@ -42,14 +45,21 @@ public class BangKeSuDungTienVayService {
     }
 
     @SneakyThrows
-    public static void writeOut(
+    public static Map<String, Object> writeOut(
             String outputFolder,
             List<Map<String, Object>> hoaDonRecords,
             ZonedDateTime fileDate,
             String contractNumber,
             Resource template
     ) {
-        new BangKeSuDungTienVayService(outputFolder, hoaDonRecords, fileDate, contractNumber, template.getInputStream()).exportDocument();
+        long t1 = System.currentTimeMillis();
+        Map<String, Object> stats = new BangKeSuDungTienVayService(outputFolder, hoaDonRecords, fileDate, contractNumber, template.getInputStream()).exportDocument();
+        return MapUtils.ImmutableMap()
+                .put("step", "Generate 'Bảng Kê Sử Dụng Tiền Vay'")
+                .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
+                .put("detail", List.of(stats))
+                .build();
+
     }
 
     private Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords) {
@@ -72,16 +82,38 @@ public class BangKeSuDungTienVayService {
         records.forEach(item -> this.excelTable.insert(item));
     }
 
-    private void exportDocument() {
-        this.insertRecordToTable();
-        this.excelTable.removeSampleRow();
-        this.fillSum();
-        this.build();
+    private Map<String, Object> exportDocument() {
+        Map<String, Object> stats = new HashMap<>();
+        try {
+            long t1 = System.currentTimeMillis();
+            this.insertRecordToTable();
+            this.excelTable.removeSampleRow();
+            stats.put("fillTableDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            this.fillSum();
+            stats.put("fillOtherDataDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            String fileName = this.build();
+            stats.put("fileName", fileName);
+            stats.put("writeFileDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+        } finally {
+            log.info("Step: {}. File name: {}. Fill table duration: {}. Fill other data duration: {}. Write file duration: {}",
+                    "Generate 'Bảng Kê Sử Dụng Tiền Vay'",
+                    MapUtils.getString(stats, "fileName"),
+                    MapUtils.getString(stats, "fillTableDuration"),
+                    MapUtils.getString(stats, "fillOtherDataDuration"),
+                    MapUtils.getString(stats, "writeFileDuration")
+            );
+        }
+        return stats;
     }
 
-    private void build() {
+    private String build() {
         String fileName = String.format("Bảng kê sử dụng tiền vay - %s.xlsx", DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_03));
         this.excelWriter.build(outputFolder + "/" + fileName);
+        return fileName;
     }
 
     private void fillSum() {

@@ -5,6 +5,7 @@ import com.adg.api.department.InternationalPayment.handler.office.word.WordWrite
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
@@ -18,6 +19,7 @@ import java.util.Map;
  * @author Minh-Luan H. Phan
  * Created on: 2022.05.03 20:24
  */
+@Log4j2
 public class DonCamKetService {
 
     private final WordWriter wordWriter;
@@ -33,12 +35,18 @@ public class DonCamKetService {
     }
 
     @SneakyThrows
-    public static void writeOut(String outputFolder,
+    public static Map<String, Object> writeOut(String outputFolder,
                                 List<Map<String, Object>> hoaDonRecords,
                                 ZonedDateTime fileDate,
                                 Resource resource
     ) {
-        new DonCamKetService(outputFolder, hoaDonRecords, fileDate, resource.getInputStream()).exportDocument();
+        long t1 = System.currentTimeMillis();
+        Map<String, Object> stats = new DonCamKetService(outputFolder, hoaDonRecords, fileDate, resource.getInputStream()).exportDocument();
+        return MapUtils.ImmutableMap()
+                .put("step", "Generate 'Đơn Cam Kết'")
+                .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
+                .put("detail", List.of(stats))
+                .build();
     }
 
     private Map<String, Object> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords) {
@@ -60,10 +68,35 @@ public class DonCamKetService {
         return result;
     }
 
-    private void exportDocument() {
-        this.fillTextData();
-        this.fillTableData();
-        this.build();
+    private Map<String, Object> exportDocument() {
+        Map<String, Object> stats = new HashMap<>();
+        try {
+            long t1 = System.currentTimeMillis();
+            this.fillTextData();
+            stats.put("fillOtherDataDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            this.fillTableData();
+            stats.put("fillTableDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            String fileName = this.build();
+            stats.put("fileName", fileName);
+            stats.put("writeFileDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+        } finally {
+
+            log.info("Step: {}. File name: {}. Fill table duration: {}. Fill other data duration: {}. Write file duration: {}",
+                    "Generate 'Đơn Cam Kết'",
+                    MapUtils.getString(stats, "fileName"),
+                    MapUtils.getString(stats, "fillTableDuration"),
+                    MapUtils.getString(stats, "fillOtherDataDuration"),
+                    MapUtils.getString(stats, "writeFileDuration")
+            );
+
+        }
+        return stats;
+
     }
 
     private void fillTextData() {
@@ -74,7 +107,7 @@ public class DonCamKetService {
         this.wordWriter.fillTableData(MapUtils.getListMapStringObject(this.data, "Danh mục hoá đơn diện tử"));
     }
 
-    private void build() {
+    private String build() {
         String fileName = String.format("Đơn cam kết - %s.docx",
                 DateTimeUtils.convertZonedDateTimeToFormat(
                         this.fileDate,
@@ -83,5 +116,6 @@ public class DonCamKetService {
                 )
         );
         this.wordWriter.build(outputFolder + "/" + fileName);
+        return fileName;
     }
 }

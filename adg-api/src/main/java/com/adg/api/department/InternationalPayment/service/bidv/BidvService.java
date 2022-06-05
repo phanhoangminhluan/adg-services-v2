@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -193,10 +194,39 @@ public class BidvService {
         msgSb.append(String.format(" - Duration: %s", DateTimeUtils.getRunningTimeInSecond(receivedAt))).append("\n");
         msgSb.append(String.format(" - Response body: ```%s```", JsonUtils.toJson(payload))).append("\n");
         this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("BIDV - IMPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
-
     }
 
-    public byte[] generateDisbursementFiles(Map<String, Object> request) {
+    public void sendGenerateDisbursementFilesNotification(Map<String, Object> request, long receivedAt, Map<String, Object> map) {
+        StringBuilder msgSb = new StringBuilder();
+
+        List<Map<String, Object>> statsList = MapUtils.getListMapStringObject(map, "statList");
+        String duration = MapUtils.getString(map, "duration");
+
+        msgSb.append("*--- GENERAL INFORMATION ---*").append("\n");
+        msgSb.append(String.format("Running Steps: %s", statsList.size())).append("\n");
+        msgSb.append(String.format("Duration: %s", duration)).append("\n\n\n");
+
+        msgSb.append("*--- DETAIL ---*").append("\n");
+        AtomicInteger stepIndex = new AtomicInteger();
+        String statMsg = statsList.stream().map(stat -> {
+            stepIndex.getAndIncrement();
+            String step = MapUtils.getString(stat, "step");
+            String stepDuration = MapUtils.getString(stat, "duration");
+            List<Map<String, Object>> detailStep = MapUtils.getListMapStringObject(stat, "detail");
+            String detailStepMsg = detailStep.stream().map(detail -> {
+                String fillTableDuration = MapUtils.getString(detail, "fillTableDuration", "none");
+                String fillOtherDataDuration = MapUtils.getString(detail, "fillOtherDataDuration", "none");
+                String fileName = MapUtils.getString(detail, "fileName");
+                String writeFileDuration = MapUtils.getString(detail, "writeFileDuration", "none");
+                return String.format("File Name: %s\nDuration of Fill Table/Fill Other/Write File: %s/%s/%s", fileName, fillTableDuration, fillOtherDataDuration, writeFileDuration);
+            }).collect(Collectors.joining("\n---\n"));
+            return String.format("- Step %s: *%s*\n- Duration: %s\n- Generated files: %s file(s)\n- Detail: ```%s```", stepIndex, step, stepDuration, detailStep.size(), detailStepMsg);
+        }).collect(Collectors.joining("\n---\n"));
+        msgSb.append(statMsg).append("\n\n");
+        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("BIDV - EXPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
+    }
+
+    public Pair<byte[], Map<String, Object>> generateDisbursementFiles(Map<String, Object> request) {
         Map<String, Object> data = MapUtils.getMapStringObject(request, "data");
         List<Map<String, Object>> hoaDonRecords = MapUtils.getListMapStringObject(data, "hd");
         List<Map<String, Object>> phieuNhapKhoRecords = MapUtils.getListMapStringObject(data, "pnk");
@@ -208,7 +238,9 @@ public class BidvService {
     }
 
     @SneakyThrows
-    private byte[] writeFiles(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> phieuNhapKhoRecords, ZonedDateTime fileDate, String contractNumber) {
+    private Pair<byte[], Map<String, Object>> writeFiles(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> phieuNhapKhoRecords, ZonedDateTime fileDate, String contractNumber) {
+
+        long t1 = System.currentTimeMillis();
 
         String outputFolder = this.getOutputFolder();
         String zipPath = this.getOutputZipFolder() + String.format("BIDV - Hồ Sơ Giải Ngân - %s.zip", System.currentTimeMillis());
@@ -221,28 +253,33 @@ public class BidvService {
         List<Map<String, Object>> hoaDonRecordsSortBySttKhongGop = hoaDonPair.getSecond();
 
 
-        BangKeSuDungTienVayService
+        Map<String, Object> stats1 = BangKeSuDungTienVayService
                 .writeOut(outputFolder, hoaDonRecordsSortBySttKhongGop, fileDate, contractNumber, bangKeSuDungTienVayTemplate);
 
-        DonCamKetService
+        Map<String, Object> stats2 = DonCamKetService
                 .writeOut(outputFolder, hoaDonRecordsSortBySttKhongGop, fileDate, donCamKetTemplate);
 
-        BienBanKiemTraSuDungVonVayService
+        Map<String, Object> stats3 = BienBanKiemTraSuDungVonVayService
                 .writeOut(outputFolder, hoaDonRecordsGroupByNhaCungCap, fileDate, contractNumber, bienBanKiemTraSuDungVonVayTemplate);
 
-        HopDongTinDungService
+        Map<String, Object> stats4 = HopDongTinDungService
                 .writeOut(outputFolder, hoaDonRecordsGroupByNhaCungCap, fileDate, contractNumber, hopDongTinDungTemplate);
 
-        UyNhiemChiService
+        Map<String, Object> stats5 = UyNhiemChiService
                 .writeOut(outputFolder, hoaDonRecordsGroupByNhaCungCap, fileDate, uyNhiemChiTemplate);
 
-        DonMuaHangService
+        Map<String, Object> stats6 = DonMuaHangService
                 .writeOut(outputFolder, hoaDonRecordsGroupByNhaCungCap, phieuNhapKhoRecordsGroupByNhaCungCapAndSoHoaDon, fileDate, donMuaHangTemplate);
 
         ZipUtils.zipFolder(Paths.get(outputFolder), Paths.get(zipPath));
 
-        return IOUtils.toByteArray(new FileInputStream(zipPath));
-
+        return Pair
+                .of(
+                        IOUtils.toByteArray(new FileInputStream(zipPath)),
+                        MapUtils.ImmutableMap()
+                                .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
+                                .put("statList", List.of(stats1, stats2, stats3, stats4, stats5, stats6)).build()
+                );
     }
 
 

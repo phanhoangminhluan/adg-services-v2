@@ -5,7 +5,8 @@
     "soTaiKhoan": "7111 2995342",
     "tenNganHang": "KBNN TP THỦ ĐỨC, Tỉnh/TP: TP THỦ ĐỨC",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Cảng Sài Gòn KV I"
   },
   {
     "maKhachHang": "CCSGKVIV",
@@ -13,7 +14,8 @@
     "soTaiKhoan": "7111 299508",
     "tenNganHang": "KBNN TP THỦ ĐỨC, Tỉnh/TP: TP THỦ ĐỨC",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Cảng Sài Gòn KV IV"
   },
   {
     "maKhachHang": "CANGHPKVI",
@@ -21,7 +23,8 @@
     "soTaiKhoan": "7111 2995022",
     "tenNganHang": "KBNN Hồng Bàng , Tỉnh/TP: Hải Phòng",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Cảng Hải Phòng KV I"
   },
   {
     "maKhachHang": "CANGHPKVII",
@@ -29,7 +32,8 @@
     "soTaiKhoan": "7111 2995023",
     "tenNganHang": "KBNN Lê Chân , Tỉnh/TP: Hải Phòng",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Cảng Hải Phòng KV II"
   },
   {
     "maKhachHang": "CDINHVUHP",
@@ -37,7 +41,8 @@
     "soTaiKhoan": "7111 2995119",
     "tenNganHang": "KBNN Hải An , Tỉnh/TP: Hải Phòng",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Cảng Đình Vũ"
   },
   {
     "maKhachHang": "CHPKVIII",
@@ -45,7 +50,8 @@
     "soTaiKhoan": "7111 2995024",
     "tenNganHang": "KBNN Hải An , Tỉnh/TP: Hải Phòng",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Cảng Hải Phòng KV III"
   },
   {
     "maKhachHang": "CTHOPBD",
@@ -53,7 +59,8 @@
     "soTaiKhoan": "7111 2995490",
     "tenNganHang": "KBNN Bình Dương; Tỉnh/TP: Bình Dương",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Cảng tổng hợp Bình Dương"
   },
   {
     "maKhachHang": "CÔNG TY TNHH THƯƠNG MẠI DỊCH VỤ HANNY VIỆT NAM",
@@ -61,7 +68,8 @@
     "soTaiKhoan": "888 1199 996 868",
     "tenNganHang": "MB - TÂN CẢNG",
     "maSoThue": "0315555862",
-    "diaChi": "75/5B Đường Bình Quới, Phường 27, Quận Bình Thạnh, Thành phố Hồ Chí Minh"
+    "diaChi": "75/5B Đường Bình Quới, Phường 27, Quận Bình Thạnh, Thành phố Hồ Chí Minh",
+    "shortName": "Hanny Việt Nam"
   },
   {
     "maKhachHang": "CÔNG TY CỔ PHẦN HÓA CHẤT NHỰA ĐÀ NẴNG",
@@ -69,7 +77,8 @@
     "soTaiKhoan": "004.100.000.2178",
     "tenNganHang": "VIETCOMBANK - CN ĐÀ NẴNG",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Hoá Chất Nhựa Đà Nẵng"
   },
   {
     "maKhachHang": "CÔNG TY TNHH SỢI DỆT MAY VIỆT NHẬT",
@@ -77,7 +86,8 @@
     "soTaiKhoan": "030 900 000 4589",
     "tenNganHang": "Public Bank Vietnam - Chi nhánh TP.HCM",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Dệt May Việt Nhật"
   },
   {
     "maKhachHang": "CÔNG TY TNHH CÔNG NGHIỆP AGRINA",
@@ -85,7 +95,8 @@
     "soTaiKhoan": "3402 00000 0078",
     "tenNganHang": "PUBLIC BANK VIETNAM-CN TÂN BÌNH",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Công Nghiệp Agrina"
   },
   {
     "maKhachHang": "CÔNG TY TNHH BAO BÌ TẤN PHONG",
@@ -93,7 +104,8 @@
     "soTaiKhoan": "191.111.226.660.66",
     "tenNganHang": "TECHCOMBANK - CN CHỢ LỚN, TP HCM",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Bao Bì Tấn Phong"
   },
   {
     "maKhachHang": "CÔNG TY TNHH ĐẦU TƯ SAO MAI PHÚ QUỐC",
@@ -101,7 +113,8 @@
     "soTaiKhoan": "15111 0193 4002",
     "tenNganHang": "MB - CN An Phú Tp.HCM",
     "maSoThue": "0316072498",
-    "diaChi": "43 Thạnh Mỹ Lợi, Phường Thạnh Mỹ Lợi, Quận 2, Thành phố Hồ Chí Minh"
+    "diaChi": "43 Thạnh Mỹ Lợi, Phường Thạnh Mỹ Lợi, Quận 2, Thành phố Hồ Chí Minh",
+    "shortName": "Sao Mai Phú Quốc"
   },
   {
     "maKhachHang": "CÔNG TY TNHH THƯƠNG MẠI SẢN XUẤT NHỰA NHẬT PHONG",
@@ -109,7 +122,8 @@
     "soTaiKhoan": "1691 0000 747 892",
     "tenNganHang": "BIDV - CN BÀ CHIỂU",
     "maSoThue": "0315198603",
-    "diaChi": "672A29 Phan Văn Trị, Phường 10, Quận Gò Vấp, Thành Phố Hồ Chí Minh, Việt Nam"
+    "diaChi": "672A29 Phan Văn Trị, Phường 10, Quận Gò Vấp, Thành Phố Hồ Chí Minh, Việt Nam",
+    "shortName": "Nhựa Nhật Phong"
   },
   {
     "maKhachHang": "CÔNG TY CỔ PHẦN DRAGON LEADER",
@@ -117,7 +131,8 @@
     "soTaiKhoan": "68811 9999 6868",
     "tenNganHang": "MB - CN TÂN CẢNG, TP HCM",
     "maSoThue": "0316246987",
-    "diaChi": "262A đường Pasteur, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh, Việt Nam"
+    "diaChi": "262A đường Pasteur, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh, Việt Nam",
+    "shortName": "Dragon Leader"
   },
   {
     "maKhachHang": "CÔNG TY TNHH HƯNG NGHIỆP FORMOSA",
@@ -125,7 +140,8 @@
     "soTaiKhoan": "A002000108236",
     "tenNganHang": "VIETCOMBANK - NHƠN TRẠCH, ĐỒNG NAI",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Hưng Nghiệp Formosa"
   },
   {
     "maKhachHang": "CÔNG TY CỔ PHẦN ĐẦU TƯ HƯNG ĐÔNG",
@@ -133,7 +149,8 @@
     "soTaiKhoan": "191 339 013 560 18",
     "tenNganHang": "TECHCOMBANK-CN BÌNH THẠNH",
     "maSoThue": "0312372187",
-    "diaChi": "428 Điện Biên Phủ - Phường 11 - Quận 10 - TP Hồ Chí Minh"
+    "diaChi": "428 Điện Biên Phủ - Phường 11 - Quận 10 - TP Hồ Chí Minh",
+    "shortName": "Hưng Đông"
   },
   {
     "maKhachHang": "CHI NHÁNH PHÂN PHỐI NGUYÊN LIỆU CÔNG NGHIỆP DẦU KHÍ - CÔNG TY CỔ PHẦN THƯƠNG MẠI DỊCH VỤ DẦU KHÍ MIỀN TRUNG",
@@ -141,7 +158,8 @@
     "soTaiKhoan": "191 315 321 688 89",
     "tenNganHang": "NH TMCP KỸ THƯƠNG VIỆT NAM - CN QUẢNG NGÃI",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Dầu Khí Miền Trung"
   },
   {
     "maKhachHang": "CÔNG TY CỔ PHẦN NHỰA TÂN TIẾN",
@@ -149,7 +167,8 @@
     "soTaiKhoan": "018 616 780 001",
     "tenNganHang": "ĐÔNG Á  - CN QUẬN 7",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Nhựa Tân Tiến"
   },
   {
     "maKhachHang": "CÔNG TY CỔ PHẦN BAO BÌ ĐẠI LỤC",
@@ -157,7 +176,8 @@
     "soTaiKhoan": "132.100.000.521.36",
     "tenNganHang": "BIDV- CN NAM SÀI GÒN",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Bao Bì Đại Lục"
   },
   {
     "maKhachHang": "CÔNG TY CỔ PHẦN THƯƠNG MẠI DỊCH VỤ TÂM ĐỨC TÍN",
@@ -165,7 +185,8 @@
     "soTaiKhoan": "xxxxx.xxxx.xxxx",
     "tenNganHang": "xxxxxxxxx",
     "maSoThue": "0311338218",
-    "diaChi": "482/11/14A Nơ Trang Long, Phường 13, Quận Bình Thạnh, Thành phố Hồ Chí Minh, Việt Nam"
+    "diaChi": "482/11/14A Nơ Trang Long, Phường 13, Quận Bình Thạnh, Thành phố Hồ Chí Minh, Việt Nam",
+    "shortName": "Tâm Đức Tín"
   },
   {
     "maKhachHang": "CÔNG TY TNHH BAO BÌ BẾN THÀNH",
@@ -173,7 +194,8 @@
     "soTaiKhoan": "19.13.00.94.665.010",
     "tenNganHang": "TCB - CN GIA ĐỊNH",
     "maSoThue": "3702420748",
-    "diaChi": "Số 3, đường 18, khu hành chính Nhị Đồng 2, Phường Dĩ An, Thành phố Dĩ An, Tỉnh Bình Dương, Việt Nam"
+    "diaChi": "Số 3, đường 18, khu hành chính Nhị Đồng 2, Phường Dĩ An, Thành phố Dĩ An, Tỉnh Bình Dương, Việt Nam",
+    "shortName": "Bao Bì Bến Thành"
   },
   {
     "maKhachHang": "CÔNG TY TNHH VINMOS",
@@ -181,6 +203,7 @@
     "soTaiKhoan": "081 1006 263 076",
     "tenNganHang": "TMCP An Bình - CN Chánh Hưng, Tp.HCM",
     "maSoThue": "xxxxxxxxx",
-    "diaChi": "xxxxxxx"
+    "diaChi": "xxxxxxx",
+    "shortName": "Vinmos"
   }
 ]
