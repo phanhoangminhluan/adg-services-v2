@@ -177,8 +177,8 @@ public class BangKeSuDungTienVayService {
         );
 
         Cell signDateCell = this.excelWriter.getCell(
-                this.excelWriter.getRow(soTienNhanNoHeaderCell.getRowIndex() + this.excelTable.getSize() + 5),
-                soTienNhanNoHeaderCell.getColumnIndex()
+                this.excelWriter.getRow(soTienHeaderCell.getRowIndex() + this.excelTable.getSize() + 5),
+                soTienHeaderCell.getColumnIndex()
         );
 
         ExcelUtils.setCell(tongCell, String.format("SUM(%s:%s)", startCell, endCell), CellType.FORMULA);

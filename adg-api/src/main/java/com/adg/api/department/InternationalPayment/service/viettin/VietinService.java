@@ -47,6 +47,9 @@ public class VietinService {
     @Value("${international-payment.bidv.input.zip}")
     private String inputZip;
 
+    @Value("${env}")
+    private String env;
+
     @Value("${international-payment.bidv.output.files}")
     private String output;
 
@@ -220,7 +223,7 @@ public class VietinService {
             return String.format("- Step %s: *%s*\n- Duration: %s\n- Generated files: %s file(s)\n- Detail: ```%s```", stepIndex, step, stepDuration, detailStep.size(), detailStepMsg);
         }).collect(Collectors.joining("\n---\n"));
         msgSb.append(statMsg).append("\n\n");
-        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("VIETIN - EXPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
+        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, env, String.format("VIETIN - EXPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
     }
 
     public void sendParseFileNotification(Map<String, Object> payload, long receivedAt, MultipartFile file, Map<String, Object> stats) {
@@ -253,7 +256,7 @@ public class VietinService {
         msgSb.append("*--- RESPONSE INFORMATION ---*").append("\n");
         msgSb.append(String.format(" - Duration: %s", DateTimeUtils.getRunningTimeInSecond(receivedAt))).append("\n");
         msgSb.append(String.format(" - Response body: ```%s```", JsonUtils.toJson(payload))).append("\n");
-        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("VIETIN - IMPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
+        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, env, String.format("VIETIN - IMPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
     }
 
     private Map<String, Object> groupHoaDonByNCC(List<Map<String, Object>> hoaDonRecords) {

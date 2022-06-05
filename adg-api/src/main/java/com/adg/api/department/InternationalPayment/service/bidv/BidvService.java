@@ -47,6 +47,9 @@ public class BidvService {
     @Value("${international-payment.bidv.output.files}")
     private String output;
 
+    @Value("${env}")
+    private String env;
+
     @Value("${international-payment.bidv.output.zip}")
     private String outputZipFolder;
 
@@ -199,7 +202,7 @@ public class BidvService {
         msgSb.append("*--- RESPONSE INFORMATION ---*").append("\n");
         msgSb.append(String.format(" - Duration: %s", DateTimeUtils.getRunningTimeInSecond(receivedAt))).append("\n");
         msgSb.append(String.format(" - Response body: ```%s```", JsonUtils.toJson(payload))).append("\n");
-        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("BIDV - IMPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
+        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, env, String.format("BIDV - IMPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
     }
 
     public void sendGenerateDisbursementFilesNotification(Map<String, Object> request, long receivedAt, Map<String, Object> map) {
@@ -229,7 +232,7 @@ public class BidvService {
             return String.format("- Step %s: *%s*\n- Duration: %s\n- Generated files: %s file(s)\n- Detail: ```%s```", stepIndex, step, stepDuration, detailStep.size(), detailStepMsg);
         }).collect(Collectors.joining("\n---\n"));
         msgSb.append(statMsg).append("\n\n");
-        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("BIDV - EXPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
+        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, env, String.format("BIDV - EXPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
     }
 
     public Pair<byte[], Map<String, Object>> generateDisbursementFiles(Map<String, Object> request) {
