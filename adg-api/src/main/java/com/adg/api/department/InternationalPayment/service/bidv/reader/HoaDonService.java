@@ -2,15 +2,16 @@ package com.adg.api.department.InternationalPayment.service.bidv.reader;
 
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelReader;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
-import com.merlin.asset.core.utils.MapUtils;
-import com.merlin.asset.core.utils.ParserUtils;
-import com.merlin.asset.core.utils.StringUtils;
+import com.merlin.asset.core.utils.*;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,12 @@ public class HoaDonService {
 
     private static final Logger logger = LoggerFactory.getLogger(HoaDonService.class);
 
-    public List<Map<String, Object>> parseHoaDonFile(String fileHoaDonPath) {
+    @SneakyThrows
+    public Pair<List<Map<String, Object>>, Map<String, Object>> parseHoaDonFile(String fileHoaDonPath) {
+
+        Map<String, Object> stats = new HashMap<>();
+
+        long t1 = System.currentTimeMillis();
         ExcelReader excelReader = new ExcelReader(fileHoaDonPath);
         Map<String, Object> output = excelReader.readTable("A2");
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(output, "records");
@@ -40,7 +46,12 @@ public class HoaDonService {
             deAccentedRecords.add(this.deAccentAllKeys(record));
         }
 
-        return deAccentedRecords;
+        stats.put("fileName", fileHoaDonPath.substring(fileHoaDonPath.lastIndexOf("/") + 1));
+        stats.put("fileSize", NumberUtils.formatNumber1(Files.size(Path.of(fileHoaDonPath))));
+        stats.put("recordSize", deAccentedRecords.size());
+        stats.put("parseDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+        return Pair.of(deAccentedRecords, stats);
     }
 
     public Pair<Map<String, Object>, List<Map<String, Object>>> transformHoaDonRecords(List<Map<String, Object>> hoaDonRecords) {

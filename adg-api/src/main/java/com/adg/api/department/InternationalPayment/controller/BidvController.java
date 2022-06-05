@@ -1,5 +1,6 @@
 package com.adg.api.department.InternationalPayment.controller;
 
+import com.adg.api.department.Accounting.service.SlackService;
 import com.adg.api.department.InternationalPayment.service.bidv.BidvService;
 import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
@@ -7,6 +8,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +28,9 @@ public class BidvController {
     @Autowired
     private BidvService bidvService;
 
+    @Autowired
+    private SlackService slackService;
+
     @Value("${international-payment.bidv.input.zip}")
     private String inputZip;
 
@@ -40,12 +45,19 @@ public class BidvController {
     @PostMapping("import")
     @SneakyThrows
     public Map<String, Object> importFile(@RequestParam("file") MultipartFile file) {
+        long t1 = System.currentTimeMillis();
+
         log.info("Import request. Original File Name: {}. Size: {}. Content Type: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
-        Map<String, Object> data = this.bidvService.parseFile(file.getInputStream());
-        return MapUtils.ImmutableMap()
-                .put("data", data)
-                .put("status", "ok")
-                .build();
+
+        Pair<Map<String, Object>, Map<String, Object>> pair = this.bidvService.parseFile(file.getInputStream());
+
+        Map<String, Object> payload = MapUtils.ImmutableMap().put("data", pair.getFirst()).put("status", "ok").build();
+
+        log.info(String.format("Import response. %s", JsonUtils.toJson(payload)));
+
+        this.bidvService.sendParseFileNotification(payload, t1, file, pair.getSecond());
+
+        return payload;
     }
 
     @PostMapping(value = "export",

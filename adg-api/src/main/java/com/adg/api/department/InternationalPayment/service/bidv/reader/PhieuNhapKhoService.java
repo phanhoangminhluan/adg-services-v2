@@ -2,13 +2,14 @@ package com.adg.api.department.InternationalPayment.service.bidv.reader;
 
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelReader;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.PhieuNhapKhoHeaderMetadata;
-import com.merlin.asset.core.utils.DateTimeUtils;
-import com.merlin.asset.core.utils.MapUtils;
-import com.merlin.asset.core.utils.ParserUtils;
-import com.merlin.asset.core.utils.StringUtils;
+import com.merlin.asset.core.utils.*;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -22,17 +23,25 @@ import java.util.stream.Collectors;
 @Log4j2
 public class PhieuNhapKhoService {
 
-    public List<Map<String, Object>> readPhieuNhapKho(List<String> phieuNhapKhoFilePaths) {
+    @SneakyThrows
+    public Pair<List<Map<String, Object>>, Map<String, Object>> parseListPhieuNhapKho(List<String> phieuNhapKhoFilePaths) {
         List<Map<String, Object>> phieuNhapKhoRecords = new ArrayList<>();
 
+        Map<String, Object> stats = new HashMap<>();
+
+        List<Map<String, Object>> detailStats = new ArrayList<>();
+
+        long t1 = System.currentTimeMillis();
+
         for (String phieuNhapKhoFilePath : phieuNhapKhoFilePaths) {
+            long t2 = System.currentTimeMillis();
             ExcelReader excelReader = new ExcelReader(phieuNhapKhoFilePath);
             Map<String, Object> output = this.scanPhieuNhapKhoTable(excelReader, 14, "A");
             List<Map<String, Object>> records = MapUtils.getListMapStringObject(output, "records");
 
             String rawDescription = excelReader.getCellValueAsString("A10");
             Map<String, Object> descriptionMap = this.parsePhieuNhapKhoDescription(rawDescription);
-
+            int totalRecordOfEachFile = 0;
             for (Map<String, Object> record : records) {
 
                 String sttValue = MapUtils.getString(record, PhieuNhapKhoHeaderMetadata.STT.name);
@@ -47,11 +56,22 @@ public class PhieuNhapKhoService {
                         .forEach(headerMetadata -> phieuNhapKhoRecord.put(headerMetadata.deAccentedName, MapUtils.getString(record, headerMetadata.name)));
                 phieuNhapKhoRecord.put(PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName, MapUtils.getString(descriptionMap, PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName));
                 phieuNhapKhoRecord.put(PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName, MapUtils.getString(descriptionMap, PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName));
-
+                totalRecordOfEachFile++;
                 phieuNhapKhoRecords.add(phieuNhapKhoRecord);
             }
+
+            detailStats.add(MapUtils.ImmutableMap()
+                            .put("fileName", phieuNhapKhoFilePath.substring(phieuNhapKhoFilePath.lastIndexOf("/") + 1))
+                            .put("recordSize", totalRecordOfEachFile)
+                            .put("fileSize", NumberUtils.formatNumber1(Files.size(Path.of(phieuNhapKhoFilePath))))
+                            .put("parseDuration", DateTimeUtils.getRunningTimeInSecond(t2))
+                    .build());
         }
-        return phieuNhapKhoRecords;
+        stats.put("totalRecords", phieuNhapKhoRecords.size());
+        stats.put("detailStats", detailStats);
+        stats.put("parseDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+        return Pair.of(phieuNhapKhoRecords, stats);
     }
 
     private Map<String, Object> scanPhieuNhapKhoTable(ExcelReader excelReader, int row, String column) {

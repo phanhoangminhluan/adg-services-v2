@@ -1,5 +1,8 @@
 package com.adg.api.department.InternationalPayment.service.bidv;
 
+import com.adg.api.department.Accounting.enums.Module;
+import com.adg.api.department.Accounting.enums.SlackAuthor;
+import com.adg.api.department.Accounting.service.SlackService;
 import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
 import com.adg.api.department.InternationalPayment.service.bidv.reader.PhieuNhapKhoService;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.BangKeSuDungTienVay.BangKeSuDungTienVayService;
@@ -10,7 +13,9 @@ import com.adg.api.department.InternationalPayment.service.bidv.writer.HopDongTi
 import com.adg.api.department.InternationalPayment.service.bidv.writer.UyNhiemChi.UyNhiemChiService;
 import com.adg.api.util.ZipUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
+import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
+import com.merlin.asset.core.utils.NumberUtils;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
@@ -19,15 +24,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Minh-Luan H. Phan
@@ -70,6 +79,9 @@ public class BidvService {
     @Autowired
     private PhieuNhapKhoService phieuNhapKhoService;
 
+    @Autowired
+    private SlackService slackService;
+
     private String getOutputFolder() {
         String path = String.format(output, DateTimeUtils.convertZonedDateTimeToFormat(ZonedDateTime.now(), "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue("yyyy/MM/dd/HHmmss")));
         File file = new File(path);
@@ -84,34 +96,104 @@ public class BidvService {
         return path;
     }
 
-    public Map<String, Object> parseFile(InputStream inputStream) {
+    public Pair<Map<String, Object>, Map<String, Object>> parseFile(InputStream inputStream) {
         List<File> files = new ArrayList<>();
+
+        List<Map<String, Object>> filesInfo = new ArrayList<>();
+        Map<String, Object> pnkStats = new HashMap<>();
+        Map<String, Object> hdStats = new HashMap<>();
         try {
             files = ZipUtils.uncompressZipFile(inputStream, inputZip);
             String hoaDonFilePath = "";
             List<String> phieuNhapKhoFilePaths = new ArrayList<>();
             for (File f : files) {
+                String type;
+                String fileName = f.getName();
+                long fileSize = Files.size(f.toPath());
                 if (f.getName().toLowerCase().startsWith("pnk")) {
                     phieuNhapKhoFilePaths.add(f.getAbsolutePath());
+                    type = "pnk";
                 } else {
                     hoaDonFilePath = f.getAbsolutePath();
+                    type = "hd";
                 }
+                filesInfo.add(MapUtils.ImmutableMap()
+                        .put("type", type)
+                        .put("name", fileName)
+                        .put("size", fileSize)
+                        .build());
             }
 
-            List<Map<String, Object>> hoaDonRecords = this.hoaDonService.parseHoaDonFile(hoaDonFilePath);
-            List<Map<String, Object>> phieuNhapKhoRecords = this.phieuNhapKhoService.readPhieuNhapKho(phieuNhapKhoFilePaths);
+            Pair<List<Map<String, Object>>, Map<String, Object>> hoaDonPair = this.hoaDonService.parseHoaDonFile(hoaDonFilePath);
+            hdStats = hoaDonPair.getSecond();
+            Pair<List<Map<String, Object>>, Map<String, Object>> phieuNhapKhoPair = this.phieuNhapKhoService.parseListPhieuNhapKho(phieuNhapKhoFilePaths);
+            pnkStats = phieuNhapKhoPair.getSecond();
 
-            return MapUtils.ImmutableMap()
-                    .put("hd", hoaDonRecords)
-                    .put("pnk", phieuNhapKhoRecords)
-                    .build();
+
+            return Pair.of(MapUtils.ImmutableMap()
+                    .put("hd", hoaDonPair.getFirst())
+                    .put("pnk", phieuNhapKhoPair.getFirst())
+                    .build(), MapUtils.ImmutableMap()
+                            .put("filesInfo", filesInfo)
+                            .put("hdStats", hdStats)
+                            .put("pnkStats", pnkStats)
+                    .build());
 
         } catch (Exception exception) {
             exception.printStackTrace();
         } finally {
             files.forEach(File::delete);
         }
-        return MapUtils.ImmutableMap().build();
+        return Pair.of(MapUtils.ImmutableMap()
+                .put("hd", List.of())
+                .put("pnk", List.of())
+                .build(), MapUtils.ImmutableMap()
+                .put("filesInfo", filesInfo)
+                .put("hdStats", hdStats)
+                .put("pnkStats", pnkStats)
+                .build());
+    }
+
+    public void sendParseFileNotification(Map<String, Object> payload, long receivedAt, MultipartFile file, Map<String, Object> stats) {
+        StringBuilder msgSb = new StringBuilder();
+
+        List<Map<String, Object>> fileMetadatas = MapUtils.getListMapStringObject(stats, "filesInfo");
+        Map<String, Object> hdStats = MapUtils.getMapStringObject(stats, "hdStats");
+        Map<String, Object> pnkStats = MapUtils.getMapStringObject(stats, "pnkStats");
+
+        String fileMetadataStr = fileMetadatas.stream().map(fileMetadata ->
+                String.format("   > %s - %s - %s",
+                        MapUtils.getString(fileMetadata, "type"),
+                        MapUtils.getString(fileMetadata, "name"),
+                        NumberUtils.formatNumber1(MapUtils.getLong(fileMetadata, "size")) + " kb"
+                        )
+        ).collect(Collectors.joining("\n"));
+
+        msgSb.append("*--- REQUEST INFORMATION ---*").append("\n");
+        msgSb.append(String.format(" - File name: %s", file.getOriginalFilename())).append("\n");
+        msgSb.append(String.format(" - File size: %s kb", NumberUtils.formatNumber1(file.getSize()))).append("\n");
+        msgSb.append(String.format(" - Content type: %s", file.getContentType())).append("\n\n");
+
+        msgSb.append("*--- PROCESSING STATISTIC ---*").append("\n");
+        msgSb.append(" - Handle Hoa Don").append("\n");
+        msgSb.append(String.format("      + File name: %s", MapUtils.getString(hdStats, "fileName"))).append("\n");
+        msgSb.append(String.format("      + File size: %s kb", MapUtils.getString(hdStats, "fileSize"))).append("\n");
+        msgSb.append(String.format("      + Parse duration: %s", MapUtils.getString(hdStats, "parseDuration"))).append("\n");
+        msgSb.append(String.format("      + Record size: %s", MapUtils.getString(hdStats, "recordSize"))).append("\n\n");
+
+        String pnkDetail = MapUtils.getListMapStringObject(pnkStats, "detailStats").stream()
+                .map(detailStat -> String.format("%s (%s kb): %s record(s) - %s", MapUtils.getString(detailStat, "fileName"), MapUtils.getString(detailStat, "fileSize"), MapUtils.getString(detailStat, "recordSize"), MapUtils.getString(detailStat, "parseDuration")))
+                        .collect(Collectors.joining("\n         > ", "\n         > ", ""));
+        msgSb.append(" - Handle Phieu Nhap Kho").append("\n");
+        msgSb.append(String.format("      + Parse duration: %s", MapUtils.getString(pnkStats, "parseDuration"))).append("\n");
+        msgSb.append(String.format("      + Record size: %s", MapUtils.getString(pnkStats, "totalRecords"))).append("\n");
+        msgSb.append(String.format("      + Detail: %s", pnkDetail)).append("\n\n");
+
+        msgSb.append("*--- RESPONSE INFORMATION ---*").append("\n");
+        msgSb.append(String.format(" - Duration: %s", DateTimeUtils.getRunningTimeInSecond(receivedAt))).append("\n");
+        msgSb.append(String.format(" - Response body: ```%s```", JsonUtils.toJson(payload))).append("\n");
+        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("BIDV - IMPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
+
     }
 
     public byte[] generateDisbursementFiles(Map<String, Object> request) {

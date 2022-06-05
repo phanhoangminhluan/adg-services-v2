@@ -80,7 +80,7 @@ public class VietinService {
             }
 
             List<Map<String, Object>> toKhaiHaiQuan = this.toKhaiHaiQuanService.readToKhaiHaiQuan(fileTKHQ);
-            List<Map<String, Object>> hoaDon = this.hoaDonService.parseHoaDonFile(fileHoaDon);
+            List<Map<String, Object>> hoaDon = this.hoaDonService.parseHoaDonFile(fileHoaDon).getFirst();
 
             return MapUtils.ImmutableMap()
                     .put("tkhq", toKhaiHaiQuan)
