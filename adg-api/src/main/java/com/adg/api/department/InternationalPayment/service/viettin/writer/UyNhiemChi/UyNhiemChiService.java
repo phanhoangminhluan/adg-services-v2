@@ -41,11 +41,23 @@ public class UyNhiemChiService {
     }
 
     private static class UyNhiemChiAddress {
-        public static final String SO_TAI_KHOAN = "C12";
-        public static final String NGAN_HANG = "E12";
-        public static final String SO_TIEN_BANG_SO = "C15";
-        public static final String SO_TIEN_BANG_CHU = "C17";
-        public static final String NOI_DUNG = "D18";
+
+        public static class Copy1 {
+            public static final String SO_TAI_KHOAN = "C12";
+            public static final String NGAN_HANG = "E12";
+            public static final String SO_TIEN_BANG_SO = "C15";
+            public static final String SO_TIEN_BANG_CHU = "C17";
+            public static final String NOI_DUNG = "D18";
+        }
+
+        public static class Copy2 {
+            public static final String SO_TAI_KHOAN = "C38";
+            public static final String NGAN_HANG = "E38";
+            public static final String SO_TIEN_BANG_SO = "C41";
+            public static final String SO_TIEN_BANG_CHU = "C43";
+            public static final String NOI_DUNG = "D44";
+        }
+
     }
 
     @SneakyThrows
@@ -124,31 +136,56 @@ public class UyNhiemChiService {
 
     private void fillTextData() {
         ExcelUtils.setCell(
-                this.excelWriter.getCell(UyNhiemChiAddress.SO_TAI_KHOAN),
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy1.SO_TAI_KHOAN),
+                MapUtils.getString(data, "stk"),
+                CellType.STRING
+        );
+        ExcelUtils.setCell(
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy2.SO_TAI_KHOAN),
                 MapUtils.getString(data, "stk"),
                 CellType.STRING
         );
 
         ExcelUtils.setCell(
-                this.excelWriter.getCell(UyNhiemChiAddress.NGAN_HANG),
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy1.NGAN_HANG),
+                MapUtils.getString(data, "nganHang"),
+                CellType.STRING
+        );
+        ExcelUtils.setCell(
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy2.NGAN_HANG),
                 MapUtils.getString(data, "nganHang"),
                 CellType.STRING
         );
 
         ExcelUtils.setCell(
-                this.excelWriter.getCell(UyNhiemChiAddress.SO_TIEN_BANG_SO),
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy1.SO_TIEN_BANG_SO),
+                MapUtils.getString(data, "soTienBangSo"),
+                CellType.NUMERIC
+        );
+        ExcelUtils.setCell(
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy2.SO_TIEN_BANG_SO),
                 MapUtils.getString(data, "soTienBangSo"),
                 CellType.NUMERIC
         );
 
         ExcelUtils.setCell(
-                this.excelWriter.getCell(UyNhiemChiAddress.SO_TIEN_BANG_CHU),
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy1.SO_TIEN_BANG_CHU),
+                MapUtils.getString(data, "soTienBangChu"),
+                CellType.STRING
+        );
+        ExcelUtils.setCell(
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy2.SO_TIEN_BANG_CHU),
                 MapUtils.getString(data, "soTienBangChu"),
                 CellType.STRING
         );
 
         ExcelUtils.setCell(
-                this.excelWriter.getCell(UyNhiemChiAddress.NOI_DUNG),
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy1.NOI_DUNG),
+                MapUtils.getString(data, "noiDungThanhToan"),
+                CellType.STRING
+        );
+        ExcelUtils.setCell(
+                this.excelWriter.getCell(UyNhiemChiAddress.Copy2.NOI_DUNG),
                 MapUtils.getString(data, "noiDungThanhToan"),
                 CellType.STRING
         );

@@ -80,7 +80,7 @@ public class GiayNhanNoService {
 
         return MapUtils.ImmutableMap()
                 .put("tongTienThanhToanBangSo", NumberUtils.formatNumber1(soTienBangSo))
-                .put("tongTienThanhToanBangChu", soTienBangChu)
+                .put("tongTienThanhToanBangChu", soTienBangChu.toLowerCase())
                 .put("mucDichSuDungKhoanNo", mucDichSuDungKhoanNo.trim())
                 .put("ngayFileDate", String.format("Ngày %s tháng %s năm %s", fileDate.getDayOfMonth(), fileDate.getMonthValue(), fileDate.getYear()))
                 .build();

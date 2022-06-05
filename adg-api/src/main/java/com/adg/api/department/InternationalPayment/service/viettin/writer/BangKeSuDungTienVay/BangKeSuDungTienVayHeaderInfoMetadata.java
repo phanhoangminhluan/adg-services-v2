@@ -94,7 +94,7 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
                             "UTC"
                     ),
             record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedName),
-            false
+            true
     ),
     SoTien(
             "SỐ TIỀN (VND)",
@@ -126,7 +126,7 @@ public enum BangKeSuDungTienVayHeaderInfoMetadata implements AdgExcelTableHeader
             CellType.STRING,
             record -> "CK",
             record -> "CK",
-            false
+            true
     )
     ;
     private final String header;

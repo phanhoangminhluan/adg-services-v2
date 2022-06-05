@@ -16,10 +16,7 @@ import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Minh-Luan H. Phan
@@ -107,7 +104,11 @@ public class BangKeSuDungTienVayService {
             bangKe.add(transformedRecord);
         }
 
-        for (Map<String, Object> toKhaiHaiQuanRecord : toKhaiHaiQuanRecords) {
+        List<Map<String, Object>> sortedToKhaiHaiQuan = new ArrayList<>(toKhaiHaiQuanRecords);
+
+        sortedToKhaiHaiQuan.sort(Comparator.comparing(o -> MapUtils.getString(o, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName)));
+
+        for (Map<String, Object> toKhaiHaiQuanRecord : sortedToKhaiHaiQuan) {
             Map<String, Object> transformedRecord = new HashMap<>();
             for (BangKeSuDungTienVayHeaderInfoMetadata headerInfoMetadata : BangKeSuDungTienVayHeaderInfoMetadata.values()) {
                 if (headerInfoMetadata == BangKeSuDungTienVayHeaderInfoMetadata.TT) {
@@ -124,6 +125,11 @@ public class BangKeSuDungTienVayService {
         result.put("Bảng kê", bangKe);
         return result;
     }
+
+    private void sortToKhaiHaiQuanByBank(List<Map<String, Object>> toKhaiHaiQuanRecords) {
+
+    }
+
     private void insertRecordToTable() {
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(this.data, "Bảng kê");
         records.forEach(item -> this.excelTable.insert(item));

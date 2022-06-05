@@ -33,7 +33,6 @@ public class HoaDonService {
         long t1 = System.currentTimeMillis();
         ExcelReader excelReader = new ExcelReader(fileHoaDonPath);
         Map<String, Object> output = this.scanHoaDonTable(excelReader, 1, "A");
-//        Map<String, Object> output = excelReader.readTable("A2");
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(output, "records");
         List<Map<String, Object>> actualRecords = records.stream().filter(record -> !ParserUtils.isNullOrEmpty(MapUtils.getString(record, HoaDonHeaderMetadata.SoChungTu.name, "").trim())).collect(Collectors.toList());
 

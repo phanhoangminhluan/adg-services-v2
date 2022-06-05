@@ -23,7 +23,10 @@ public enum BangKeNopThueHeaderInfoMetadata implements AdgExcelTableHeaderInfo {
             "Số tờ TK/số QĐ/số TB/ Mã định danh hồ sơ (ID)",
             "E25",
             CellType.STRING,
-            record -> MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName)
+            record -> {
+                String soToKhai = MapUtils.getString(record, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName);
+                return soToKhai.substring(0, soToKhai.length() - 1);
+            }
     ),
     KyThue(
             "Kỳ thuế/ngày QĐ/ngày TB",
