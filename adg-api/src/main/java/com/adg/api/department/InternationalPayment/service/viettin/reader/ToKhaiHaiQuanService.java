@@ -1,16 +1,17 @@
 package com.adg.api.department.InternationalPayment.service.viettin.reader;
 
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelReader;
-import com.merlin.asset.core.utils.JsonUtils;
-import com.merlin.asset.core.utils.MapUtils;
-import com.merlin.asset.core.utils.ParserUtils;
+import com.merlin.asset.core.utils.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,13 +38,21 @@ public class ToKhaiHaiQuanService {
 
     }
 
-    public List<Map<String, Object>> readToKhaiHaiQuan(List<String> filePaths) {
+    @SneakyThrows
+    public Pair<List<Map<String, Object>>, Map<String, Object>> parseToKhaiHaiQuanFile(List<String> toKhaiHaiQuanFilePaths) {
 
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<Map<String, Object>> toKhaiHaiQuanRecords = new ArrayList<>();
+
+        long t1 = System.currentTimeMillis();
+
+        Map<String, Object> stats = new HashMap<>();
+        List<Map<String, Object>> detailStats = new ArrayList<>();
+
 
         int i = 1;
-        for (String filePath : filePaths) {
-            ExcelReader excelReader = new ExcelReader(filePath);
+        for (String tokhaiHaiQuanFilePath : toKhaiHaiQuanFilePaths) {
+            long t2 = System.currentTimeMillis();
+            ExcelReader excelReader = new ExcelReader(tokhaiHaiQuanFilePath);
             Map<String, Object> output = MapUtils.getMapStringObject(excelReader.getCellValues(this.toKhaiHaiQuanAddressMap), "data");
             List<String> tenSacThueList = MapUtils
                     .getListString(output, "Tên sắc thuế")
@@ -70,7 +79,7 @@ public class ToKhaiHaiQuanService {
                         .put(ToKhaiHaiQuanHeaderInfoMetadata.TienThue.deAccentedName, tienThue)
                         .build());
             }
-            result.add(MapUtils.ImmutableMap()
+            toKhaiHaiQuanRecords.add(MapUtils.ImmutableMap()
                             .put(ToKhaiHaiQuanHeaderInfoMetadata.SoThuTuKhongGop.deAccentedName, i)
                             .put(ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.deAccentedName, ToKhaiHaiQuanHeaderInfoMetadata.SoToKhai.transformCallback.apply(output))
                             .put(ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.deAccentedName, ToKhaiHaiQuanHeaderInfoMetadata.TenCoQuan.transformCallback.apply(output))
@@ -78,9 +87,20 @@ public class ToKhaiHaiQuanService {
                             .put(ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.deAccentedName, ToKhaiHaiQuanHeaderInfoMetadata.NgayDangKy.transformCallback.apply(output))
                             .put(ToKhaiHaiQuanHeaderInfoMetadata.ChiTietThue.deAccentedName, chiTietThueList)
                     .build());
+            detailStats.add(MapUtils.ImmutableMap()
+                    .put("fileName", tokhaiHaiQuanFilePath.substring(tokhaiHaiQuanFilePath.lastIndexOf("/") + 1))
+                    .put("recordSize", chiTietThueList.size())
+                    .put("fileSize", NumberUtils.formatNumber1(Files.size(Path.of(tokhaiHaiQuanFilePath))))
+                    .put("parseDuration", DateTimeUtils.getRunningTimeInSecond(t2))
+                    .build());
             i++;
         }
-        return result;
+
+        stats.put("totalRecords", toKhaiHaiQuanRecords.size());
+        stats.put("detailStats", detailStats);
+        stats.put("parseDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+        return Pair.of(toKhaiHaiQuanRecords, stats);
     }
 
     public Map<String, Object> groupToKhaiHaiQuanRecordsBySoToKhai(List<Map<String, Object>> toKhaiHaiQuanRecords) {

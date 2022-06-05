@@ -12,19 +12,21 @@ import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKe
 import com.adg.api.department.InternationalPayment.service.viettin.writer.GiayNhanNo.GiayNhanNoService;
 import com.adg.api.department.InternationalPayment.service.viettin.writer.UyNhiemChi.UyNhiemChiService;
 import com.adg.api.util.ZipUtils;
-import com.merlin.asset.core.utils.DateTimeUtils;
-import com.merlin.asset.core.utils.MapUtils;
+import com.merlin.asset.core.utils.*;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
  * Created on: 2022.05.28 22:55
  */
 @Service
+@Log4j2
 public class VietinService {
 
     @Value("${international-payment.bidv.input.zip}")
@@ -74,34 +77,73 @@ public class VietinService {
     @Autowired
     private SlackService slackService;
 
-    public Map<String, Object> parseFile(InputStream inputStream) {
+    public Pair<Map<String, Object>, Map<String, Object>> parseFile(InputStream inputStream) {
         List<File> files = new ArrayList<>();
+        List<Map<String, Object>> filesInfo = new ArrayList<>();
+
+        Map<String, Object> tkhqStats = new HashMap<>();
+        Map<String, Object> hdStats = new HashMap<>();
+
         try {
             files = ZipUtils.uncompressZipFile(inputStream, inputZip);
-            String fileHoaDon = "";
-            List<String> fileTKHQ = new ArrayList<>();
+            String hoaDonFilePath = "";
+            List<String> toKhaiHaiQuanFilePaths = new ArrayList<>();
             for (File f : files) {
+                String type;
+                String fileName = f.getName();
+                long fileSize = Files.size(f.toPath());
+
                 if (f.getName().toLowerCase().startsWith("tokhai")) {
-                    fileTKHQ.add(f.getAbsolutePath());
+                    toKhaiHaiQuanFilePaths.add(f.getAbsolutePath());
+                    type = "tkhq";
                 } else {
-                    fileHoaDon = f.getAbsolutePath();
+                    hoaDonFilePath = f.getAbsolutePath();
+                    type = "hd";
                 }
+                filesInfo.add(MapUtils.ImmutableMap()
+                        .put("type", type)
+                        .put("name", fileName)
+                        .put("size", fileSize)
+                        .build());
             }
 
-            List<Map<String, Object>> toKhaiHaiQuan = this.toKhaiHaiQuanService.readToKhaiHaiQuan(fileTKHQ);
-            List<Map<String, Object>> hoaDon = this.hoaDonService.parseHoaDonFile(fileHoaDon).getFirst();
+            Pair<List<Map<String, Object>>, Map<String, Object>> toKhaiHaiQuanPair = this.toKhaiHaiQuanService.parseToKhaiHaiQuanFile(toKhaiHaiQuanFilePaths);
+            tkhqStats = toKhaiHaiQuanPair.getSecond();
 
-            return MapUtils.ImmutableMap()
-                    .put("tkhq", toKhaiHaiQuan)
-                    .put("hd", hoaDon)
-                    .build();
+            Pair<List<Map<String, Object>>, Map<String, Object>> hoaDonPair = this.hoaDonService.parseHoaDonFile(hoaDonFilePath);
+            hdStats = hoaDonPair.getSecond();
+
+            return Pair.of(
+                    MapUtils.ImmutableMap()
+                            .put("hd", hoaDonPair.getFirst())
+                            .put("tkhq", toKhaiHaiQuanPair.getFirst())
+                            .build(),
+                    MapUtils.ImmutableMap()
+                            .put("filesInfo", filesInfo)
+                            .put("hdStats", hdStats)
+                            .put("tkhqStats", tkhqStats)
+                            .build()
+            );
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            log.error("Error while read Vietin File. Exception message: {}. Exception stacktrace: {}", exception.getMessage(), LogUtils.getStackTrace(exception));
+            return Pair.of(
+                    MapUtils.ImmutableMap()
+                            .put("hd", List.of())
+                            .put("tkhq", List.of())
+                            .put("exceptionMessage", exception.getMessage())
+                            .put("exceptionStackTrace", LogUtils.getStackTrace(exception))
+                            .build(),
+                    MapUtils.ImmutableMap()
+                            .put("filesInfo", filesInfo)
+                            .put("hdStats", hdStats)
+                            .put("tkhqStats", tkhqStats)
+                            .build()
+            );
         } finally {
             files.forEach(File::delete);
         }
-        return MapUtils.ImmutableMap().build();
+
     }
 
     public Pair<byte[], Map<String, Object>> generateDisbursementFiles(Map<String, Object> request) {
@@ -179,6 +221,39 @@ public class VietinService {
         }).collect(Collectors.joining("\n---\n"));
         msgSb.append(statMsg).append("\n\n");
         this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("VIETIN - EXPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
+    }
+
+    public void sendParseFileNotification(Map<String, Object> payload, long receivedAt, MultipartFile file, Map<String, Object> stats) {
+        StringBuilder msgSb = new StringBuilder();
+
+        List<Map<String, Object>> fileMetadatas = MapUtils.getListMapStringObject(stats, "filesInfo");
+        Map<String, Object> hdStats = MapUtils.getMapStringObject(stats, "hdStats");
+        Map<String, Object> tkhqStats = MapUtils.getMapStringObject(stats, "tkhqStats");
+
+        msgSb.append("*--- REQUEST INFORMATION ---*").append("\n");
+        msgSb.append(String.format(" - File name: %s", file.getOriginalFilename())).append("\n");
+        msgSb.append(String.format(" - File size: %s kb", NumberUtils.formatNumber1(file.getSize()))).append("\n");
+        msgSb.append(String.format(" - Content type: %s", file.getContentType())).append("\n\n");
+
+        msgSb.append("*--- PROCESSING STATISTIC ---*").append("\n");
+        msgSb.append(" - Handle Hoa Don").append("\n");
+        msgSb.append(String.format("      + File name: %s", MapUtils.getString(hdStats, "fileName"))).append("\n");
+        msgSb.append(String.format("      + File size: %s kb", MapUtils.getString(hdStats, "fileSize"))).append("\n");
+        msgSb.append(String.format("      + Parse duration: %s", MapUtils.getString(hdStats, "parseDuration"))).append("\n");
+        msgSb.append(String.format("      + Record size: %s", MapUtils.getString(hdStats, "recordSize"))).append("\n\n");
+
+        String pnkDetail = MapUtils.getListMapStringObject(tkhqStats, "detailStats").stream()
+                .map(detailStat -> String.format("%s (%s kb): %s record(s) - %s", MapUtils.getString(detailStat, "fileName"), MapUtils.getString(detailStat, "fileSize"), MapUtils.getString(detailStat, "recordSize"), MapUtils.getString(detailStat, "parseDuration")))
+                .collect(Collectors.joining("\n         > ", "\n         > ", ""));
+        msgSb.append(" - Handle To Khai Hai Quan").append("\n");
+        msgSb.append(String.format("      + Parse duration: %s", MapUtils.getString(tkhqStats, "parseDuration"))).append("\n");
+        msgSb.append(String.format("      + Record size: %s", MapUtils.getString(tkhqStats, "totalRecords"))).append("\n");
+        msgSb.append(String.format("      + Detail: %s", pnkDetail)).append("\n\n");
+
+        msgSb.append("*--- RESPONSE INFORMATION ---*").append("\n");
+        msgSb.append(String.format(" - Duration: %s", DateTimeUtils.getRunningTimeInSecond(receivedAt))).append("\n");
+        msgSb.append(String.format(" - Response body: ```%s```", JsonUtils.toJson(payload))).append("\n");
+        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("VIETIN - IMPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
     }
 
     private Map<String, Object> groupHoaDonByNCC(List<Map<String, Object>> hoaDonRecords) {

@@ -29,12 +29,19 @@ public class VietinController {
     @PostMapping("import")
     @SneakyThrows
     public Map<String, Object> importFile(@RequestParam("file") MultipartFile file) {
+        long t1 = System.currentTimeMillis();
+
         log.info("Import request. Original File Name: {}. Size: {}. Content Type: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
-        Map<String, Object> data = vietinService.parseFile(file.getInputStream());
-        return MapUtils.ImmutableMap()
-                .put("data", data)
-                .put("status", "ok")
-                .build();
+
+        Pair<Map<String, Object>, Map<String, Object>> pair = this.vietinService.parseFile(file.getInputStream());
+
+        Map<String, Object> payload = MapUtils.ImmutableMap().put("data", pair.getFirst()).put("status", "ok").build();
+
+        log.info(String.format("Import response. %s", JsonUtils.toJson(payload)));
+
+        this.vietinService.sendParseFileNotification(payload, t1, file, pair.getSecond());
+
+        return payload;
     }
 
     @PostMapping(value = "export",

@@ -12,10 +12,7 @@ import com.adg.api.department.InternationalPayment.service.bidv.writer.DonMuaHan
 import com.adg.api.department.InternationalPayment.service.bidv.writer.HopDongTinDung.HopDongTinDungService;
 import com.adg.api.department.InternationalPayment.service.bidv.writer.UyNhiemChi.UyNhiemChiService;
 import com.adg.api.util.ZipUtils;
-import com.merlin.asset.core.utils.DateTimeUtils;
-import com.merlin.asset.core.utils.JsonUtils;
-import com.merlin.asset.core.utils.MapUtils;
-import com.merlin.asset.core.utils.NumberUtils;
+import com.merlin.asset.core.utils.*;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
@@ -131,28 +128,37 @@ public class BidvService {
             pnkStats = phieuNhapKhoPair.getSecond();
 
 
-            return Pair.of(MapUtils.ImmutableMap()
-                    .put("hd", hoaDonPair.getFirst())
-                    .put("pnk", phieuNhapKhoPair.getFirst())
-                    .build(), MapUtils.ImmutableMap()
+            return Pair.of(
+                    MapUtils.ImmutableMap()
+                            .put("hd", hoaDonPair.getFirst())
+                            .put("pnk", phieuNhapKhoPair.getFirst())
+                            .build(),
+                    MapUtils.ImmutableMap()
                             .put("filesInfo", filesInfo)
                             .put("hdStats", hdStats)
                             .put("pnkStats", pnkStats)
-                    .build());
+                            .build()
+            );
 
         } catch (Exception exception) {
             exception.printStackTrace();
+            log.error("Error while read Bidv File. Exception message: {}. Exception stacktrace: {}", exception.getMessage(), LogUtils.getStackTrace(exception));
+            return Pair.of(
+                    MapUtils.ImmutableMap()
+                            .put("hd", List.of())
+                            .put("pnk", List.of())
+                            .put("exceptionMessage", exception.getMessage())
+                            .put("exceptionStackTrace", LogUtils.getStackTrace(exception))
+                            .build(),
+                    MapUtils.ImmutableMap()
+                            .put("filesInfo", filesInfo)
+                            .put("hdStats", hdStats)
+                            .put("pnkStats", pnkStats)
+                            .build()
+            );
         } finally {
             files.forEach(File::delete);
         }
-        return Pair.of(MapUtils.ImmutableMap()
-                .put("hd", List.of())
-                .put("pnk", List.of())
-                .build(), MapUtils.ImmutableMap()
-                .put("filesInfo", filesInfo)
-                .put("hdStats", hdStats)
-                .put("pnkStats", pnkStats)
-                .build());
     }
 
     public void sendParseFileNotification(Map<String, Object> payload, long receivedAt, MultipartFile file, Map<String, Object> stats) {

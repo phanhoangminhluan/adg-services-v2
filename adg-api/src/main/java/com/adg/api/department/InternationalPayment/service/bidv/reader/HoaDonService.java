@@ -32,7 +32,8 @@ public class HoaDonService {
 
         long t1 = System.currentTimeMillis();
         ExcelReader excelReader = new ExcelReader(fileHoaDonPath);
-        Map<String, Object> output = excelReader.readTable("A2");
+        Map<String, Object> output = this.scanHoaDonTable(excelReader, 1, "A");
+//        Map<String, Object> output = excelReader.readTable("A2");
         List<Map<String, Object>> records = MapUtils.getListMapStringObject(output, "records");
         List<Map<String, Object>> actualRecords = records.stream().filter(record -> !ParserUtils.isNullOrEmpty(MapUtils.getString(record, HoaDonHeaderMetadata.SoChungTu.name, "").trim())).collect(Collectors.toList());
 
@@ -122,6 +123,22 @@ public class HoaDonService {
             throw new IllegalArgumentException(String.format("There are %s errors from HeaderValidation and %s errors from RecordValidation", headerErrorMessages.size(), recordErrorMessages.size()));
         }
 
+    }
+
+    private Map<String, Object> scanHoaDonTable(ExcelReader excelReader, int row, String column) {
+        Map<String, Object> output = null;
+        int currentRow = row;
+        do {
+            output = excelReader.readTable(column + currentRow + "");
+            List<Map<String, Object>> headers = MapUtils.getListMapStringObject(output, "headers");
+            List<String> errorHeaderMessages = this.validateHoaDonHeaders(headers);
+            if (errorHeaderMessages.isEmpty()) {
+                break;
+            } else {
+                currentRow++;
+            }
+        } while (currentRow - row < 10);
+        return output;
     }
 
     private List<String> validateHoaDonHeaders(List<Map<String, Object>> headers) {
