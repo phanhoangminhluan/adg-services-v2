@@ -1,5 +1,8 @@
 package com.adg.api.department.InternationalPayment.service.viettin;
 
+import com.adg.api.department.Accounting.enums.Module;
+import com.adg.api.department.Accounting.enums.SlackAuthor;
+import com.adg.api.department.Accounting.service.SlackService;
 import com.adg.api.department.InternationalPayment.service.bidv.enums.HoaDonHeaderMetadata;
 import com.adg.api.department.InternationalPayment.service.bidv.reader.HoaDonService;
 import com.adg.api.department.InternationalPayment.service.viettin.reader.ToKhaiHaiQuanService;
@@ -16,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -27,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author Minh-Luan H. Phan
@@ -65,6 +71,9 @@ public class VietinService {
     @Autowired
     private HoaDonService hoaDonService;
 
+    @Autowired
+    private SlackService slackService;
+
     public Map<String, Object> parseFile(InputStream inputStream) {
         List<File> files = new ArrayList<>();
         try {
@@ -95,7 +104,7 @@ public class VietinService {
         return MapUtils.ImmutableMap().build();
     }
 
-    public byte[] generateDisbursementFiles(Map<String, Object> request) {
+    public Pair<byte[], Map<String, Object>> generateDisbursementFiles(Map<String, Object> request) {
         Map<String, Object> data = MapUtils.getMapStringObject(request, "data");
         List<Map<String, Object>> hoaDon = MapUtils.getListMapStringObject(data, "hd");
         List<Map<String, Object>> toKhaiHaiQuan = MapUtils.getListMapStringObject(data, "tkhq");
@@ -106,7 +115,9 @@ public class VietinService {
     }
 
     @SneakyThrows
-    private byte[] writeFiles(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate) {
+    private Pair<byte[], Map<String, Object>> writeFiles(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate) {
+        long t1 = System.currentTimeMillis();
+
         String outputFolder = this.getOutputFolder();
         String zipPath = this.getOutputZipFolder() + String.format("VIETIN - Hồ Sơ Giải Ngân - %s.zip", System.currentTimeMillis());
 
@@ -114,24 +125,60 @@ public class VietinService {
         Map<String, Object> toKhaiHaiQuanRecordsGroupBySoToKhai = this.toKhaiHaiQuanService.groupToKhaiHaiQuanRecordsBySoToKhai(toKhaiHaiQuanRecords);
 
 
-        BangKeChungTuDienTuDeNghiGiaiNganService
+        Map<String, Object> stats1 = BangKeChungTuDienTuDeNghiGiaiNganService
                 .writeOut(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, bangKeChungTuDienTuDeNghiGiaiNganTemplate);
 
-        BangKeSuDungTienVayService
+        Map<String, Object> stats2 = BangKeSuDungTienVayService
                 .writeOut(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, bangKeSuDungTienVayTemplate);
 
-        GiayNhanNoService
+        Map<String, Object> stats3 = GiayNhanNoService
                 .writeOut(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, giayNhanNoTemplate);
 
-        UyNhiemChiService
+        Map<String, Object> stats4 = UyNhiemChiService
                 .writeOut(outputFolder, hoaDonRecordsGroupByNhaCungCap, fileDate, uyNhiemChiTemplate);
 
-        BangKeNopThueService
+        Map<String, Object> stats5 = BangKeNopThueService
                 .writeOut(outputFolder, toKhaiHaiQuanRecordsGroupBySoToKhai, fileDate, bangKeNopThueTemplate);
 
         ZipUtils.zipFolder(Paths.get(outputFolder), Paths.get(zipPath));
 
-        return IOUtils.toByteArray(new FileInputStream(zipPath));
+        return Pair
+                .of(
+                        IOUtils.toByteArray(new FileInputStream(zipPath)),
+                        MapUtils.ImmutableMap()
+                                .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
+                                .put("statList", List.of(stats1, stats2, stats3, stats4, stats5)).build()
+                );
+    }
+
+    public void sendGenerateDisbursementFilesNotification(Map<String, Object> request, long receivedAt, Map<String, Object> map) {
+        StringBuilder msgSb = new StringBuilder();
+
+        List<Map<String, Object>> statsList = MapUtils.getListMapStringObject(map, "statList");
+        String duration = MapUtils.getString(map, "duration");
+
+        msgSb.append("*--- GENERAL INFORMATION ---*").append("\n");
+        msgSb.append(String.format("Running Steps: %s", statsList.size())).append("\n");
+        msgSb.append(String.format("Duration: %s", duration)).append("\n\n\n");
+
+        msgSb.append("*--- DETAIL ---*").append("\n");
+        AtomicInteger stepIndex = new AtomicInteger();
+        String statMsg = statsList.stream().map(stat -> {
+            stepIndex.getAndIncrement();
+            String step = MapUtils.getString(stat, "step");
+            String stepDuration = MapUtils.getString(stat, "duration");
+            List<Map<String, Object>> detailStep = MapUtils.getListMapStringObject(stat, "detail");
+            String detailStepMsg = detailStep.stream().map(detail -> {
+                String fillTableDuration = MapUtils.getString(detail, "fillTableDuration", "none");
+                String fillOtherDataDuration = MapUtils.getString(detail, "fillOtherDataDuration", "none");
+                String fileName = MapUtils.getString(detail, "fileName");
+                String writeFileDuration = MapUtils.getString(detail, "writeFileDuration", "none");
+                return String.format("File Name: %s\nDuration of Fill Table/Fill Other/Write File: %s/%s/%s", fileName, fillTableDuration, fillOtherDataDuration, writeFileDuration);
+            }).collect(Collectors.joining("\n---\n"));
+            return String.format("- Step %s: *%s*\n- Duration: %s\n- Generated files: %s file(s)\n- Detail: ```%s```", stepIndex, step, stepDuration, detailStep.size(), detailStepMsg);
+        }).collect(Collectors.joining("\n---\n"));
+        msgSb.append(statMsg).append("\n\n");
+        this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, "", String.format("VIETIN - EXPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());
     }
 
     private Map<String, Object> groupHoaDonByNCC(List<Map<String, Object>> hoaDonRecords) {

@@ -10,6 +10,7 @@ import com.adg.api.util.MoneyUtils;
 import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.core.io.Resource;
@@ -25,6 +26,7 @@ import java.util.Map;
  * @author Minh-Luan H. Phan
  * Created on: 2022.05.29 19:13
  */
+@Log4j2
 public class BangKeNopThueService {
 
     private final ExcelWriter excelWriter;
@@ -49,11 +51,19 @@ public class BangKeNopThueService {
     }
 
     @SneakyThrows
-    public static void writeOut(String outputFolder, Map<String, Object> toKhaiHaiQuanRecordsGroupBySoToKhai, ZonedDateTime fileDate, Resource resource) {
+    public static Map<String, Object> writeOut(String outputFolder, Map<String, Object> toKhaiHaiQuanRecordsGroupBySoToKhai, ZonedDateTime fileDate, Resource resource) {
+        long t1 = System.currentTimeMillis();
+        List<Map<String, Object>> statsList = new ArrayList<>();
         for (String soToKhai : toKhaiHaiQuanRecordsGroupBySoToKhai.keySet()) {
-            new BangKeNopThueService(outputFolder, MapUtils.getListMapStringObject(toKhaiHaiQuanRecordsGroupBySoToKhai, soToKhai), soToKhai, fileDate, resource.getInputStream())
+            Map<String, Object> stats = new BangKeNopThueService(outputFolder, MapUtils.getListMapStringObject(toKhaiHaiQuanRecordsGroupBySoToKhai, soToKhai), soToKhai, fileDate, resource.getInputStream())
                     .exportDocument();
+            statsList.add(stats);
         }
+        return MapUtils.ImmutableMap()
+                .put("step", "Generate 'Bảng Kê Nộp Thuế'")
+                .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
+                .put("detail", statsList)
+                .build();
     }
 
     private Map<String, Object> transformRecords(List<Map<String, Object>> toKhaiHaiQuanRecords) {
@@ -88,10 +98,32 @@ public class BangKeNopThueService {
                 .put("Bảng kê", table)
                 .build();
     }
-    public void exportDocument() {
-        this.insertRecordToTable();
-        this.fillData();
-        this.build();
+    public Map<String, Object> exportDocument() {
+        Map<String, Object> stats = new HashMap<>();
+
+        try {
+            long t1 = System.currentTimeMillis();
+            this.insertRecordToTable();
+            stats.put("fillTableDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            this.fillData();
+            stats.put("fillOtherDataDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            String fileName = this.build();
+            stats.put("fileName", fileName);
+            stats.put("writeFileDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+        } finally {
+            log.info("Step: {}. File name: {}. Fill table duration: {}. Fill other data duration: {}. Write file duration: {}",
+                    "Generate 'Bảng Kê Nộp Thuế'",
+                    MapUtils.getString(stats, "fileName"),
+                    MapUtils.getString(stats, "fillTableDuration", "none"),
+                    MapUtils.getString(stats, "fillOtherDataDuration"),
+                    MapUtils.getString(stats, "writeFileDuration")
+            );
+        }
+        return stats;
     }
 
     private void insertRecordToTable() {
@@ -100,12 +132,13 @@ public class BangKeNopThueService {
         this.excelTable.removeSampleRow();
     }
 
-    private void build() {
+    private String build() {
         String fileName = String.format("Bảng kê nộp thuế - %s - %s.xlsx",
                 this.soToKhai,
                 DateTimeUtils.convertZonedDateTimeToFormat(this.fileDate, "UTC", DateTimeUtils.FMT_03)
         );
         this.excelWriter.build(outputFolder + "/" + fileName);
+        return fileName;
     }
 
     private void fillData() {

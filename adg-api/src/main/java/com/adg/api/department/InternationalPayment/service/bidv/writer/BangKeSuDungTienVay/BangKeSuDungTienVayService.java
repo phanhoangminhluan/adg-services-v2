@@ -53,7 +53,8 @@ public class BangKeSuDungTienVayService {
             Resource template
     ) {
         long t1 = System.currentTimeMillis();
-        Map<String, Object> stats = new BangKeSuDungTienVayService(outputFolder, hoaDonRecords, fileDate, contractNumber, template.getInputStream()).exportDocument();
+        Map<String, Object> stats = new BangKeSuDungTienVayService(outputFolder, hoaDonRecords, fileDate, contractNumber, template.getInputStream())
+                .exportDocument();
         return MapUtils.ImmutableMap()
                 .put("step", "Generate 'Bảng Kê Sử Dụng Tiền Vay'")
                 .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))

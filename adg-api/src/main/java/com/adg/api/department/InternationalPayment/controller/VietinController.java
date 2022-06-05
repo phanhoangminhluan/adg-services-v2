@@ -6,6 +6,7 @@ import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +42,12 @@ public class VietinController {
     )
     public byte[] exportFile(@RequestBody Map<String, Object> request) {
         log.info("Export Request: {}", JsonUtils.toJson(request));
-        return this.vietinService.generateDisbursementFiles(request);
+        long t1 = System.currentTimeMillis();
+
+        Pair<byte[], Map<String, Object>> pair = this.vietinService.generateDisbursementFiles(request);
+
+        this.vietinService.sendGenerateDisbursementFilesNotification(request, t1, pair.getSecond());
+
+        return pair.getFirst();
     }
 }

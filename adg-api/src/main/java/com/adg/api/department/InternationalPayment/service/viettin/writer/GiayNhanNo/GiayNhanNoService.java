@@ -8,6 +8,7 @@ import com.merlin.asset.core.utils.DateTimeUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import com.merlin.asset.core.utils.NumberUtils;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * @author Minh-Luan H. Phan
  * Created on: 2022.05.29 15:47
  */
+@Log4j2
 public class GiayNhanNoService {
 
     private final WordWriter wordWriter;
@@ -36,9 +38,17 @@ public class GiayNhanNoService {
     }
 
     @SneakyThrows
-    public static void writeOut(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, Resource resource) {
-        new GiayNhanNoService(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, resource.getInputStream())
+    public static Map<String, Object> writeOut(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, Resource resource) {
+        long t1 = System.currentTimeMillis();
+
+        Map<String, Object> stats = new GiayNhanNoService(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, resource.getInputStream())
                 .exportDocument();
+
+        return MapUtils.ImmutableMap()
+                .put("step", "Generate 'Giấy Nhận Nợ'")
+                .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
+                .put("detail", List.of(stats))
+                .build();
     }
 
     private Map<String, Object> transformRecords(List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords) {
@@ -76,12 +86,30 @@ public class GiayNhanNoService {
                 .build();
     }
 
-    private void exportDocument() {
-        this.wordWriter.fillTextData(data);
-        this.build();
+    private Map<String, Object> exportDocument() {
+        Map<String, Object> stats = new HashMap<>();
+        try {
+            long t1 = System.currentTimeMillis();
+            this.wordWriter.fillTextData(data);
+            stats.put("fillOtherDataDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+
+            t1 = System.currentTimeMillis();
+            String fileName = this.build();
+            stats.put("fileName", fileName);
+            stats.put("writeFileDuration", DateTimeUtils.getRunningTimeInSecond(t1));
+        } finally {
+            log.info("Step: {}. File name: {}. Fill table duration: {}. Fill other data duration: {}. Write file duration: {}",
+                    "Generate 'Giấy Nhận Nợ'",
+                    MapUtils.getString(stats, "fileName"),
+                    MapUtils.getString(stats, "fillTableDuration", "none"),
+                    MapUtils.getString(stats, "fillOtherDataDuration"),
+                    MapUtils.getString(stats, "writeFileDuration")
+            );
+        }
+        return stats;
     }
 
-    private void build() {
+    private String build() {
         String fileName = String.format("Giấy nhận nợ - %s.docx",
                 DateTimeUtils.convertZonedDateTimeToFormat(
                         fileDate,
@@ -90,6 +118,7 @@ public class GiayNhanNoService {
                 )
         );
         this.wordWriter.build(outputFolder + "/" + fileName);
+        return fileName;
     }
 
 }

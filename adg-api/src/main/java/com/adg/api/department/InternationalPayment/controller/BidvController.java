@@ -67,7 +67,7 @@ public class BidvController {
         log.info("Export Request: {}", JsonUtils.toJson(request));
         long t1 = System.currentTimeMillis();
 
-        Pair<byte[], Map<String, Object>> pair =  this.bidvService.generateDisbursementFiles(request);
+        Pair<byte[], Map<String, Object>> pair = this.bidvService.generateDisbursementFiles(request);
         this.bidvService.sendGenerateDisbursementFilesNotification(request, t1, pair.getSecond());
         return pair.getFirst();
     }

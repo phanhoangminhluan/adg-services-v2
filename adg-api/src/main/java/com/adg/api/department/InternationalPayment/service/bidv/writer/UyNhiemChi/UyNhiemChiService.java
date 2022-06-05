@@ -49,7 +49,7 @@ public class UyNhiemChiService {
         }
 
         return MapUtils.ImmutableMap()
-                .put("step", "Generate 'Bảng Kê Sử Dụng Tiền Vay'")
+                .put("step", "Generate 'Uỷ Nhiệm Chi'")
                 .put("duration", DateTimeUtils.getRunningTimeInSecond(t1))
                 .put("detail", statsList)
                 .build();
@@ -86,7 +86,7 @@ public class UyNhiemChiService {
             log.info("Step: {}. File name: {}. Fill table duration: {}. Fill other data duration: {}. Write file duration: {}",
                     "Generate 'Uỷ Nhiệm Chi'",
                     MapUtils.getString(stats, "fileName"),
-                    MapUtils.getString(stats, "fillTableDuration"),
+                    MapUtils.getString(stats, "fillTableDuration", "none"),
                     MapUtils.getString(stats, "fillOtherDataDuration"),
                     MapUtils.getString(stats, "writeFileDuration")
             );
