@@ -149,8 +149,16 @@ public class ExcelReader {
 
     public Cell getCell(String cellAddress) {
         CellReference cellReference = new CellReference(cellAddress);
-        return this.sheet
-                .getRow(cellReference.getRow())
-                .getCell(cellReference.getCol());
+        Row row = this.sheet
+                .getRow(cellReference.getRow());
+        if (row == null) {
+            row = this.sheet.createRow(cellReference.getRow());
+        }
+
+        Cell cell = row.getCell(cellReference.getCol());
+        if (cell == null) {
+            cell = row.createCell(cellReference.getCol());
+        }
+        return cell;
     }
 }

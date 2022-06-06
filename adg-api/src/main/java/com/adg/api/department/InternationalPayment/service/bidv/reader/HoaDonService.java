@@ -128,6 +128,7 @@ public class HoaDonService {
         Map<String, Object> output = null;
         int currentRow = row;
         do {
+
             output = excelReader.readTable(column + currentRow + "");
             List<Map<String, Object>> headers = MapUtils.getListMapStringObject(output, "headers");
             List<String> errorHeaderMessages = this.validateHoaDonHeaders(headers);
