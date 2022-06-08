@@ -89,7 +89,7 @@ public class VietinService {
 
         try {
             files = ZipUtils.uncompressZipFile(inputStream, inputZip);
-            String hoaDonFilePath = "";
+            String hoaDonFilePath = null;
             List<String> toKhaiHaiQuanFilePaths = new ArrayList<>();
             for (File f : files) {
                 String type;
@@ -110,16 +110,26 @@ public class VietinService {
                         .build());
             }
 
-            Pair<List<Map<String, Object>>, Map<String, Object>> toKhaiHaiQuanPair = this.toKhaiHaiQuanService.parseToKhaiHaiQuanFile(toKhaiHaiQuanFilePaths);
-            tkhqStats = toKhaiHaiQuanPair.getSecond();
+            List<Map<String, Object>> tkhqRecords = new ArrayList<>();
+            List<Map<String, Object>> hdRecords = new ArrayList<>();
 
-            Pair<List<Map<String, Object>>, Map<String, Object>> hoaDonPair = this.hoaDonService.parseHoaDonFile(hoaDonFilePath);
-            hdStats = hoaDonPair.getSecond();
+
+            if (!toKhaiHaiQuanFilePaths.isEmpty()) {
+                Pair<List<Map<String, Object>>, Map<String, Object>> toKhaiHaiQuanPair = this.toKhaiHaiQuanService.parseToKhaiHaiQuanFile(toKhaiHaiQuanFilePaths);
+                tkhqStats = toKhaiHaiQuanPair.getSecond();
+                tkhqRecords = toKhaiHaiQuanPair.getFirst();
+            }
+
+            if (!ParserUtils.isNullOrEmpty(hoaDonFilePath)) {
+                Pair<List<Map<String, Object>>, Map<String, Object>> hoaDonPair = this.hoaDonService.parseHoaDonFile(hoaDonFilePath);
+                hdStats = hoaDonPair.getSecond();
+                hdRecords = hoaDonPair.getFirst();
+            }
 
             return Pair.of(
                     MapUtils.ImmutableMap()
-                            .put("hd", hoaDonPair.getFirst())
-                            .put("tkhq", toKhaiHaiQuanPair.getFirst())
+                            .put("hd", hdRecords)
+                            .put("tkhq", tkhqRecords)
                             .build(),
                     MapUtils.ImmutableMap()
                             .put("filesInfo", filesInfo)
@@ -220,7 +230,8 @@ public class VietinService {
                 String writeFileDuration = MapUtils.getString(detail, "writeFileDuration", "none");
                 return String.format("File Name: %s\nDuration of Fill Table/Fill Other/Write File: %s/%s/%s", fileName, fillTableDuration, fillOtherDataDuration, writeFileDuration);
             }).collect(Collectors.joining("\n---\n"));
-            return String.format("- Step %s: *%s*\n- Duration: %s\n- Generated files: %s file(s)\n- Detail: ```%s```", stepIndex, step, stepDuration, detailStep.size(), detailStepMsg);
+            detailStepMsg = ParserUtils.isNullOrEmpty(detailStepMsg) ? "\n" : "````" + detailStepMsg + "```";
+            return String.format("- Step %s: *%s*\n- Duration: %s\n- Generated files: %s file(s)\n- Detail: %s", stepIndex, step, stepDuration, detailStep.size(), detailStepMsg);
         }).collect(Collectors.joining("\n---\n"));
         msgSb.append(statMsg).append("\n\n");
         this.slackService.sendNotification(Module.IMPORT_EXPORT, SlackAuthor.LUAN_PHAN, env, String.format("VIETIN - EXPORT - %s", DateTimeUtils.convertZonedDateTimeToFormat(DateTimeUtils.fromEpochMilli(receivedAt, "Asia/Ho_Chi_Minh"), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_02)), msgSb.toString());

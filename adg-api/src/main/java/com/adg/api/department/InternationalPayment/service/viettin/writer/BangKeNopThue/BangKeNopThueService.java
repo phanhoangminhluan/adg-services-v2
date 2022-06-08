@@ -53,6 +53,15 @@ public class BangKeNopThueService {
     @SneakyThrows
     public static Map<String, Object> writeOut(String outputFolder, Map<String, Object> toKhaiHaiQuanRecordsGroupBySoToKhai, ZonedDateTime fileDate, Resource resource) {
         long t1 = System.currentTimeMillis();
+
+        if (toKhaiHaiQuanRecordsGroupBySoToKhai.isEmpty()) {
+            return MapUtils.ImmutableMap()
+                    .put("step", "Generate 'Bảng Kê Nộp Thuế'")
+                    .put("duration", "0s")
+                    .put("detail", List.of())
+                    .build();
+        }
+
         List<Map<String, Object>> statsList = new ArrayList<>();
         for (String soToKhai : toKhaiHaiQuanRecordsGroupBySoToKhai.keySet()) {
             Map<String, Object> stats = new BangKeNopThueService(outputFolder, MapUtils.getListMapStringObject(toKhaiHaiQuanRecordsGroupBySoToKhai, soToKhai), soToKhai, fileDate, resource.getInputStream())

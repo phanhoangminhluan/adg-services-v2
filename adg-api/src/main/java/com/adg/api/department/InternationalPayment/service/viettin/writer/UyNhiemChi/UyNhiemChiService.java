@@ -65,6 +65,14 @@ public class UyNhiemChiService {
         long t1 = System.currentTimeMillis();
         List<Map<String, Object>> statsList = new ArrayList<>();
 
+        if (hoaDonRecordsGroupByNhaCungCap.isEmpty()) {
+            return MapUtils.ImmutableMap()
+                    .put("step", "Generate 'Uỷ Nhiệm Chi'")
+                    .put("duration", "0s")
+                    .put("detail", List.of())
+                    .build();
+        }
+
         for (String nhaCungCap : hoaDonRecordsGroupByNhaCungCap.keySet()) {
             Map<String, Object> stats = new UyNhiemChiService(outputFolder, MapUtils.getListMapStringObject(hoaDonRecordsGroupByNhaCungCap, nhaCungCap), nhaCungCap, fileDate, resource.getInputStream())
                     .exportDocument();

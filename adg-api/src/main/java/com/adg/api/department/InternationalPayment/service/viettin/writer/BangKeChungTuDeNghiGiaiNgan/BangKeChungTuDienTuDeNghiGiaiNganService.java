@@ -50,7 +50,13 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
     @SneakyThrows
     public static Map<String, Object> writeOut(String outputFolder, List<Map<String, Object>> hoaDonRecords, List<Map<String, Object>> toKhaiHaiQuanRecords, ZonedDateTime fileDate, Resource resource) {
         long t1 = System.currentTimeMillis();
-
+        if (toKhaiHaiQuanRecords.isEmpty() && hoaDonRecords.isEmpty()) {
+            return MapUtils.ImmutableMap()
+                    .put("step", "Generate 'Bảng Kê Chứng Từ Điện Tử Đề Nghị Giải Ngân'")
+                    .put("duration", "0s")
+                    .put("detail", List.of())
+                    .build();
+        }
         Map<String, Object> stats = new BangKeChungTuDienTuDeNghiGiaiNganService(outputFolder, hoaDonRecords, toKhaiHaiQuanRecords, fileDate, resource.getInputStream())
                 .exportDocuments();
         return MapUtils.ImmutableMap()
