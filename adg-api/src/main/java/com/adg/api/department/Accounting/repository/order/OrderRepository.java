@@ -27,8 +27,12 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
                 "   revenue_status_id_text," +
                 "   product_name," +
                 "   price," +
-                "   price_after_tax" +
-                "   " +
+                "   price_after_tax," +
+                "   op.amount," +
+                "   op.shipping_amount," +
+                "   op.total," +
+                "   recorded_sale_users_name," +
+                "   account_number " +
                 "FROM \"order\" o " +
                 "RIGHT JOIN order_product op ON o.async_id = op.order_id " +
                 "INNER JOIN customer c ON o.account_id = c.id",

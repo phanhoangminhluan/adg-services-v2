@@ -46,13 +46,13 @@ public class CustomerOrderProductDTO extends AbstractDTO {
     private double priceAfterTax;
 
     @SerializedName("amount")
-    private int amount;
+    private double amount;
 
     @SerializedName("shipping_amount")
-    private int shippingAmount;
+    private double shippingAmount;
 
     @SerializedName("total")
-    private int total;
+    private double total;
 
     @SerializedName("recorded_sale_users_name")
     private String recordedSaleUsersName;

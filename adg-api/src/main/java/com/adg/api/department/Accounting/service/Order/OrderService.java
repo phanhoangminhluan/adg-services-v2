@@ -66,6 +66,7 @@ public class OrderService extends AbstractMisaService<OrderDTO, OrderEntity, Str
 
     public List<CustomerOrderProductDTO> getCustomTable() {
         List<Map<String, Object>> customTableListMap = this.repository.getCustomTable();
+
         List<Map<String, Object>> reCustomTableListMap = customTableListMap.stream().map(record -> {
             Date date = (Date) record.get("sale_order_date");
             ZonedDateTime zdt = date.toLocalDate().atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")) ;

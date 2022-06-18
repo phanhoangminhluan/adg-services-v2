@@ -67,13 +67,13 @@ public class CustomerOrderProductEntity extends BaseEntity implements Serializab
     private double priceAfterTax;
 
     @MappingField
-    private int amount;
+    private double amount;
 
     @MappingField
-    private int shippingAmount;
+    private double shippingAmount;
 
     @MappingField
-    private int total;
+    private double total;
 
     @MappingField
     @Column(columnDefinition = "text")
