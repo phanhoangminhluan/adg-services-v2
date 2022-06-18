@@ -203,8 +203,8 @@ public class BangKeSuDungTienVayService {
                 taiKhoanHeaderCell.getColumnIndex()
         );
 
-        ExcelUtils.setCell(soTienNhanNoCell, totalCost, CellType.NUMERIC);
-        ExcelUtils.setCell(soTienChuyenKhoanCell, totalCost, CellType.NUMERIC);
+        ExcelUtils.setCell(soTienNhanNoCell, String.format("%s", tongCell.getAddress().formatAsString()), CellType.FORMULA);
+        ExcelUtils.setCell(soTienChuyenKhoanCell, String.format("%s", tongCell.getAddress().formatAsString()), CellType.FORMULA);
 
     }
 

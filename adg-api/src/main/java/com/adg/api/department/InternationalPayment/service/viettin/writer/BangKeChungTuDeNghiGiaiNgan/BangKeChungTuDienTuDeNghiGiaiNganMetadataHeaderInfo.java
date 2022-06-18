@@ -9,12 +9,12 @@ import org.apache.poi.ss.usermodel.CellType;
  */
 public enum BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo implements AdgExcelTableHeaderInfo {
 
-    TT("TT", "A9", CellType.NUMERIC, false),
-    SoChungTu("Số chứng từ", "B9", CellType.NUMERIC, false),
-    NgayChungTu("Ngày chứng từ", "C9", CellType.STRING, false),
-    SoTien("Số tiền (VND)", "D9", CellType.NUMERIC, false),
-    DonViPhatHanh("Đơn vị phát hành", "E9", CellType.STRING, true),
-    GhiChu("Ghi chú", "F9", CellType.STRING, false);
+    TT("TT", "A10", CellType.NUMERIC, false),
+    SoChungTu("Số chứng từ", "B10", CellType.NUMERIC, false),
+    NgayChungTu("Ngày chứng từ", "C10", CellType.STRING, false),
+    SoTien("Số tiền (VND)", "D10", CellType.NUMERIC, false),
+    DonViPhatHanh("Đơn vị phát hành", "E10", CellType.STRING, true),
+    GhiChu("Ghi chú", "F10", CellType.STRING, false);
 
     private final String header;
     private final String cellAddress;

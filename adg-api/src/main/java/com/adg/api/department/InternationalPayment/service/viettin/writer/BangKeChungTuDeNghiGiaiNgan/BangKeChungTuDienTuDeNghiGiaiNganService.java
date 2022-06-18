@@ -148,7 +148,7 @@ public class BangKeChungTuDienTuDeNghiGiaiNganService {
     }
 
     private void fillSignDate() {
-        String originalCellAddress = "D17";
+        String originalCellAddress = "D18";
         Cell originalCell = this.excelWriter.getCell(originalCellAddress);
         Cell shiftedCell = this.excelWriter
                 .getCell(

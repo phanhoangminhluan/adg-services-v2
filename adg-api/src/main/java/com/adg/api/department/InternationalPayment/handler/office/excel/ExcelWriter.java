@@ -59,6 +59,8 @@ public class ExcelWriter {
             Cell sourceCell = this.getCell(sourceRow, i);
             targetCell.setCellStyle(sourceCell.getCellStyle());
         }
+        targetRow.setRowStyle(sourceRow.getRowStyle());
+        targetRow.setHeight(sourceRow.getHeight());
         return targetRow;
     }
 
