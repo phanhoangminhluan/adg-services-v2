@@ -1,6 +1,7 @@
 package com.adg.api.department.Accounting.enums;
 
 import com.adg.api.department.Accounting.dal.entity.customer.CustomerDTO;
+import com.adg.api.department.Accounting.dal.entity.datalake.CustomerOrderProduct.CustomerOrderProductDTO;
 import com.adg.api.department.Accounting.dal.entity.employee.EmployeeDTO;
 import com.adg.api.department.Accounting.dal.entity.order.OrderDTO;
 import com.adg.api.department.Accounting.dal.entity.organization_unit.OrganizationUnitDTO;
@@ -19,7 +20,8 @@ public enum MisaModel {
     PRODUCT("Products", "modified_date",  MisaOrderType.DESC, ProductDTO.class), // 1059
     STOCK("Stocks", "modified_date",  MisaOrderType.DESC, StockDTO.class), // 175
     EMPLOYEE("Employees", "modified_date",  MisaOrderType.DESC, EmployeeDTO.class), // 137
-    ORGANIZATION_UNIT("OrganizationUnits", "modified_date",  MisaOrderType.DESC, OrganizationUnitDTO.class); // 26
+    ORGANIZATION_UNIT("OrganizationUnits", "modified_date",  MisaOrderType.DESC, OrganizationUnitDTO.class), // 26
+    CUSTOMER_ORDER_PRODUCT("CustomerOrderProducts", "sale_order_date", MisaOrderType.DESC, CustomerOrderProductDTO.class);
 
     public final String uri;
     public final String orderByField;

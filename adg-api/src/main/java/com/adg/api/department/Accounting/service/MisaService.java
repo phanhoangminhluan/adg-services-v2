@@ -3,6 +3,7 @@ package com.adg.api.department.Accounting.service;
 import com.adg.api.department.Accounting.enums.MisaModel;
 import com.adg.api.department.Accounting.model.MisaSyncDTO;
 import com.adg.api.department.Accounting.service.Customer.CustomerService;
+import com.adg.api.department.Accounting.service.CustomerOrderProduct.CustomerOrderProductService;
 import com.adg.api.department.Accounting.service.Employee.EmployeeService;
 import com.adg.api.department.Accounting.service.Order.OrderService;
 import com.adg.api.department.Accounting.service.OrganizationUnit.OrganizationUnitService;
@@ -37,6 +38,9 @@ public class MisaService {
 
     @Autowired
     private OrganizationUnitService organizationUnitService;
+
+    @Autowired
+    private CustomerOrderProductService customerOrderProductService;
 
     @Autowired
     private OrderService orderService;
@@ -78,6 +82,10 @@ public class MisaService {
             });
         }
 
+        if (misaSyncDTO.getModels().contains(MisaModel.CUSTOMER_ORDER_PRODUCT)) {
+            EXECUTOR_SERVICE.execute(() -> {
+                customerOrderProductService.sync(misaSyncDTO);
+            });
+        }
     }
-
 }

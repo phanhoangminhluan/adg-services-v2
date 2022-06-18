@@ -1,6 +1,7 @@
 package com.adg.api.department.Accounting.configuration;
 
 import com.adg.api.department.Accounting.dal.entity.customer.CustomerEntity;
+import com.adg.api.department.Accounting.dal.entity.datalake.CustomerOrderProduct.CustomerOrderProductEntity;
 import com.adg.api.department.Accounting.dal.entity.employee.EmployeeEntity;
 import com.adg.api.department.Accounting.dal.entity.order.OrderEntity;
 import com.adg.api.department.Accounting.dal.entity.order_product.OrderProductEntity;
@@ -51,6 +52,11 @@ public class MapperConfiguration {
     @Bean
     public OrganizationUnitMapper organizationUnitMapper() {
         return new OrganizationUnitMapper(OrganizationUnitEntity.class);
+    }
+
+    @Bean
+    public CustomerOrderProductMapper customerOrderProductMapper() {
+        return new CustomerOrderProductMapper(CustomerOrderProductEntity.class);
     }
 
 }
