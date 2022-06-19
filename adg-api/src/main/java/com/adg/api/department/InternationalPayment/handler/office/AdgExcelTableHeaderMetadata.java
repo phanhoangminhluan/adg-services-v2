@@ -1,9 +1,9 @@
 package com.adg.api.department.InternationalPayment.handler.office;
 
-import com.adg.api.department.InternationalPayment.service.bidv.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata;
-import com.adg.api.department.InternationalPayment.service.bidv.writer.DonMuaHang.DonMuaHangHeaderInfoMetadata;
-import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo;
-import com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeNopThue.BangKeNopThueHeaderInfoMetadata;
+import com.adg.api.department.InternationalPayment.bank.bidv.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata;
+import com.adg.api.department.InternationalPayment.bank.bidv.writer.DonMuaHang.DonMuaHangHeaderInfoMetadata;
+import com.adg.api.department.InternationalPayment.bank.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo;
+import com.adg.api.department.InternationalPayment.bank.viettin.writer.BangKeNopThue.BangKeNopThueHeaderInfoMetadata;
 import lombok.Builder;
 import lombok.Data;
 
@@ -43,7 +43,7 @@ public class AdgExcelTableHeaderMetadata {
     }
 
     public static AdgExcelTableHeaderMetadata getViettinBangKeSuDungTienVay() {
-        List<AdgExcelTableHeaderInfo> headers = Arrays.asList(com.adg.api.department.InternationalPayment.service.viettin.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata.values());
+        List<AdgExcelTableHeaderInfo> headers = Arrays.asList(com.adg.api.department.InternationalPayment.bank.viettin.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata.values());
 
         return AdgExcelTableHeaderMetadata.builder()
                 .headers(headers)

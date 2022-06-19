@@ -1,13 +1,11 @@
 package com.adg.api.department.InternationalPayment.controller;
 
-import com.adg.api.department.Accounting.service.SlackService;
-import com.adg.api.department.InternationalPayment.service.bidv.BidvService;
+import com.adg.api.department.InternationalPayment.bank.bidv.BidvService;
 import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -27,20 +25,6 @@ public class BidvController {
 
     @Autowired
     private BidvService bidvService;
-
-    @Autowired
-    private SlackService slackService;
-
-    @Value("${international-payment.bidv.input.zip}")
-    private String inputZip;
-
-    @GetMapping
-    public Map<String, Object> get() {
-        return MapUtils.ImmutableMap()
-                .put("data", MapUtils.ImmutableMap().build())
-                .put("status", "ok")
-                .build();
-    }
 
     @PostMapping("import")
     @SneakyThrows

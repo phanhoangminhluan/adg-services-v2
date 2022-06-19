@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.controller;
 
-import com.adg.api.department.InternationalPayment.service.viettin.VietinService;
+import com.adg.api.department.InternationalPayment.bank.viettin.VietinService;
 import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
