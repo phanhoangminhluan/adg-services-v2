@@ -148,16 +148,7 @@ public class MbService {
         StringBuilder msgSb = new StringBuilder();
 
         List<Map<String, Object>> fileMetadatas = MapUtils.getListMapStringObject(stats, "filesInfo");
-        Map<String, Object> hdStats = MapUtils.getMapStringObject(stats, "hdStats");
         Map<String, Object> pnkStats = MapUtils.getMapStringObject(stats, "pnkStats");
-
-        String fileMetadataStr = fileMetadatas.stream().map(fileMetadata ->
-                String.format("   > %s - %s - %s",
-                        MapUtils.getString(fileMetadata, "type"),
-                        MapUtils.getString(fileMetadata, "name"),
-                        NumberUtils.formatNumber1(MapUtils.getLong(fileMetadata, "size")) + " kb"
-                )
-        ).collect(Collectors.joining("\n"));
 
         msgSb.append("*--- REQUEST INFORMATION ---*").append("\n");
         msgSb.append(String.format(" - File name: %s", file.getOriginalFilename())).append("\n");
@@ -165,12 +156,6 @@ public class MbService {
         msgSb.append(String.format(" - Content type: %s", file.getContentType())).append("\n\n");
 
         msgSb.append("*--- PROCESSING STATISTIC ---*").append("\n");
-        msgSb.append(" - Handle Hoa Don").append("\n");
-        msgSb.append(String.format("      + File name: %s", MapUtils.getString(hdStats, "fileName"))).append("\n");
-        msgSb.append(String.format("      + File size: %s kb", MapUtils.getString(hdStats, "fileSize"))).append("\n");
-        msgSb.append(String.format("      + Parse duration: %s", MapUtils.getString(hdStats, "parseDuration"))).append("\n");
-        msgSb.append(String.format("      + Record size: %s", MapUtils.getString(hdStats, "recordSize"))).append("\n\n");
-
         String pnkDetail = MapUtils.getListMapStringObject(pnkStats, "detailStats").stream()
                 .map(detailStat -> String.format("%s (%s kb): %s record(s) - %s", MapUtils.getString(detailStat, "fileName"), MapUtils.getString(detailStat, "fileSize"), MapUtils.getString(detailStat, "recordSize"), MapUtils.getString(detailStat, "parseDuration")))
                 .collect(Collectors.joining("\n         > ", "\n         > ", ""));
