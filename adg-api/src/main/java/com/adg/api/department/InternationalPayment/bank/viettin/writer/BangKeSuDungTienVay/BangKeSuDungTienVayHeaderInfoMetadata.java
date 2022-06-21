@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.bank.viettin.writer.BangKeSuDungTienVay;
 
-import com.adg.api.department.InternationalPayment.bank.bidv.NhaCungCapDTO;
+import com.adg.api.department.InternationalPayment.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderInfo;
 import com.adg.api.department.InternationalPayment.reader.header.HoaDonHeaderMetadata;
 import com.adg.api.department.InternationalPayment.reader.header.ToKhaiHaiQuanHeaderInfoMetadata;

@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.bank.bidv.writer.UyNhiemChi;
 
-import com.adg.api.department.InternationalPayment.bank.bidv.NhaCungCapDTO;
+import com.adg.api.department.InternationalPayment.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.handler.office.word.WordWriter;
 import com.adg.api.department.InternationalPayment.reader.header.HoaDonHeaderMetadata;
 import com.adg.api.util.MoneyUtils;

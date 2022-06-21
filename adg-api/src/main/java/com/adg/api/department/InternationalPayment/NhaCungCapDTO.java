@@ -1,4 +1,4 @@
-package com.adg.api.department.InternationalPayment.bank.bidv;
+package com.adg.api.department.InternationalPayment;
 
 import com.google.common.reflect.TypeToken;
 import com.merlin.asset.core.utils.FileUtils;
@@ -25,7 +25,7 @@ public class NhaCungCapDTO {
 
     private static String localPath = "/Users/luan.phm/engineering/Projects/ADongGroup/adg-services-v2/adg-api/src/main/resources/adg-clients.json";
     private static String prodPath = "/home/ubuntu/adg-services-v2/adg-api/src/main/resources/adg-clients.json";
-    private static final String path = localPath;
+    private static final String path = prodPath;
     static {
         String raw = FileUtils.readContent(path);
         List<NhaCungCapDTO> dtos = JsonUtils.fromJson(raw, new TypeToken<List<NhaCungCapDTO>>(){}.getType());

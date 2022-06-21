@@ -36,11 +36,11 @@ public class PhieuNhapKhoService {
         for (String phieuNhapKhoFilePath : phieuNhapKhoFilePaths) {
             long t2 = System.currentTimeMillis();
             ExcelReader excelReader = new ExcelReader(phieuNhapKhoFilePath);
-            Map<String, Object> output = this.scanPhieuNhapKhoTable(excelReader, 14, "A");
+            Map<String, Object> output = this. scanPhieuNhapKhoTable(excelReader, 12, "A");
             List<Map<String, Object>> records = MapUtils.getListMapStringObject(output, "records");
 
-            String rawDescription = excelReader.getCellValueAsString("A10");
-            Map<String, Object> descriptionMap = this.parsePhieuNhapKhoDescription(rawDescription);
+
+            Map<String, Object> descriptionMap = this.parsePhieuNhapKhoDescription(excelReader);
             int totalRecordOfEachFile = 0;
             for (Map<String, Object> record : records) {
 
@@ -56,6 +56,7 @@ public class PhieuNhapKhoService {
                         .forEach(headerMetadata -> phieuNhapKhoRecord.put(headerMetadata.deAccentedName, MapUtils.getString(record, headerMetadata.name)));
                 phieuNhapKhoRecord.put(PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName, MapUtils.getString(descriptionMap, PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName));
                 phieuNhapKhoRecord.put(PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName, MapUtils.getString(descriptionMap, PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName));
+                phieuNhapKhoRecord.put(PhieuNhapKhoHeaderMetadata.NgayChungTu.deAccentedName, MapUtils.getString(descriptionMap, PhieuNhapKhoHeaderMetadata.NgayChungTu.deAccentedName));
                 totalRecordOfEachFile++;
                 phieuNhapKhoRecords.add(phieuNhapKhoRecord);
             }
@@ -138,7 +139,19 @@ public class PhieuNhapKhoService {
         return phieuNhapKhoRecordsGroupByNhaCungCapAndSoHoaDon;
     }
 
-    private Map<String, Object> parsePhieuNhapKhoDescription(String description) {
+    private Map<String, Object> parsePhieuNhapKhoDescription(ExcelReader excelReader) {
+
+        int row = 5;
+        String description;
+        do {
+            description = excelReader.getCellValueAsString("A" + row);
+            if (ParserUtils.toString(description).startsWith("- Theo hóa đơn số")) {
+                break;
+            }
+            row++;
+        } while (row < 15);
+
+
         Map<String, Object> output = new HashMap<>();
         List<String> arr = Arrays.asList(description.split("của"));
         String ncc = arr.get(1).trim();
@@ -154,6 +167,7 @@ public class PhieuNhapKhoService {
                 ParserUtils.toInt(arr2.get(1)),
                 0,0,0,0, ZoneId.of("Asia/Ho_Chi_Minh")
         );
+
 
         output.put(PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName, soHoaDon);
         output.put(PhieuNhapKhoHeaderMetadata.NgayChungTu.deAccentedName, DateTimeUtils.convertZonedDateTimeToFormat(zdt, "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_03)));

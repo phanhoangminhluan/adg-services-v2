@@ -2,6 +2,7 @@ package com.adg.api.department.InternationalPayment.handler.office;
 
 import com.adg.api.department.InternationalPayment.bank.bidv.writer.BangKeSuDungTienVay.BangKeSuDungTienVayHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.bank.bidv.writer.DonMuaHang.DonMuaHangHeaderInfoMetadata;
+import com.adg.api.department.InternationalPayment.bank.mb.writer.DanhSachHoaDonCamHangHeaderInfoMetadata;
 import com.adg.api.department.InternationalPayment.bank.viettin.writer.BangKeChungTuDeNghiGiaiNgan.BangKeChungTuDienTuDeNghiGiaiNganMetadataHeaderInfo;
 import com.adg.api.department.InternationalPayment.bank.viettin.writer.BangKeNopThue.BangKeNopThueHeaderInfoMetadata;
 import lombok.Builder;
@@ -71,4 +72,12 @@ public class AdgExcelTableHeaderMetadata {
                 .build();
     }
 
+    public static AdgExcelTableHeaderMetadata getDanhSachHoaDonCamHang() {
+        List<AdgExcelTableHeaderInfo> headers = Arrays.asList(DanhSachHoaDonCamHangHeaderInfoMetadata.values());
+        return AdgExcelTableHeaderMetadata.builder()
+                .headers(headers)
+                .startCellAddress("A4")
+                .columnSize(headers.size())
+                .build();
+    }
 }

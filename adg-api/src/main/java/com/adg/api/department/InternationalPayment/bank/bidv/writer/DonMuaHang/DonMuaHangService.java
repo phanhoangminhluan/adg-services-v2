@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.bank.bidv.writer.DonMuaHang;
 
-import com.adg.api.department.InternationalPayment.bank.bidv.NhaCungCapDTO;
+import com.adg.api.department.InternationalPayment.NhaCungCapDTO;
 import com.adg.api.department.InternationalPayment.handler.office.AdgExcelTableHeaderMetadata;
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelTable;
 import com.adg.api.department.InternationalPayment.handler.office.excel.ExcelUtils;
