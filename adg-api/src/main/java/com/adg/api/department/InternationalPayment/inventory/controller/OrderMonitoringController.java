@@ -1,4 +1,4 @@
-package com.adg.api.department.InternationalPayment.disbursement.order;
+package com.adg.api.department.InternationalPayment.inventory.controller;
 
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
@@ -100,27 +100,35 @@ public class OrderMonitoringController {
 
     @GetMapping("inventory")
     @SneakyThrows
-    private List<Map<String, Object>> importFile(@RequestParam("port") String port) {
-        return List.of(
-                MapUtils.ImmutableMap()
-                        .put("soKheUoc", "UP-TF2213901116/CLN-02")
-                        .put("matHang", "PP H5300")
-                        .put("ton", "")
-                        .put("nhap", 330)
-                        .put("soLuongDaGiaiChap", 22)
-                        .put("xuatBan", 22)
-                        .put("soLuongDaGiaiChapChuaBan", "")
-                        .put("tonChuaBan", 308)
-                        .put("tonChuaGiaiChap", 308)
-                        .put("ngayLayChungTu", "07/06/2022")
-                        .put("ngayDenHan", "22/06/2022")
-                        .put("donGiaUsdTan", 1265)
-                        .put("triGiaUSD", 389620)
-                        .put("triGiaVND",  9156070000.0)
-                        .put("soTienNoCang",  7324856000.0)
-                        .put("ghiChu", "NT")
-                        .build()
-        );
+    private Map<String, Object> importFile(@RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
+        return MapUtils.ImmutableMap()
+                .put("data", MapUtils.ImmutableMap()
+                        .put("inventory", List.of(
+                                MapUtils.ImmutableMap()
+                                        .put("id", "21748af2-ff27-11ec-b939-0242ac120002")
+                                        .put("contractId", "UP-TF2035301047/CLN")
+                                        .put("productId", "ABS3 750SW")
+                                        .put("price", 2430)
+                                        .put("totalStockQuantity", 400)
+                                        .put("totalReleaseQuantity", 100)
+                                        .put("lcDate", "2021-02-16")
+                                        .build(),
+                                MapUtils.ImmutableMap()
+                                        .put("id", "79c68c94-f125-4c2f-beec-689fa1088c16")
+                                        .put("contractId", "UP-TF3035301047/CLN")
+                                        .put("productId", "ABS2 750SW")
+                                        .put("price", 1255)
+                                        .put("totalStockQuantity", 3000)
+                                        .put("totalReleaseQuantity", 200)
+                                        .put("lcDate", "2021-02-16")
+                                        .build()))
+                        .put("pageIndex", 1)
+                        .put("pageSize", 2)
+                        .put("totalRecords", 2)
+                        .build())
+                .put("status", "ok")
+                .put("message", "ok")
+                .build();
     }
 
 }
