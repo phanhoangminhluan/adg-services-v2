@@ -7,5 +7,6 @@ package com.adg.api.department.Accounting.enums;
 public enum Module {
 
     SYNC_MISA_API,
-    IMPORT_EXPORT
+    IMPORT_EXPORT,
+    ORDER_TRACKING,
 }
