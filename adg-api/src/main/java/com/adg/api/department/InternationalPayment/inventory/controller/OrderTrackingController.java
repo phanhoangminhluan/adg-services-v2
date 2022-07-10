@@ -1,5 +1,6 @@
 package com.adg.api.department.InternationalPayment.inventory.controller;
 
+import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
 import com.adg.api.department.InternationalPayment.inventory.entity.Order;
 import com.adg.api.department.InternationalPayment.inventory.service.CrmOrderService;
 import com.adg.api.department.InternationalPayment.inventory.service.reader.DonMuaHangService;
@@ -60,27 +61,8 @@ public class OrderTrackingController {
 
     @GetMapping("inventory")
     @SneakyThrows
-    private List<Map<String, Object>> getRecordsByPort(@RequestParam("port") String port) {
-        return List.of(
-                MapUtils.ImmutableMap()
-                        .put("soKheUoc", "UP-TF2213901116/CLN-02")
-                        .put("matHang", "PP H5300")
-                        .put("ton", "")
-                        .put("nhap", 330)
-                        .put("soLuongDaGiaiChap", 22)
-                        .put("xuatBan", 22)
-                        .put("soLuongDaGiaiChapChuaBan", "")
-                        .put("tonChuaBan", 308)
-                        .put("tonChuaGiaiChap", 308)
-                        .put("ngayLayChungTu", "07/06/2022")
-                        .put("ngayDenHan", "22/06/2022")
-                        .put("donGiaUsdTan", 1265)
-                        .put("triGiaUSD", 389620)
-                        .put("triGiaVND",  9156070000.0)
-                        .put("soTienNoCang",  7324856000.0)
-                        .put("ghiChu", "NT")
-                        .build()
-        );
+    private GetOrderByPortDTO getOrdersByPort(@RequestParam("port") String port, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
+        return this.crmOrderService.getOrderByPort(port, pageIndex, pageSize);
     }
 
 }

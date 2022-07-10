@@ -1,6 +1,8 @@
 package com.adg.api.department.InternationalPayment.inventory.service;
 
 import com.adg.api.department.InternationalPayment.inventory.dto.DonMuaHangDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.inventory.OrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.entity.Bank;
 import com.adg.api.department.InternationalPayment.inventory.entity.Order;
 import com.adg.api.department.InternationalPayment.inventory.entity.Storage;
@@ -11,9 +13,12 @@ import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,6 +41,9 @@ public class CrmOrderService {
     @Autowired
     private BankService bankService;
 
+    @Autowired
+    private OrderTransactionService orderTransactionService;
+
     @SneakyThrows
     @Transactional
     public List<Order> insertDonMuaHangRecord(Map<String, Object> donMuaHangRequest) {
@@ -51,6 +59,22 @@ public class CrmOrderService {
         }).collect(Collectors.toList());
 
         return this.repository.saveAll(orders);
+    }
+
+    public GetOrderByPortDTO getOrderByPort(String port, int pageIndex, int pageSize) {
+        Page<Order> orderPage = this.repository.getOrdersByPortName(port, PageRequest.of(pageIndex, pageSize));
+        List<OrderDTO> orderDTOs = new ArrayList<>();
+
+        for (Order order : orderPage.getContent()) {
+            double totalReleaseQuantity = this.orderTransactionService.countReleaseQuantityByOrderId(order.getId());
+            orderDTOs.add(OrderDTO.newInstance(order, totalReleaseQuantity));
+        }
+
+        return GetOrderByPortDTO.builder()
+                .orders(orderDTOs)
+                .totalRecords(orderPage.getTotalElements())
+                .totalPages(orderPage.getTotalPages())
+                .build();
     }
 
 }
