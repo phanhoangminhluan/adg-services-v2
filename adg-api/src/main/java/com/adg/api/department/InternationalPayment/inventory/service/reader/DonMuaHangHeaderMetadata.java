@@ -35,7 +35,7 @@ public enum DonMuaHangHeaderMetadata {
 
     DonMuaHangHeaderMetadata(String name, boolean isNullable, boolean isOriginalField, AdgHeaderType type) {
         this.name = name;
-        this.deAccentedName = StringUtils.makeCamelCase(this.name);
+        this.deAccentedName = StringUtils.makeCamelCase(this.name).replaceAll("Đ", "D").replaceAll("đ", "d");
         this.isNullable = isNullable;
         this.isOriginalField = isOriginalField;
         this.type = type;

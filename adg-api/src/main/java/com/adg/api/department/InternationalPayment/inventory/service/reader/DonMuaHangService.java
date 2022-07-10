@@ -4,8 +4,10 @@ import com.adg.api.department.Accounting.enums.Module;
 import com.adg.api.department.Accounting.enums.SlackAuthor;
 import com.adg.api.department.Accounting.service.SlackService;
 import com.adg.api.department.InternationalPayment.disbursement.office.excel.ExcelReader;
-import com.adg.api.department.InternationalPayment.disbursement.reader.header.HoaDonHeaderMetadata;
+import com.adg.api.department.InternationalPayment.inventory.dto.DonMuaHangDTO;
 import com.adg.api.util.ZipUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merlin.asset.core.utils.*;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -42,6 +44,8 @@ public class DonMuaHangService {
     @Value("${env}")
     private String env;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     public Pair<Map<String, Object>, Map<String, Object>> parseFile(InputStream inputStream) {
         List<File> files = new ArrayList<>();
@@ -65,10 +69,10 @@ public class DonMuaHangService {
 
             Pair<List<Map<String, Object>>, Map<String, Object>> donMuaHangPair = this.parseDonMuaHangFile(donMuaHangFilePath);
             dmhStats = donMuaHangPair.getSecond();
-
+            List<DonMuaHangDTO> donMuaHangDTO = objectMapper.readValue(JsonUtils.toJson(donMuaHangPair.getFirst()), new TypeReference<>() {});
             return Pair.of(
                     MapUtils.ImmutableMap()
-                            .put("dmh", donMuaHangPair.getFirst())
+                            .put("dmh", donMuaHangDTO)
                             .build(),
                     MapUtils.ImmutableMap()
                             .put("filesInfo", filesInfo)
@@ -195,24 +199,24 @@ public class DonMuaHangService {
 
         for (Map<String, Object> record : records) {
             Map<String, Object> deAccentedRecord = this.deAccentAllKeys(record);
-            for (DonMuaHangHeaderMetadata hoaDonHeaderMetadata : DonMuaHangHeaderMetadata.values()) {
-                String val = MapUtils.getString(deAccentedRecord, hoaDonHeaderMetadata.deAccentedName, null);
+            for (DonMuaHangHeaderMetadata donMuaHangHeaderMetadata : DonMuaHangHeaderMetadata.values()) {
+                String val = MapUtils.getString(deAccentedRecord, donMuaHangHeaderMetadata.deAccentedName, null);
                 if (ParserUtils.isNullOrEmpty(val)) {
-                    if (!hoaDonHeaderMetadata.isNullable) {
+                    if (!donMuaHangHeaderMetadata.isNullable) {
                         messages.add(String.format(
                                 "%s: Value of '%s' cannot be null or empty",
-                                MapUtils.getString(deAccentedRecord, HoaDonHeaderMetadata.SoChungTu.deAccentedName),
-                                hoaDonHeaderMetadata.name)
+                                MapUtils.getString(deAccentedRecord, DonMuaHangHeaderMetadata.SoDonHang.deAccentedName),
+                                donMuaHangHeaderMetadata.deAccentedName)
                         );
                     }
                 } else {
-                    if (!hoaDonHeaderMetadata.type.verifyMethod.apply(val)) {
+                    if (!donMuaHangHeaderMetadata.type.verifyMethod.apply(val)) {
                         messages.add(String.format(
                                 "%s: Value of '%s' which is '%s' cannot be formatted as %s",
-                                MapUtils.getString(deAccentedRecord, HoaDonHeaderMetadata.SoChungTu.deAccentedName),
-                                hoaDonHeaderMetadata.name,
-                                MapUtils.getString(deAccentedRecord, hoaDonHeaderMetadata.deAccentedName),
-                                hoaDonHeaderMetadata.type.javaType.getSimpleName())
+                                MapUtils.getString(deAccentedRecord, DonMuaHangHeaderMetadata.SoDonHang.deAccentedName),
+                                donMuaHangHeaderMetadata.name,
+                                MapUtils.getString(deAccentedRecord, donMuaHangHeaderMetadata.deAccentedName),
+                                donMuaHangHeaderMetadata.type.javaType.getSimpleName())
                         );
                     }
                 }
@@ -246,7 +250,7 @@ public class DonMuaHangService {
 
     private Map<String, Object> deAccentAllKeys(Map<String, Object> record) {
         Map<String, Object> deAccentedRecord = new HashMap<>();
-        record.forEach((key, val) -> deAccentedRecord.put(StringUtils.makeCamelCase(key), val));
+        record.forEach((key, val) -> deAccentedRecord.put(StringUtils.makeCamelCase(key.replaceAll("đ", "d").replaceAll("Đ", "D")), val));
         return deAccentedRecord;
     }
 

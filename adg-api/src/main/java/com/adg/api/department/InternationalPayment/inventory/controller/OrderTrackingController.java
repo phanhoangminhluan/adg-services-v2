@@ -1,5 +1,7 @@
 package com.adg.api.department.InternationalPayment.inventory.controller;
 
+import com.adg.api.department.InternationalPayment.inventory.entity.Order;
+import com.adg.api.department.InternationalPayment.inventory.service.CrmOrderService;
 import com.adg.api.department.InternationalPayment.inventory.service.reader.DonMuaHangService;
 import com.merlin.asset.core.utils.JsonUtils;
 import com.merlin.asset.core.utils.MapUtils;
@@ -26,6 +28,9 @@ public class OrderTrackingController {
     @Autowired
     private DonMuaHangService donMuaHangService;
 
+    @Autowired
+    private CrmOrderService crmOrderService;
+
     @PostMapping("order/import")
     @SneakyThrows
     private Map<String, Object> importFile(@RequestParam("file") MultipartFile file) {
@@ -48,17 +53,14 @@ public class OrderTrackingController {
 
     @PostMapping("order/confirm")
     @SneakyThrows
-    private Map<String, Object> previewFile(@RequestBody Map<String, Object> request) {
-        return MapUtils.ImmutableMap()
-                .put("data", List.of())
-                .put("status", "ok")
-                .put("message", "ok")
-                .build();
+    private List<Order> confirmOrder(@RequestBody Map<String, Object> request) {
+
+        return this.crmOrderService.insertDonMuaHangRecord(request);
     }
 
     @GetMapping("inventory")
     @SneakyThrows
-    private List<Map<String, Object>> importFile(@RequestParam("port") String port) {
+    private List<Map<String, Object>> getRecordsByPort(@RequestParam("port") String port) {
         return List.of(
                 MapUtils.ImmutableMap()
                         .put("soKheUoc", "UP-TF2213901116/CLN-02")
