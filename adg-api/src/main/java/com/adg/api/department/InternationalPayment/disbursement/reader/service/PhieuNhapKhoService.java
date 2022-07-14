@@ -145,17 +145,16 @@ public class PhieuNhapKhoService {
         String description;
         do {
             description = excelReader.getCellValueAsString("A" + row);
-            if (ParserUtils.toString(description).startsWith("- Theo hóa đơn số")) {
+            if (ParserUtils.toString(description).startsWith("- Theo hóa đơn số")) {
                 break;
             }
             row++;
         } while (row < 15);
 
-
         Map<String, Object> output = new HashMap<>();
-        List<String> arr = Arrays.asList(description.split("của"));
+        List<String> arr = Arrays.asList(description.split("của"));
         String ncc = arr.get(1).trim();
-        String firstPart = arr.get(0).replace("- Theo hóa đơn số", "").trim();
+        String firstPart = arr.get(0).replace("- Theo hóa đơn số", "").trim();
         List<String> arr2 = Arrays.asList(firstPart.split(" ")).stream().filter(str -> (
                 !str.trim().equalsIgnoreCase("ngày") && !str.trim().equalsIgnoreCase("tháng") && !str.trim().equalsIgnoreCase("năm") && !str.trim().equalsIgnoreCase("")
         )).collect(Collectors.toList());
