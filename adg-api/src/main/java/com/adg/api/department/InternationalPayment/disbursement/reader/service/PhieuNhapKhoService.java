@@ -44,10 +44,10 @@ public class PhieuNhapKhoService {
             int totalRecordOfEachFile = 0;
             for (Map<String, Object> record : records) {
 
-                String sttValue = MapUtils.getString(record, PhieuNhapKhoHeaderMetadata.STT.name);
+                String sttValue = MapUtils.getString(record, PhieuNhapKhoHeaderMetadata.TenNhanHieu.name);
 
                 if (ParserUtils.isNullOrEmpty(sttValue)) continue;
-                if (sttValue.equals("- Tổng số tiền (Viết bằng chữ):")) break;
+                if (sttValue.contains("Cộng")) break;
 
                 Map<String, Object> phieuNhapKhoRecord = new HashMap<>();
 
@@ -145,7 +145,8 @@ public class PhieuNhapKhoService {
         String description;
         do {
             description = excelReader.getCellValueAsString("A" + row);
-            if (ParserUtils.toString(description).startsWith("- Theo hóa đơn số")) {
+            description = ParserUtils.toString(description).replaceAll(String.valueOf((char) 160), " ");
+            if (StringUtils.deAccent(description).startsWith("- Theo hoa don so")) {
                 break;
             }
             row++;
@@ -154,10 +155,16 @@ public class PhieuNhapKhoService {
         Map<String, Object> output = new HashMap<>();
         List<String> arr = Arrays.asList(description.split("của"));
         String ncc = arr.get(1).trim();
-        String firstPart = arr.get(0).replace("- Theo hóa đơn số", "").trim();
-        List<String> arr2 = Arrays.asList(firstPart.split(" ")).stream().filter(str -> (
-                !str.trim().equalsIgnoreCase("ngày") && !str.trim().equalsIgnoreCase("tháng") && !str.trim().equalsIgnoreCase("năm") && !str.trim().equalsIgnoreCase("")
-        )).collect(Collectors.toList());
+        String firstPart = StringUtils.deAccent(arr.get(0)).replace("- Theo hoa don so", "").trim();
+
+        List<String> arr2 = Arrays.asList(firstPart.split(" "))
+                .stream()
+                .filter(str -> (
+                        !str.trim().equalsIgnoreCase("ngay")
+                                && !str.trim().equalsIgnoreCase("thang")
+                                && !str.trim().equalsIgnoreCase("nam")
+                                && !str.trim().equalsIgnoreCase("")))
+                .collect(Collectors.toList());
 
         String soHoaDon = arr2.get(0);
         ZonedDateTime zdt = ZonedDateTime.of(
