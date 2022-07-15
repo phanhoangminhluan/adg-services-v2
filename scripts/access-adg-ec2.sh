@@ -1,0 +1,1 @@
+ssh -i /Users/luan.phm/engineering/Projects/ADongGroup/aws-keypair/3rd-adg-ec2-key.cer ubuntu@ec2-52-221-240-20.ap-southeast-1.compute.amazonaws.com
