@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Minh-Luan H. Phan
@@ -21,7 +23,13 @@ public class StorageService {
 
     public Storage findByName(@NonNull String name) {
         Storage storage = this.repository.findByName(name);
-        if (Objects.isNull(storage)) throw new EntityNotFoundException(String.format("There is not storage named '%s'", name));
+        if (Objects.isNull(storage)) throw new EntityNotFoundException(String.format("There is no storage named '%s'", name));
         return storage;
+    }
+
+    public Storage findById(@NonNull UUID portId) {
+        Optional<Storage> storageOptional = this.repository.findById(portId);
+        if (storageOptional.isEmpty()) throw new EntityNotFoundException(String.format("There is no storage id '%s'", portId));
+        return storageOptional.get();
     }
 }

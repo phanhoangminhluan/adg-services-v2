@@ -1,15 +1,21 @@
 package com.adg.api.department.InternationalPayment.inventory.controller;
 
+import com.adg.api.department.InternationalPayment.inventory.dto.FilePurchaseOrderDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
-import com.adg.api.department.InternationalPayment.inventory.entity.Order;
+import com.adg.api.department.InternationalPayment.inventory.dto.marker_validator.InsertPurchaseOrderValidator;
 import com.adg.api.department.InternationalPayment.inventory.service.CrmOrderService;
 import com.adg.api.department.InternationalPayment.inventory.service.reader.DonMuaHangService;
+import com.adg.api.general.http.ResponseWrapper;
+import com.adg.api.util.BindingResultUtils;
 import com.merlin.asset.core.utils.JsonUtils;
-import com.merlin.asset.core.utils.MapUtils;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +28,7 @@ import java.util.Map;
  */
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/international-payment/tracking/tcb/")
+@RequestMapping("/international-payment/tracking/order")
 @Log4j2
 public class OrderTrackingController {
 
@@ -32,31 +38,41 @@ public class OrderTrackingController {
     @Autowired
     private CrmOrderService crmOrderService;
 
-    @PostMapping("order/import")
+    @Autowired
+    private ResponseWrapper responseWrapper;
+
+    @PostMapping("read-file")
     @SneakyThrows
-    private Map<String, Object> importFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity readPurchaseOrderFile(@RequestParam("file") MultipartFile file) {
 
         long t1 = System.currentTimeMillis();
 
         log.info("Import request. Original File Name: {}. Size: {}. Content Type: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
 
-        Pair<Map<String, Object>, Map<String, Object>> pair = this.donMuaHangService.parseFile(file.getInputStream());
+        Pair<List<PurchaseOrderDTO>, Map<String, Object>> pair = this.donMuaHangService.parseFile(file.getInputStream());
 
-        Map<String, Object> payload = MapUtils.ImmutableMap().put("data", pair.getFirst()).put("status", "ok").build();
 
-        log.info(String.format("Import response. %s", JsonUtils.toJson(payload)));
+        FilePurchaseOrderDTO filePurchaseOrderDTO = FilePurchaseOrderDTO.builder()
+                .purchaseOrders(pair.getFirst())
+                .build();
 
-        this.donMuaHangService.sendParseFileNotification(payload, t1, file, pair.getSecond());
+        log.info(String.format("Import response. %s", JsonUtils.toJson(filePurchaseOrderDTO)));
 
-        return payload;
+        this.donMuaHangService.sendParseFileNotification(filePurchaseOrderDTO, t1, file, pair.getSecond());
+
+        return responseWrapper.ok(filePurchaseOrderDTO);
 
     }
 
-    @PostMapping("order/confirm")
+    @PostMapping
     @SneakyThrows
-    private List<Order> confirmOrder(@RequestBody Map<String, Object> request) {
+    private ResponseEntity insertOrders(@RequestBody @Validated(InsertPurchaseOrderValidator.class) FilePurchaseOrderDTO filePurchaseOrderDTO, BindingResult bindingResult) {
 
-        return this.crmOrderService.insertDonMuaHangRecord(request);
+        if (bindingResult.hasErrors()) {
+            return this.responseWrapper.error(BindingResultUtils.getErrorMessages(bindingResult));
+        }
+
+        return this.crmOrderService.insertDonMuaHangRecord(filePurchaseOrderDTO);
     }
 
     @GetMapping("inventory")

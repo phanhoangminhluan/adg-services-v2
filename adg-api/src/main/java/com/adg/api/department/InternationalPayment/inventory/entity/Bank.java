@@ -18,5 +18,6 @@ import javax.persistence.Table;
 public class Bank extends BaseEntity {
 
     private String name;
+    private String otherName;
 
 }

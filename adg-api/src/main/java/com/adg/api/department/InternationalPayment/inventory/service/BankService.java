@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Minh-Luan H. Phan
@@ -19,8 +21,13 @@ public class BankService {
     @Autowired
     private BankRepository repository;
 
-    public Bank findByName(@NonNull String name) {
-        Bank bank = this.repository.findByName(name);
+    public Bank findById(@NonNull UUID bankId) {
+        Optional<Bank> bankOptional = this.repository.findById(bankId);
+        if (bankOptional.isEmpty()) throw new EntityNotFoundException(String.format("There is no bank with id '%s'", bankId));
+        return bankOptional.get();
+    }
+    public Bank findByOtherName(@NonNull String name) {
+        Bank bank = this.repository.findByOtherName(name);
         if (Objects.isNull(bank)) throw new EntityNotFoundException(String.format("There is no bank named '%s'", name));
         return bank;
     }

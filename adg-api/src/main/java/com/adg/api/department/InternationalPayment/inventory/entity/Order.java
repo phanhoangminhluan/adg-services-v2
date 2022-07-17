@@ -1,6 +1,6 @@
 package com.adg.api.department.InternationalPayment.inventory.entity;
 
-import com.adg.api.department.InternationalPayment.inventory.dto.DonMuaHangDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.entity.shared.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
@@ -45,7 +45,7 @@ public class Order extends BaseEntity {
 
     private double receivedQuantity;
 
-    private double price;
+    private double unitPrice;
 
     private ZonedDateTime lcDate;
 
@@ -55,18 +55,18 @@ public class Order extends BaseEntity {
 
     private String note;
 
-    public static Order newInstance(DonMuaHangDTO donMuaHangDTO, Bank bank, Storage port) {
+    public static Order newInstance(PurchaseOrderDTO purchaseOrderDTO, Bank bank, Storage port) {
         return Order.builder()
-                .contractId(donMuaHangDTO.getDienGiai().split("-")[1].trim())
-                .productId(donMuaHangDTO.getMaHang())
+                .contractId(purchaseOrderDTO.getDescription().split("-")[1].trim())
+                .productId(purchaseOrderDTO.getProductId())
                 .port(port)
                 .bank(bank)
-                .orderQuantity(donMuaHangDTO.getSoLuongDatHang())
-                .receivedQuantity(donMuaHangDTO.getSoLuongDaNhan())
-                .price(donMuaHangDTO.getDonGia())
-                .lcDate(donMuaHangDTO.getNgayMoLC().atStartOfDay(ZoneId.of("UTC")))
-                .orderCode(donMuaHangDTO.getSoDonHang())
-                .providerCode(donMuaHangDTO.getMaNhaCungCap())
+                .orderQuantity(purchaseOrderDTO.getOrderQuantity())
+                .receivedQuantity(purchaseOrderDTO.getReceivedQuantity())
+                .unitPrice(purchaseOrderDTO.getUnitPrice())
+                .lcDate(purchaseOrderDTO.getLcDate().atStartOfDay(ZoneId.of("UTC")))
+                .orderCode(purchaseOrderDTO.getOrderCode())
+                .providerCode(purchaseOrderDTO.getProviderCode())
                 .build();
 
     }

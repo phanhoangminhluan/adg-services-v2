@@ -4,7 +4,9 @@ import com.adg.api.department.Accounting.enums.Module;
 import com.adg.api.department.Accounting.enums.SlackAuthor;
 import com.adg.api.department.Accounting.service.SlackService;
 import com.adg.api.department.InternationalPayment.disbursement.office.excel.ExcelReader;
-import com.adg.api.department.InternationalPayment.inventory.dto.DonMuaHangDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.FilePurchaseOrderDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
+import com.adg.api.department.InternationalPayment.inventory.service.BankService;
 import com.adg.api.util.ZipUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,10 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -46,8 +45,11 @@ public class DonMuaHangService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Autowired
+    private BankService bankService;
 
-    public Pair<Map<String, Object>, Map<String, Object>> parseFile(InputStream inputStream) {
+
+    public Pair<List<PurchaseOrderDTO>, Map<String, Object>> parseFile(InputStream inputStream) {
         List<File> files = new ArrayList<>();
         List<Map<String, Object>> filesInfo = new ArrayList<>();
         Map<String, Object> dmhStats = new HashMap<>();
@@ -57,7 +59,7 @@ public class DonMuaHangService {
             for (File f : files) {
                 String fileName = f.getName();
                 long fileSize = Files.size(f.toPath());
-                if (f.getName().toLowerCase().startsWith("dmh")) {
+                if (f.getName().toLowerCase().endsWith("xls") || f.getName().toLowerCase().endsWith("xlsx")) {
                     donMuaHangFilePath = f.getAbsolutePath();
                     filesInfo.add(MapUtils.ImmutableMap()
                             .put("name", fileName)
@@ -69,11 +71,9 @@ public class DonMuaHangService {
 
             Pair<List<Map<String, Object>>, Map<String, Object>> donMuaHangPair = this.parseDonMuaHangFile(donMuaHangFilePath);
             dmhStats = donMuaHangPair.getSecond();
-            List<DonMuaHangDTO> donMuaHangDTO = objectMapper.readValue(JsonUtils.toJson(donMuaHangPair.getFirst()), new TypeReference<>() {});
+            List<PurchaseOrderDTO> purchaseOrderDTO = objectMapper.readValue(JsonUtils.toJson(donMuaHangPair.getFirst()), new TypeReference<>() {});
             return Pair.of(
-                    MapUtils.ImmutableMap()
-                            .put("dmh", donMuaHangDTO)
-                            .build(),
+                    purchaseOrderDTO,
                     MapUtils.ImmutableMap()
                             .put("filesInfo", filesInfo)
                             .put("dmhStats", dmhStats)
@@ -84,11 +84,7 @@ public class DonMuaHangService {
             exception.printStackTrace();
             log.error("Error while read Bidv File. Exception message: {}. Exception stacktrace: {}", exception.getMessage(), LogUtils.getStackTrace(exception));
             return Pair.of(
-                    MapUtils.ImmutableMap()
-                            .put("dmh", List.of())
-                            .put("exceptionMessage", exception.getMessage())
-                            .put("exceptionStackTrace", LogUtils.getStackTrace(exception))
-                            .build(),
+                    List.of(),
                     MapUtils.ImmutableMap()
                             .put("filesInfo", filesInfo)
                             .put("dmhStats", dmhStats)
@@ -118,17 +114,17 @@ public class DonMuaHangService {
                 .put("records", actualRecords)
                 .build());
 
-        List<Map<String, Object>> deAccentedRecords = new ArrayList<>();
+        List<Map<String, Object>> englishRecords = new ArrayList<>();
         for (Map<String, Object> record : actualRecords) {
-            deAccentedRecords.add(this.deAccentAllKeys(record));
+            englishRecords.add(this.transformToEnglishFields(record));
         }
 
         stats.put("fileName", fileDonMuaHangPath.substring(fileDonMuaHangPath.lastIndexOf("/") + 1));
         stats.put("fileSize", NumberUtils.formatNumber1(Files.size(Path.of(fileDonMuaHangPath))));
-        stats.put("recordSize", deAccentedRecords.size());
+        stats.put("recordSize", englishRecords.size());
         stats.put("parseDuration", DateTimeUtils.getRunningTimeInSecond(t1));
 
-        return Pair.of(deAccentedRecords, stats);
+        return Pair.of(englishRecords, stats);
     }
 
     private void validateFileDonMuaHang(Map<String, Object> output) {
@@ -225,7 +221,7 @@ public class DonMuaHangService {
         return messages;
     }
 
-    public void sendParseFileNotification(Map<String, Object> payload, long receivedAt, MultipartFile file, Map<String, Object> stats) {
+    public void sendParseFileNotification(FilePurchaseOrderDTO payload, long receivedAt, MultipartFile file, Map<String, Object> stats) {
         StringBuilder msgSb = new StringBuilder();
 
         Map<String, Object> dmhStats = MapUtils.getMapStringObject(stats, "dmhStats");
@@ -252,6 +248,14 @@ public class DonMuaHangService {
         Map<String, Object> deAccentedRecord = new HashMap<>();
         record.forEach((key, val) -> deAccentedRecord.put(StringUtils.makeCamelCase(key.replaceAll("đ", "d").replaceAll("Đ", "D")), val));
         return deAccentedRecord;
+    }
+
+    private Map<String, Object> transformToEnglishFields(Map<String, Object> record) {
+        Map<String, Object> output = new HashMap<>();
+        Arrays.stream(DonMuaHangHeaderMetadata.values())
+                .filter(donMuaHangHeaderMetadata -> Objects.nonNull(donMuaHangHeaderMetadata.englishName))
+                .forEach(header -> output.put(header.englishName, MapUtils.getString(record, header.name)));
+        return output;
     }
 
 

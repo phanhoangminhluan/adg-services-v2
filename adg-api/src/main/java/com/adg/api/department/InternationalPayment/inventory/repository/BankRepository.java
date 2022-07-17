@@ -13,6 +13,6 @@ import java.util.UUID;
 @Repository
 public interface BankRepository extends JpaRepository<Bank, UUID> {
 
-    Bank findByName(String name);
+    Bank findByOtherName(String name);
 
 }

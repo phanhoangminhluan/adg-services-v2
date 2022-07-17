@@ -32,7 +32,7 @@ public class OrderDTO {
                 .id(order.getId())
                 .contractId(order.getContractId())
                 .productId(order.getProductId())
-                .price(order.getPrice())
+                .price(order.getUnitPrice())
                 .totalStockQuantity(order.getReceivedQuantity() - totalReleaseQuantity)
                 .totalReleaseQuantity(totalReleaseQuantity)
                 .lcDate(order.getLcDate().toLocalDate())

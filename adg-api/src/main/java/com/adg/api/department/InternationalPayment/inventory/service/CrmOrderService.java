@@ -1,26 +1,28 @@
 package com.adg.api.department.InternationalPayment.inventory.service;
 
-import com.adg.api.department.InternationalPayment.inventory.dto.DonMuaHangDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.FilePurchaseOrderDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.OrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.entity.Bank;
 import com.adg.api.department.InternationalPayment.inventory.entity.Order;
 import com.adg.api.department.InternationalPayment.inventory.entity.Storage;
 import com.adg.api.department.InternationalPayment.inventory.repository.CrmOrderRepository;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.merlin.asset.core.utils.JsonUtils;
-import com.merlin.asset.core.utils.MapUtils;
+import com.adg.api.general.http.ResponseWrapper;
+import com.merlin.asset.core.utils.DateTimeUtils;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -28,12 +30,14 @@ import java.util.stream.Collectors;
  * Created on: 2022.07.11 01:50
  */
 @Service
+//@DependsOn(value = {"customFilter"})
 public class CrmOrderService {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private CrmOrderRepository repository;
+
+    @Autowired
+    private ResponseWrapper responseWrapper;
 
     @Autowired
     private StorageService storageService;
@@ -46,19 +50,37 @@ public class CrmOrderService {
 
     @SneakyThrows
     @Transactional
-    public List<Order> insertDonMuaHangRecord(Map<String, Object> donMuaHangRequest) {
+    public ResponseEntity insertDonMuaHangRecord(FilePurchaseOrderDTO filePurchaseOrderDTO) {
 
-        List<Map<String, Object>> donMuaHang = MapUtils.getListMapStringObject(donMuaHangRequest, "data.dmh");
-        String portName = MapUtils.getString(donMuaHangRequest, "data.port");
-        List<DonMuaHangDTO> donMuaHangDTOs = this.objectMapper.readValue(JsonUtils.toJson(donMuaHang), new TypeReference<>() {});
+        String portId = filePurchaseOrderDTO.getPortId().toString();
+        List<PurchaseOrderDTO> purchaseOrderDTOS = filePurchaseOrderDTO.getPurchaseOrders();
 
-        List<Order> orders = donMuaHangDTOs.stream().map(donMuaHangDTO -> {
-            Bank bank = this.bankService.findByName(donMuaHangDTO.getNganHangMoLC());
-            Storage port = this.storageService.findByName(portName);
-            return Order.newInstance(donMuaHangDTO, bank, port);
+        List<Order> orders = purchaseOrderDTOS.stream().map(purchaseOrderDTO -> {
+            Bank bank = this.bankService.findById(filePurchaseOrderDTO.getBankId());
+            Storage port = this.storageService.findById(UUID.fromString(portId));
+            return Order.newInstance(purchaseOrderDTO, bank, port);
         }).collect(Collectors.toList());
+        List<String> errorMessages = new ArrayList<>();
 
-        return this.repository.saveAll(orders);
+        for (Order order : orders) {
+            Optional<Order> orderOptional = this.repository.findByContractIdAndProductId(order.getContractId(), order.getProductId());
+            if (!orderOptional.isEmpty()) {
+                Order savedBeforeOrder = orderOptional.get();
+                String errorMsg = String.format(
+                        "This order (contract_id: '%s', product_id: '%s') had been inserted on '%s'.",
+                        savedBeforeOrder.getContractId(),
+                        savedBeforeOrder.getProductId(),
+                        DateTimeUtils.convertZonedDateTimeToFormat(savedBeforeOrder.getUpdatedAt().atZone(ZoneId.of("Asia/Ho_Chi_Minh")), "Asia/Ho_Chi_Minh", DateTimeUtils.FMT_01)
+                );
+                errorMessages.add(errorMsg);
+            }
+        }
+        if (!errorMessages.isEmpty()) {
+            return this.responseWrapper.error(ResponseWrapper.NULL_DATA, errorMessages);
+        }
+        List<Order> savedOrders = this.repository.saveAll(orders);
+
+        return this.responseWrapper.ok(ResponseWrapper.NULL_DATA, String.format("There are %s entities that were saved", savedOrders.size()));
     }
 
     public GetOrderByPortDTO getOrderByPort(String port, int pageIndex, int pageSize) {
