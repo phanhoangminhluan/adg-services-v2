@@ -75,7 +75,7 @@ public class OrderTrackingController {
         return this.crmOrderService.insertDonMuaHangRecord(filePurchaseOrderDTO);
     }
 
-    @GetMapping("inventory")
+    @GetMapping
     @SneakyThrows
     private GetOrderByPortDTO getOrdersByPort(@RequestParam("port") String port, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
         return this.crmOrderService.getOrderByPort(port, pageIndex, pageSize);
