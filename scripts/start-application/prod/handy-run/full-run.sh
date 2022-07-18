@@ -35,7 +35,7 @@ mvn clean install
 echo "STEP 3: STOP OLD INSTANCE"
 sudo kill -9 `sudo lsof -t -i:443`
 
-echo "STEP 3: START NEW INSTANCE"
+echo "STEP 4: START NEW INSTANCE"
 
 nohup java \
     -Xms256M \
