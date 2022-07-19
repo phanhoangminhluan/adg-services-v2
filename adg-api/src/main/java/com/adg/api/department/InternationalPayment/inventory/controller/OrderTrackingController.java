@@ -86,7 +86,7 @@ public class OrderTrackingController {
     }
 
     @GetMapping("{orderId}/transaction")
-    public ResponseEntity<ResponseDTO<List<LayeredTransactionHistoryDTO>>> getTransactionByOrderId(@PathVariable String orderId, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
+    public ResponseEntity<ResponseDTO<List<LayeredTransactionHistoryDTO>>> getTransactionByOrderId(@PathVariable String orderId) {
 
         List<LayeredTransactionHistoryDTO> transactionHistoryDTOs = List.of(
                 LayeredTransactionHistoryDTO.builder()

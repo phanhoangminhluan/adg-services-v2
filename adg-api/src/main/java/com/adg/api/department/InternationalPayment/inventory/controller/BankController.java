@@ -9,10 +9,7 @@ import com.adg.api.department.InternationalPayment.inventory.service.OrderTransa
 import com.adg.api.general.http.ResponseWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -43,7 +40,7 @@ public class BankController {
     }
 
     @GetMapping("{bankId}/transaction")
-    public ResponseEntity<ResponseDTO<PaginationTransactionHistoryDTO>> getTransactionsByBank() {
+    public ResponseEntity<ResponseDTO<PaginationTransactionHistoryDTO>> getTransactionsByBank(@PathVariable String bankId,  @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
         List<TransactionHistoryDTO> transactions = List.of(
                 TransactionHistoryDTO.builder()
                         .id(UUID.randomUUID())
