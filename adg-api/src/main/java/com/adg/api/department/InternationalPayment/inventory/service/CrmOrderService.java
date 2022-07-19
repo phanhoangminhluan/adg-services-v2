@@ -1,7 +1,9 @@
 package com.adg.api.department.InternationalPayment.inventory.service;
 
 import com.adg.api.department.InternationalPayment.inventory.dto.FilePurchaseOrderDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.OrderNoteDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.ResponseDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.OrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.entity.Bank;
@@ -19,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -97,6 +96,32 @@ public class CrmOrderService {
                 .totalRecords(orderPage.getTotalElements())
                 .totalPages(orderPage.getTotalPages())
                 .build();
+    }
+
+    @Transactional
+    public ResponseEntity<ResponseDTO<Set<UUID>>> updateNote(List<OrderNoteDTO> orderNoteDTOS) {
+
+        Map<UUID, String> orderNoteMap = new HashMap<>();
+        for (OrderNoteDTO orderNoteDTO : orderNoteDTOS) {
+            orderNoteMap.put(orderNoteDTO.getOrderId(), orderNoteDTO.getNote());
+        }
+
+        List<Order> orders = this.repository.findAllById(orderNoteMap.keySet());
+
+        Set<UUID> availableIDs = orders.stream().map(Order::getId).collect(Collectors.toSet());
+
+        if (orders.size() != orderNoteMap.keySet().size()) {
+            Set<UUID> errorIds = orderNoteMap.keySet()
+                    .stream()
+                    .filter(orderId -> !availableIDs.contains(orderId))
+                    .collect(Collectors.toSet());
+            return this.responseWrapper.error(errorIds, String.format("There are %s order_id does not exist", errorIds.size()));
+        }
+
+        orders.forEach(order -> order.setNote(orderNoteMap.get(order.getId())));
+        this.repository.saveAll(orders);
+
+        return this.responseWrapper.ok(availableIDs, String.format("%s orders with note have been updated", availableIDs.size()));
     }
 
 }

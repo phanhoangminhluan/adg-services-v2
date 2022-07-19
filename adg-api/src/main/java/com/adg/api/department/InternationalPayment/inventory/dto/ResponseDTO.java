@@ -64,4 +64,10 @@ public class ResponseDTO<T> {
                 .build();
     }
 
+    public static <T> ResponseDTO<T> newErrorInstance(@Nullable T data, String errorMessage) {
+        return ResponseDTO.<T>builder()
+                .data(data)
+                .messages(List.of(errorMessage))
+                .build();
+    }
 }

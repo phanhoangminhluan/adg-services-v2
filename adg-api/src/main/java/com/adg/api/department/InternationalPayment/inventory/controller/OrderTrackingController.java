@@ -1,9 +1,6 @@
 package com.adg.api.department.InternationalPayment.inventory.controller;
 
-import com.adg.api.department.InternationalPayment.inventory.dto.FilePurchaseOrderDTO;
-import com.adg.api.department.InternationalPayment.inventory.dto.LayeredTransactionHistoryDTO;
-import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
-import com.adg.api.department.InternationalPayment.inventory.dto.ResponseDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.*;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.marker_validator.InsertPurchaseOrderValidator;
 import com.adg.api.department.InternationalPayment.inventory.service.CrmOrderService;
@@ -21,9 +18,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -83,6 +82,11 @@ public class OrderTrackingController {
     @SneakyThrows
     private GetOrderByPortDTO getOrdersByPort(@RequestParam("portId") String portId, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
         return this.crmOrderService.getOrderByPort(portId, pageIndex, pageSize);
+    }
+
+    @PutMapping("update-note")
+    public ResponseEntity<ResponseDTO<Set<UUID>>> updateNote(@RequestBody @Valid OrderNoteRequestDTO orderNoteRequestDTO) {
+        return this.crmOrderService.updateNote(orderNoteRequestDTO.getOrders());
     }
 
     @GetMapping("{orderId}/transaction")

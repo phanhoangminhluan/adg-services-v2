@@ -34,4 +34,7 @@ public class ResponseWrapper {
         return ResponseEntity.badRequest().body(ResponseDTO.newErrorInstance(data, messageDetails));
     }
 
+    public <T> ResponseEntity<ResponseDTO<T>> error(T data, String messageDetail) {
+        return ResponseEntity.badRequest().body(ResponseDTO.newErrorInstance(data, messageDetail));
+    }
 }
