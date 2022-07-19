@@ -31,11 +31,14 @@ echo ""
 
 echo "STEP 2: BUILD CODE"
 mvn clean install
+echo ""
 
 echo "STEP 3: STOP OLD INSTANCE"
 sudo kill -9 `sudo lsof -t -i:443`
+echo ""
 
 echo "STEP 4: START NEW INSTANCE"
+
 
 nohup java \
     -Xms256M \
@@ -43,5 +46,5 @@ nohup java \
     -Dspring.profiles.active="$ACTIVE_PROFILE-$MODE" \
     -DLOG_DIR="$LOG_DIR" \
     -jar "$JAR_PATH" \
-    com.adg.server.AdgServerApplication "$ACTIVE_PROFILE"
+    com.adg.server.AdgServerApplication "$ACTIVE_PROFILE" &
 
