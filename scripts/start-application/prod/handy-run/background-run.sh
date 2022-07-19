@@ -45,5 +45,5 @@ nohup java \
     -Dspring.profiles.active="$ACTIVE_PROFILE-$MODE" \
     -DLOG_DIR="$LOG_DIR" \
     -jar "$JAR_PATH" \
-    com.adg.server.AdgServerApplication "$ACTIVE_PROFILE"
+    com.adg.server.AdgServerApplication "$ACTIVE_PROFILE" &
 
