@@ -22,4 +22,6 @@ public interface CrmOrderRepository extends JpaRepository<Order, UUID> {
 
     Optional<Order> findByContractIdAndProductId(String contractId, String productId);
 
+    @Query(value = "SELECT o FROM Order o WHERE o.port.id = :portId")
+    Page<Order> getOrdersByPortId(UUID portId, Pageable pageable);
 }

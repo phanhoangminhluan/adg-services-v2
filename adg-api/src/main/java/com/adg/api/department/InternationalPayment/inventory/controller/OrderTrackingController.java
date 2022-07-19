@@ -1,7 +1,9 @@
 package com.adg.api.department.InternationalPayment.inventory.controller;
 
 import com.adg.api.department.InternationalPayment.inventory.dto.FilePurchaseOrderDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.LayeredTransactionHistoryDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.ResponseDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.marker_validator.InsertPurchaseOrderValidator;
 import com.adg.api.department.InternationalPayment.inventory.service.CrmOrderService;
@@ -19,8 +21,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Minh-Luan H. Phan
@@ -77,8 +81,110 @@ public class OrderTrackingController {
 
     @GetMapping
     @SneakyThrows
-    private GetOrderByPortDTO getOrdersByPort(@RequestParam("port") String port, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
-        return this.crmOrderService.getOrderByPort(port, pageIndex, pageSize);
+    private GetOrderByPortDTO getOrdersByPort(@RequestParam("portId") String portId, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
+        return this.crmOrderService.getOrderByPort(portId, pageIndex, pageSize);
+    }
+
+    @GetMapping("{orderId}/transaction")
+    public ResponseEntity<ResponseDTO<List<LayeredTransactionHistoryDTO>>> getTransactionByOrderId(@PathVariable String orderId, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
+
+        List<LayeredTransactionHistoryDTO> transactionHistoryDTOs = List.of(
+                LayeredTransactionHistoryDTO.builder()
+                        .id(UUID.randomUUID())
+                        .orderId(UUID.randomUUID())
+                        .sourceStorageId(UUID.randomUUID())
+                        .targetStorageId(UUID.randomUUID())
+                        .releaseDate(ZonedDateTime.now())
+                        .releaseQuantity(200)
+                        .bankId(UUID.randomUUID())
+                        .parentId(UUID.randomUUID())
+                        .children(List.of(
+                                LayeredTransactionHistoryDTO.builder()
+                                        .id(UUID.randomUUID())
+                                        .orderId(UUID.randomUUID())
+                                        .sourceStorageId(UUID.randomUUID())
+                                        .targetStorageId(UUID.randomUUID())
+                                        .bankId(UUID.randomUUID())
+                                        .parentId(UUID.randomUUID())
+                                        .releaseDate(ZonedDateTime.now())
+                                        .releaseQuantity(150).build(),
+                                LayeredTransactionHistoryDTO.builder()
+                                        .id(UUID.randomUUID())
+                                        .orderId(UUID.randomUUID())
+                                        .sourceStorageId(UUID.randomUUID())
+                                        .targetStorageId(UUID.randomUUID())
+                                        .bankId(UUID.randomUUID())
+                                        .parentId(UUID.randomUUID())
+                                        .releaseDate(ZonedDateTime.now())
+                                        .releaseQuantity(50).build()
+                        ))
+                        .note("Nothing to note")
+                        .build(),
+                LayeredTransactionHistoryDTO.builder()
+                        .id(UUID.randomUUID())
+                        .orderId(UUID.randomUUID())
+                        .sourceStorageId(UUID.randomUUID())
+                        .targetStorageId(UUID.randomUUID())
+                        .releaseDate(ZonedDateTime.now())
+                        .bankId(UUID.randomUUID())
+                        .parentId(UUID.randomUUID())
+                        .releaseQuantity(200)
+                        .children(List.of(
+                                LayeredTransactionHistoryDTO.builder()
+                                        .id(UUID.randomUUID())
+                                        .orderId(UUID.randomUUID())
+                                        .sourceStorageId(UUID.randomUUID())
+                                        .bankId(UUID.randomUUID())
+                                        .parentId(UUID.randomUUID())
+                                        .targetStorageId(UUID.randomUUID())
+                                        .releaseDate(ZonedDateTime.now())
+                                        .releaseQuantity(150).build(),
+                                LayeredTransactionHistoryDTO.builder()
+                                        .id(UUID.randomUUID())
+                                        .orderId(UUID.randomUUID())
+                                        .sourceStorageId(UUID.randomUUID())
+                                        .bankId(UUID.randomUUID())
+                                        .parentId(UUID.randomUUID())
+                                        .targetStorageId(UUID.randomUUID())
+                                        .releaseDate(ZonedDateTime.now())
+                                        .releaseQuantity(50).build()
+                        ))
+                        .note("Nothing to note")
+                        .build(),
+                LayeredTransactionHistoryDTO.builder()
+                        .id(UUID.randomUUID())
+                        .bankId(UUID.randomUUID())
+                        .parentId(UUID.randomUUID())
+                        .orderId(UUID.randomUUID())
+                        .sourceStorageId(UUID.randomUUID())
+                        .targetStorageId(UUID.randomUUID())
+                        .releaseDate(ZonedDateTime.now())
+                        .releaseQuantity(200)
+                        .children(List.of(
+                                LayeredTransactionHistoryDTO.builder()
+                                        .id(UUID.randomUUID())
+                                        .orderId(UUID.randomUUID())
+                                        .sourceStorageId(UUID.randomUUID())
+                                        .targetStorageId(UUID.randomUUID())
+                                        .bankId(UUID.randomUUID())
+                                        .parentId(UUID.randomUUID())
+                                        .releaseDate(ZonedDateTime.now())
+                                        .releaseQuantity(150).build(),
+                                LayeredTransactionHistoryDTO.builder()
+                                        .id(UUID.randomUUID())
+                                        .orderId(UUID.randomUUID())
+                                        .sourceStorageId(UUID.randomUUID())
+                                        .targetStorageId(UUID.randomUUID())
+                                        .bankId(UUID.randomUUID())
+                                        .parentId(UUID.randomUUID())
+                                        .releaseDate(ZonedDateTime.now())
+                                        .releaseQuantity(50).build()
+                        ))
+                        .note("Nothing to note")
+                        .build()
+        );
+
+        return this.responseWrapper.ok(transactionHistoryDTOs);
     }
 
 }

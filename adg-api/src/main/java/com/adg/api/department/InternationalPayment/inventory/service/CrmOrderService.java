@@ -83,8 +83,8 @@ public class CrmOrderService {
         return this.responseWrapper.ok(ResponseWrapper.NULL_DATA, String.format("There are %s entities that were saved", savedOrders.size()));
     }
 
-    public GetOrderByPortDTO getOrderByPort(String port, int pageIndex, int pageSize) {
-        Page<Order> orderPage = this.repository.getOrdersByPortName(port, PageRequest.of(pageIndex, pageSize));
+    public GetOrderByPortDTO getOrderByPort(String portId, int pageIndex, int pageSize) {
+        Page<Order> orderPage = this.repository.getOrdersByPortId(UUID.fromString(portId), PageRequest.of(pageIndex, pageSize));
         List<OrderDTO> orderDTOs = new ArrayList<>();
 
         for (Order order : orderPage.getContent()) {

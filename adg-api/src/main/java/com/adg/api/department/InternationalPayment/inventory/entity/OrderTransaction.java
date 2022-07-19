@@ -34,8 +34,8 @@ public class OrderTransaction extends BaseEntity {
     private Storage targetStorage;
 
     @ManyToOne
-    @JoinColumn(name = "prev_order_transaction_id", referencedColumnName = "id")
-    private OrderTransaction prevOrderTransaction;
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    private OrderTransaction parent;
 
     private double releaseQuantity;
 
