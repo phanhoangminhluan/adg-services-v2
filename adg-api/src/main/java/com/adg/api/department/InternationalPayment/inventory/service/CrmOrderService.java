@@ -1,9 +1,6 @@
 package com.adg.api.department.InternationalPayment.inventory.service;
 
-import com.adg.api.department.InternationalPayment.inventory.dto.FilePurchaseOrderDTO;
-import com.adg.api.department.InternationalPayment.inventory.dto.OrderNoteDTO;
-import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
-import com.adg.api.department.InternationalPayment.inventory.dto.ResponseDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.*;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.OrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.entity.Bank;
@@ -121,6 +118,14 @@ public class CrmOrderService {
         this.repository.saveAll(orders);
 
         return this.responseWrapper.ok(availableIDs, String.format("%s orders with note have been updated", availableIDs.size()));
+    }
+
+    public ProductReleaseResultDTO releaseProduct(String orderId, ProductReleaseDTO productReleaseDTO) {
+        return ProductReleaseResultDTO.builder().stockedProducts(100).build();
+    }
+
+    public ProductReleaseResultDTO countStockedProducts(String orderId) {
+        return ProductReleaseResultDTO.builder().stockedProducts(100).build();
     }
 
 }

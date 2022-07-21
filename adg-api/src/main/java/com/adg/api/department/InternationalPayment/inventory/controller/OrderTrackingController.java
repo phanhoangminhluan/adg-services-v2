@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,18 @@ public class OrderTrackingController {
     public ResponseEntity<ResponseDTO<Set<UUID>>> updateNote(@RequestBody @Valid OrderNoteRequestDTO orderNoteRequestDTO) {
         return this.crmOrderService.updateNote(orderNoteRequestDTO.getOrders());
     }
+
+    @PostMapping("{orderId}/release")
+    public ResponseEntity releaseProduct(@PathVariable String orderId, @RequestBody @Valid ProductReleaseDTO productReleaseDTO) {
+        return this.responseWrapper.ok(this.crmOrderService.releaseProduct(orderId, productReleaseDTO));
+    }
+
+
+    @GetMapping("{orderId}/count-stocked-products")
+    public ResponseEntity countStockedProducts(@PathVariable @NotNull String orderId) {
+        return this.responseWrapper.ok(this.crmOrderService.countStockedProducts(orderId));
+    }
+
 
     @GetMapping("{orderId}/transaction")
     public ResponseEntity<ResponseDTO<List<LayeredTransactionHistoryDTO>>> getTransactionByOrderId(@PathVariable String orderId) {
