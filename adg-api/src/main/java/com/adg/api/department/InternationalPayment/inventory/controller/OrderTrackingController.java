@@ -1,8 +1,9 @@
 package com.adg.api.department.InternationalPayment.inventory.controller;
 
 import com.adg.api.department.InternationalPayment.inventory.dto.*;
-import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.marker_validator.InsertPurchaseOrderValidator;
+import com.adg.api.department.InternationalPayment.inventory.dto.order_filter.OrderFilter;
 import com.adg.api.department.InternationalPayment.inventory.service.CrmOrderService;
 import com.adg.api.department.InternationalPayment.inventory.service.reader.DonMuaHangService;
 import com.adg.api.general.http.ResponseWrapper;
@@ -80,8 +81,13 @@ public class OrderTrackingController {
 
     @GetMapping
     @SneakyThrows
-    private GetOrderByPortDTO getOrdersByPort(@RequestParam("portId") String portId, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
+    public GetOrderDTO getOrdersByPort(@RequestParam("portId") String portId, @RequestParam("pageIndex") int pageIndex, @RequestParam("pageSize") int pageSize) {
         return this.crmOrderService.getOrderByPort(portId, pageIndex, pageSize);
+    }
+
+    @PutMapping("filter")
+    public ResponseEntity getOrders(@RequestBody @Valid OrderFilter orderFilter) {
+        return this.responseWrapper.ok(this.crmOrderService.getOrderByPort("8c89b282-dbde-40eb-98af-c8ba55cd1757", 0, 3));
     }
 
     @PutMapping("update-note")

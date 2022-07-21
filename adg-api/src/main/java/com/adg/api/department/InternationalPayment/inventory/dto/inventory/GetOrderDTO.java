@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-public class GetOrderByPortDTO {
+public class GetOrderDTO {
 
     private List<OrderDTO> orders;
     private int totalPages;

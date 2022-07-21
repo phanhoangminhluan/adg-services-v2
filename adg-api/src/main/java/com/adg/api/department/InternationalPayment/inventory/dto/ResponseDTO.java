@@ -57,6 +57,13 @@ public class ResponseDTO<T> {
                 .build();
     }
 
+    public static <T> ResponseDTO<T> newErrorInstance(T data, Exception exception) {
+        return ResponseDTO.<T>builder()
+                .data(data)
+                .messages(List.of(exception.getClass().getName(), ERROR_MSG))
+                .build();
+    }
+
     public static <T> ResponseDTO<T> newErrorInstance(@Nullable T data, List<String> errorMessages) {
         return ResponseDTO.<T>builder()
                 .data(data)

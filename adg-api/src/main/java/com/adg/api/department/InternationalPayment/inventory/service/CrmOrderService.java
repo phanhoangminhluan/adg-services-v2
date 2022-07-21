@@ -4,7 +4,7 @@ import com.adg.api.department.InternationalPayment.inventory.dto.FilePurchaseOrd
 import com.adg.api.department.InternationalPayment.inventory.dto.OrderNoteDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.PurchaseOrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.ResponseDTO;
-import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderByPortDTO;
+import com.adg.api.department.InternationalPayment.inventory.dto.inventory.GetOrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.dto.inventory.OrderDTO;
 import com.adg.api.department.InternationalPayment.inventory.entity.Bank;
 import com.adg.api.department.InternationalPayment.inventory.entity.Order;
@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
  * Created on: 2022.07.11 01:50
  */
 @Service
-//@DependsOn(value = {"customFilter"})
 public class CrmOrderService {
 
     @Autowired
@@ -82,7 +81,7 @@ public class CrmOrderService {
         return this.responseWrapper.ok(ResponseWrapper.NULL_DATA, String.format("There are %s entities that were saved", savedOrders.size()));
     }
 
-    public GetOrderByPortDTO getOrderByPort(String portId, int pageIndex, int pageSize) {
+    public GetOrderDTO getOrderByPort(String portId, int pageIndex, int pageSize) {
         Page<Order> orderPage = this.repository.getOrdersByPortId(UUID.fromString(portId), PageRequest.of(pageIndex, pageSize));
         List<OrderDTO> orderDTOs = new ArrayList<>();
 
@@ -91,7 +90,7 @@ public class CrmOrderService {
             orderDTOs.add(OrderDTO.newInstance(order, totalReleaseQuantity));
         }
 
-        return GetOrderByPortDTO.builder()
+        return GetOrderDTO.builder()
                 .orders(orderDTOs)
                 .totalRecords(orderPage.getTotalElements())
                 .totalPages(orderPage.getTotalPages())
