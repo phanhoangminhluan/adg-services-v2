@@ -40,7 +40,8 @@ public class PhieuNhapKhoService {
             List<Map<String, Object>> records = MapUtils.getListMapStringObject(output, "records");
 
 
-            Map<String, Object> descriptionMap = this.parsePhieuNhapKhoDescription(excelReader);
+//            Map<String, Object> descriptionMap = this.parsePhieuNhapKhoDescription(excelReader);
+            Map<String, Object> descriptionMap = this.parsePhieuNhapKhoDescription_V2(excelReader);
             int totalRecordOfEachFile = 0;
             for (Map<String, Object> record : records) {
 
@@ -179,6 +180,83 @@ public class PhieuNhapKhoService {
         output.put(PhieuNhapKhoHeaderMetadata.NgayChungTu.deAccentedName, DateTimeUtils.convertZonedDateTimeToFormat(zdt, "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_03)));
         output.put(PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName, ncc);
         return output;
+    }
+
+    private Map<String, Object> parsePhieuNhapKhoDescription_V2(ExcelReader excelReader) {
+        Map<String, Object> output = new HashMap<>();
+
+        String sohoaDon = this.parseSoHoaDonCell(excelReader);
+        String ngayChungTu = this.parseNgayChungTuCell(excelReader);
+        String nhaCungCap = this.parseNccCell(excelReader);
+
+        output.put(PhieuNhapKhoHeaderMetadata.SoHoaDon.deAccentedName, sohoaDon);
+        output.put(PhieuNhapKhoHeaderMetadata.NgayChungTu.deAccentedName, ngayChungTu);
+        output.put(PhieuNhapKhoHeaderMetadata.NhaCungCap.deAccentedName, nhaCungCap);
+
+        return output;
+    }
+
+    private String parseNgayChungTuCell(ExcelReader excelReader) {
+        int row = 1;
+        String rawDateStr;
+        do {
+            rawDateStr = excelReader.getCellValueAsString("C" + row);
+            rawDateStr = ParserUtils.toString(rawDateStr).replaceAll(String.valueOf((char) 160), " ");
+            rawDateStr = StringUtils.deAccent(rawDateStr);
+            if (StringUtils.deAccent(rawDateStr).startsWith("Ngay")) {
+                break;
+            }
+            row++;
+        } while (row < 10);
+
+        List<String> arr2 = Arrays.asList(rawDateStr.split(" "))
+                .stream()
+                .filter(str -> (
+                        !str.trim().equalsIgnoreCase("ngay")
+                                && !str.trim().equalsIgnoreCase("thang")
+                                && !str.trim().equalsIgnoreCase("nam")
+                                && !str.trim().equalsIgnoreCase("")))
+                .collect(Collectors.toList());
+
+        ZonedDateTime zdt = ZonedDateTime.of(
+                ParserUtils.toInt(arr2.get(2)),
+                ParserUtils.toInt(arr2.get(1)),
+                ParserUtils.toInt(arr2.get(0)),
+                0,0,0,0, ZoneId.of("Asia/Ho_Chi_Minh")
+        );
+
+        return DateTimeUtils.convertZonedDateTimeToFormat(zdt, "Asia/Ho_Chi_Minh", DateTimeUtils.getFormatterWithDefaultValue(DateTimeUtils.FMT_03));
+    }
+
+    private String parseNccCell(ExcelReader excelReader) {
+        int row = 1;
+        String rawDateStr;
+        do {
+            rawDateStr = excelReader.getCellValueAsString("A" + row);
+            rawDateStr = ParserUtils.toString(rawDateStr).replaceAll(String.valueOf((char) 160), " ");
+            if (StringUtils.deAccent(rawDateStr).startsWith("- Ho va ten nguoi giao:")) {
+                rawDateStr = rawDateStr.split(":")[1].trim();
+                break;
+            }
+            row++;
+        } while (row < 10);
+
+        return rawDateStr;
+    }
+    private String parseSoHoaDonCell(ExcelReader excelReader) {
+        int row = 5;
+        String rawDataStr;
+        do {
+            rawDataStr = excelReader.getCellValueAsString("A" + row);
+            rawDataStr = ParserUtils.toString(rawDataStr).replaceAll(String.valueOf((char) 160), " ");
+            rawDataStr = StringUtils.deAccent(rawDataStr);
+            if (rawDataStr.startsWith("- Theo so hoa don so")) {//- Theo số hóa đơn số
+                rawDataStr = rawDataStr.replace("- Theo so hoa don so", "").trim();
+                break;
+            }
+            row++;
+        } while (row < 15);
+        return rawDataStr;
     }
 
 }
